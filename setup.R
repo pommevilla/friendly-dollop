@@ -35,5 +35,15 @@ data.raw.long <- data.raw %>%
 
 data.priming.long$sample_id <- fct_reorder(data.priming.long$sample_id, parse_number(data.priming.long$sample_id))
 
+non_detect_counts <- data.raw.long %>%
+  group_by(fert_level, amoA) %>% 
+  count(CT == 40) %>% 
+  rename(non_detect = `CT == 40`) %>%
+  filter(non_detect == TRUE) 
+
+removes <- non_detect_counts %>% 
+  pivot_wider(names_from = fert_level, values_from = n, names_prefix = "fert.") %>%
+  filter(fert.0 > 30 & fert.336 > 30) %>%
+  pivot_longer(cols = fert.0:fert.336, names_to = "fert_level", values_to = "n")
 
 
