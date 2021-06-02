@@ -1,0 +1,110 @@
+---
+title: "Statistics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reduce full dataset
+
+```{r}
+
+```
+
+
+## Do treatments have a significant effect on community composition?
+
+```{r}
+X <- data.priming.reduced %>% 
+  select(-c(amoA.001:amoA.074))
+Y <- data.priming.reduced %>% 
+  select(amoA.001:amoA.074)
+
+adonis(Y ~ X$fert_level + X$addition + X$crop + X$timepoint) 
+```
+
+## Gene-wise anova
+
+```{r}
+
+data.priming.reduced.long <- data.priming.reduced %>% 
+  select(-sample_id, field_rep) %>% 
+  pivot_longer(cols = amoA.001:amoA.074) 
+
+data.priming.reduced
+
+aov(amoA.001 ~ fert_level * crop * timepoint * addition , data = data.priming.reduced) %>% 
+  broom::tidy()
+aov(model)
+```
+
+```{r}
+lapply(colnames(df)[2:ncol(df)], function(x) as.formula(paste0(x, " ~ Treatment")))
+```
+```{r}
+formulae <- lapply(colnames(data.priming.reduced %>% select(amoA.001:amoA.074)), function(x) as.formula(paste0(x, " ~ fert_level * crop * timepoint * addition")))
+```
+```{r}
+res <- lapply(formulae, function(x) broom::tidy(aov(x, data = data.priming.reduced)))
+names(res) <- format(formulae)
+names(res) <- str_sub(names(res), end = 8)
+```
+
+```{r}
+anova_results <- lapply(seq_along(res), function(i) res[[i]] %>% mutate(gene = names(res)[[i]])) %>% 
+  bind_rows() %>% 
+  filter(term != "Residuals")
+```
+
+```{r}
+anova_results %>% 
+  mutate(sig = case_when(
+    p.value < 0.5 & p.value > 0.1 ~ "*",
+    p.value < 0.1 & p.value > 0.01 ~ "**",
+    p.value < 0.01 ~ "***",
+    TRUE ~ "NS"
+  )) %>% 
+  mutate(gene = str_sub(gene, -3)) %>% 
+  ggplot(aes(gene, term, fill = sig)) + 
+  geom_tile(color = "black") + 
+  coord_equal() + 
+  labs(y = "",
+       x = "amoA",
+       title = "Summary of ANOVA results",
+       fill = "Significance ") + 
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5)
+  ) + 
+  scale_fill_viridis_d(option = "magma", direction = -1)
+```
+
+
+```{r}
+data.priming.reduced.long %>% 
+  group_by(fert_level, name) %>% 
+  summarize(avg_ct = mean(value)) %>% 
+  mutate(gene = str_sub(name, -3), .keep = "unused") %>% 
+  ggplot(aes(gene, avg_ct)) +
+  geom_col() + 
+  facet_wrap(~ fert_level) + 
+  theme(
+    # legend.position = "none",
+    # panel.grid.major.y = element_blank(),
+    # panel.grid.minor.y = element_blank(),
+    panel.grid = element_blank(),
+    # axis.text.x = element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.5),
+    panel.border = element_rect(color = "black", size = 1, fill = NA),
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_y_continuous(limits = c(0, 30), expand = c(0, 0)) + 
+  labs(
+    x = "AmoA",
+    y = "Average CT\n(inverse abundance)",
+    title = "Average CT per treatment"
+  )
+```
+
