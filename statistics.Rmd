@@ -1,11 +1,13 @@
 ---
-title: "Statistics"
-output: html_document
+title: "A short analysis of impact of treatment on corn and *Miscanthus Gigantus*"
+format: 
+  html:
+    code-background: true
+execute:
+  warning: false
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
 source("setup.R")
 ```
 
