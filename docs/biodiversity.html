@@ -190,7 +190,7 @@
 
 <section id="converting-ct-values-to-presence-absence" class="level2">
 <h2 class="anchored" data-anchor-id="converting-ct-values-to-presence-absence">Converting CT values to presence absence</h2>
-<p>We’ll start off our biodiversity analysis by converting the CT values into presence/absence. A CT of 40 indicates that the gene was not detected in that sample. We’ve converted these values to <code>0</code> to show that they are absent in that sample and the remaining values to <code>1</code> to indicate presence. We’re left with</p>
+<p>We’ll start off our biodiversity analysis by converting the CT values into presence/absence. A CT of 40 indicates that the gene was not detected in that sample. We’ve converted these values to <code>0</code> to show that they are absent in that sample and the remaining values to <code>1</code> to indicate presence. After doing the transformations (not shown), we’re left with data that looks like:</p>
 <div class="cell" data-fig.alt="{}">
 <div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>amoA_presence_absence[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-stdout">
