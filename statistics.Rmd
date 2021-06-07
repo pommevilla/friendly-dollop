@@ -47,7 +47,7 @@ removes %>%
   distinct(amoA)
 ```
 
-So we see that we're removing 17 genes. We'll keep it in a long format so we can visualize this:
+So we see that we're removing 17 genes. We'll keep it in a long format so we can visualize them with `ggplot`:
 
 ```{r}
 removes %>% 

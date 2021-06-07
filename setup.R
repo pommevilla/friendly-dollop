@@ -9,7 +9,6 @@ library(scales)
 library(phyloseq)
 library(cowplot)
 library(ggtext)
-library(rio)
 
 ### Functions
 
@@ -47,3 +46,27 @@ removes <- non_detect_counts %>%
   pivot_longer(cols = fert.0:fert.336, names_to = "fert_level", values_to = "n")
 
 
+df <- data.priming[, -1]
+rownames(df) <- data.priming[, 1]
+
+metadata <- df %>% 
+  select(fert_level:field_rep) %>%
+  mutate(across(everything(), as.factor))
+
+
+amoa_counts <- df %>% 
+  select(starts_with("amoA")) 
+
+amoA_presence_absence <- data.raw %>% 
+  select(sample_id, starts_with("amoA")) %>%
+  select(-one_of(removes$amoA)) %>%
+  mutate(across(starts_with("amoA"), ~ ifelse(.x == 40, 0, 1))) %>%
+  column_to_rownames(var = "sample_id")
+
+
+
+
+ps <- phyloseq(
+  otu_table(amoA_presence_absence, taxa_are_rows = FALSE),
+  sample_data(metadata)
+)

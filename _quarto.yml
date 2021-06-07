@@ -1,4 +1,28 @@
 project:
+  type: site
   title: "friendly-dollop"
   output-dir: docs
 
+site:
+  title: "Quarto + RMD + Github Pages Test"
+  sharing: [twitter, facebook, linkedin]
+  repo-url: https://github.com/pommevilla/friendly-dollop
+  sidebar:
+    style: "docked"
+    background: light
+    search: true
+    collapse-level: 3
+    tools:
+      - icon: github
+        href: https://github.com/pommevilla/friendly-dollop
+    contents:
+      - index.Rmd
+      - statistics.Rmd
+      - biodiversity.Rmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    code-link: true
