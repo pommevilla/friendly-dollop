@@ -13,12 +13,11 @@ source("setup.R")
 
 ## Converting CT values to presence absence
 
-We'll start off our biodiversity analysis by converting the CT values into presence/absence. A CT of 40 indicates that the gene was not detected in that sample. We've converted these values to `0` to show that they are absent in that sample and the remaining values to `1` to indicate presence. We're left with 
+We'll start off our biodiversity analysis by converting the CT values into presence/absence. A CT of 40 indicates that the gene was not detected in that sample. We've converted these values to `0` to show that they are absent in that sample and the remaining values to `1` to indicate presence. After doing the transformations (not shown), we're left with data that looks like:
 
 ```{r}
 amoA_presence_absence[1:5, 1:5]
 ```
-
 
 ## Visualizing presence absence
 

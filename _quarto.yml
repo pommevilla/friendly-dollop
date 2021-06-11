@@ -11,7 +11,7 @@ site:
     style: "docked"
     background: light
     search: true
-    collapse-level: 3
+    collapse-level: 2
     tools:
       - icon: github
         href: https://github.com/pommevilla/friendly-dollop
@@ -19,6 +19,7 @@ site:
       - index.Rmd
       - statistics.Rmd
       - biodiversity.Rmd
+      - sample_python.ipynb
 
 format:
   html:

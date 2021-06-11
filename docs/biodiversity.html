@@ -140,12 +140,12 @@
 <div class="row flex-fill" id="quarto-content">
   <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
     <nav class="me-lg-auto py-2 docked  overflow-scroll">
-  <div class="px-3 pt-lg-2 text-left">
+  <div class="px-3 pt-lg-2 mt-1 text-left">
     <div class="sidebar-title mt-1 mb-0 py-0">
       <a href="./">
       Quarto + RMD + Github Pages Test
       </a>
-        <div class="sidebar-tools-main mt-1">
+        <div class="sidebar-tools-main">
     <a href="https://github.com/pommevilla/friendly-dollop" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
 </div>
     </div>
@@ -156,7 +156,7 @@
   <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
 </form>
       </div>
-        <div class="sidebar-tools-collapse mt-1">
+        <div class="sidebar-tools-collapse">
     <a href="https://github.com/pommevilla/friendly-dollop" title="" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
 </div>
     </div>
@@ -170,6 +170,9 @@
 </li>
       <li class="sidebar-item">
   <a href="./biodiversity.html" class="active">Biodiversity analysis</a>
+</li>
+      <li class="sidebar-item">
+  <a href="./sample_python.html" class="">Jupyter Notebook Demo</a>
 </li>
   </ul>
   </div>
@@ -191,7 +194,7 @@
 <section id="converting-ct-values-to-presence-absence" class="level2">
 <h2 class="anchored" data-anchor-id="converting-ct-values-to-presence-absence">Converting CT values to presence absence</h2>
 <p>We’ll start off our biodiversity analysis by converting the CT values into presence/absence. A CT of 40 indicates that the gene was not detected in that sample. We’ve converted these values to <code>0</code> to show that they are absent in that sample and the remaining values to <code>1</code> to indicate presence. After doing the transformations (not shown), we’re left with data that looks like:</p>
-<div class="cell" data-fig.alt="{}">
+<div class="cell">
 <div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>amoA_presence_absence[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-stdout">
 <pre><code>    amoA.001 amoA.002 amoA.003 amoA.004 amoA.005
@@ -206,7 +209,7 @@
 <section id="visualizing-presence-absence" class="level2">
 <h2 class="anchored" data-anchor-id="visualizing-presence-absence">Visualizing presence absence</h2>
 <p>We can plot this data to get an idea of the richness in the samples. We’ll also separate the data by fertilization level to get an idea of the relationship between that treatment and presence/absence.</p>
-<div class="cell" data-fig.alt="{}">
+<div class="cell">
 <div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>amoA_presence_absence <span class="sc">%&gt;%</span> </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"sample_id"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>, <span class="at">names_to =</span> <span class="st">"amoA"</span>, <span class="at">values_to =</span> <span class="st">"presence"</span>) <span class="sc">%&gt;%</span> </span>
