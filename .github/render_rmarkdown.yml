@@ -10,4 +10,3 @@ jobs:
         uses: lc5415/rmarkdown-action@v1
         with:
           input_file: biodiversity.Rmd
-          output_format: pdf_document
