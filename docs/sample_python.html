@@ -3,9 +3,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="author" content="Paul Villanueva">
-  <meta name="dcterms.date" content="2021-06-10">
-  <title>Quarto + RMD + Github Pages Test – Jupyter Notebook Demo</title>
+  <title>Quarto + RMD + Github Pages Test – sample_python</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -120,7 +118,7 @@
     }
 
     .cell-output-display {
-      overflow-x: scroll;
+      overflow-x: auto;
     }
 
     .hidden {
@@ -134,7 +132,7 @@
 <header id="quarto-header" class="headroom fixed-top">
 <nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <div class="container-fluid d-flex justify-content-between">
-    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline">Jupyter Notebook Demo</h1>
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
     <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
       <i class="bi bi-chevron-right"></i>
     </button>
@@ -178,7 +176,7 @@
   <a href="./biodiversity.html" class="">Biodiversity analysis</a>
 </li>
       <li class="sidebar-item">
-  <a href="./sample_python.html" class="active">Jupyter Notebook Demo</a>
+  <a href="./sample_python.html" class="active">Example Python</a>
 </li>
   </ul>
   </div>
@@ -187,28 +185,25 @@
   <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
 <h2 id="toc-title">On this page</h2>
 <ul>
-<li><a href="#example-python" class="nav-link active" data-scroll-target="#example-python">Example Python</a></li>
+<li><a href="#example-python" class="nav-link active" data-scroll-target="#example-python">Example Python</a>
+<ul class="collapse">
+<li><a href="#sample-code" class="nav-link" data-scroll-target="#sample-code">Sample code</a></li>
 <li><a href="#sample-plot" class="nav-link" data-scroll-target="#sample-plot">Sample plot</a></li>
-<li><a href="#ipyleaflet-example" class="nav-link" data-scroll-target="#ipyleaflet-example">IPyLeaflet example</a></li>
+<li><a href="#ipyleaflet-example" class="nav-link" data-scroll-target="#ipyleaflet-example">IPyLeaflet Example</a></li>
+</ul></li>
 </ul>
 </nav></div>
   <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
 <main>
-<header id="title-block-header">
-<h1 class="title d-none d-lg-block display-7">Jupyter Notebook Demo</h1>
-<p class="author">Paul Villanueva</p>
-<p class="date">June 10, 2021</p>
-</header>
 
-<section id="example-python" class="level2">
-<h2 class="anchored" data-anchor-id="example-python">Example Python</h2>
+<section id="example-python" class="level1">
+<h1>Example Python</h1>
+<section id="sample-code" class="level2">
+<h2 class="anchored" data-anchor-id="sample-code">Sample code</h2>
 <div class="cell">
-<p></p><details>
-<summary>Code</summary><p></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python cell-code"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> [x <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="op">*</span>(<span class="ss">f'</span><span class="sc">{x}</span><span class="ss"> squared is </span><span class="sc">{x</span><span class="op">^</span><span class="dv">2</span><span class="sc">}</span><span class="ss">.'</span> <span class="cf">for</span> x <span class="kw">in</span> xs), sep<span class="op">=</span><span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-stdout">
 <pre><code>0 squared is 2.
 1 squared is 3.
@@ -226,8 +221,6 @@
 <section id="sample-plot" class="level2">
 <h2 class="anchored" data-anchor-id="sample-plot">Sample plot</h2>
 <div class="cell">
-<p></p><details>
-<summary>Code</summary><p></p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python cell-code"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> BoundaryNorm</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.ticker <span class="im">import</span> MaxNLocator</span>
@@ -239,28 +232,25 @@
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()<span class="op">;</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.pcolormesh(x, y, Z)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <p><img src="sample_python_files\figure-html/cell-3-output-1.png" width="566" height="404"></p>
 </div>
 </div>
 </section>
 <section id="ipyleaflet-example" class="level2">
-<h2 class="anchored" data-anchor-id="ipyleaflet-example">IPyLeaflet example</h2>
+<h2 class="anchored" data-anchor-id="ipyleaflet-example">IPyLeaflet Example</h2>
 <div class="cell">
-<p></p><details>
-<summary>Code</summary><p></p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python cell-code"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ipyleaflet <span class="im">import</span> Map</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Map(center<span class="op">=</span>[<span class="fl">34.6252978589571</span>, <span class="op">-</span><span class="fl">77.34580993652344</span>], zoom<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"5dabd35adb4948bda656364fb099c68a","version_major":2,"version_minor":0}
+{"model_id":"dc8c027e5db04f3194f67f517af970d6","version_major":2,"version_minor":0}
 </script>
 </div>
 </div>
 <!-- -->
+</section>
 </section>
 </main>
 <div class="page-navigation page-navigation-docked">
@@ -273,7 +263,7 @@
 </div> <!-- /row -->
 </div> <!-- /container fluid -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"01f2571f2a484b8abefdc30fa9d60874":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletZoomControlModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletZoomControlModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletZoomControlView","options":["position","zoom_in_text","zoom_in_title","zoom_out_text","zoom_out_title"],"position":"topleft","zoom_in_text":"+","zoom_in_title":"Zoom in","zoom_out_text":"-","zoom_out_title":"Zoom out"}},"5dabd35adb4948bda656364fb099c68a":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapModel","state":{"_dom_classes":[],"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletMapView","bottom":0,"bounce_at_zoom_limits":true,"box_zoom":true,"center":[34.6252978589571,-77.34580993652344],"close_popup_on_click":true,"controls":["IPY_MODEL_01f2571f2a484b8abefdc30fa9d60874","IPY_MODEL_709ffb0f6123413d97b1d245ac4f8fdc"],"crs":{"custom":false,"name":"EPSG3857"},"default_style":"IPY_MODEL_c25b2a88fe1b4df697593dc72959f745","double_click_zoom":true,"dragging":true,"dragging_style":"IPY_MODEL_62caac4572814df2aeb26bba5cd737ab","east":0,"fullscreen":false,"inertia":true,"inertia_deceleration":3000,"inertia_max_speed":1500,"interpolation":"bilinear","keyboard":true,"keyboard_pan_offset":80,"keyboard_zoom_offset":1,"layers":["IPY_MODEL_be3fc32a221d4938a3c58c86283fe29d"],"layout":"IPY_MODEL_ca50486219b24c0287bf0f01ce03561d","left":9007199254740991,"max_zoom":18,"min_zoom":1,"modisdate":"yesterday","north":0,"options":["bounce_at_zoom_limits","box_zoom","center","close_popup_on_click","double_click_zoom","dragging","fullscreen","inertia","inertia_deceleration","inertia_max_speed","interpolation","keyboard","keyboard_pan_offset","keyboard_zoom_offset","max_zoom","min_zoom","scroll_wheel_zoom","tap","tap_tolerance","touch_zoom","world_copy_jump","zoom","zoom_animation_threshold","zoom_delta","zoom_snap","zoom_start"],"right":0,"scroll_wheel_zoom":false,"south":0,"style":"IPY_MODEL_b53534408ab7440091eafd9d0e5684e7","tap":true,"tap_tolerance":15,"top":9007199254740991,"touch_zoom":true,"west":0,"window_url":"","world_copy_jump":false,"zoom":10,"zoom_animation_threshold":4,"zoom_delta":1,"zoom_snap":1,"zoom_start":12}},"62caac4572814df2aeb26bba5cd737ab":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"move"}},"709ffb0f6123413d97b1d245ac4f8fdc":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletAttributionControlModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletAttributionControlModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletAttributionControlView","options":["position","prefix"],"position":"bottomright","prefix":"ipyleaflet"}},"b53534408ab7440091eafd9d0e5684e7":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"grab"}},"be3fc32a221d4938a3c58c86283fe29d":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletTileLayerModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletTileLayerModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletTileLayerView","attribution":"Map data (c) <a href=\"https://openstreetmap.org\">OpenStreetMap</a> contributors","base":true,"bottom":true,"detect_retina":false,"loading":false,"max_native_zoom":18,"max_zoom":19,"min_native_zoom":0,"min_zoom":1,"name":"","no_wrap":false,"opacity":1,"options":["attribution","detect_retina","max_native_zoom","max_zoom","min_native_zoom","min_zoom","no_wrap","tile_size","tms"],"popup":null,"popup_max_height":null,"popup_max_width":300,"popup_min_width":50,"show_loading":false,"tile_size":256,"tms":false,"url":"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png","visible":true}},"c25b2a88fe1b4df697593dc72959f745":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"grab"}},"ca50486219b24c0287bf0f01ce03561d":{"model_module":"@jupyter-widgets/base","model_module_version":"1.2.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}}},"version_major":2,"version_minor":0}
+{"state":{"1a64c55178194cd5918335bd0381b3b0":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletZoomControlModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletZoomControlModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletZoomControlView","options":["position","zoom_in_text","zoom_in_title","zoom_out_text","zoom_out_title"],"position":"topleft","zoom_in_text":"+","zoom_in_title":"Zoom in","zoom_out_text":"-","zoom_out_title":"Zoom out"}},"464bb495eda64fa7a7b5290adaff4e9e":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"grab"}},"798d07869101457cb89ab048d9f3f3cd":{"model_module":"@jupyter-widgets/base","model_module_version":"1.2.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"1.2.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"overflow_x":null,"overflow_y":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"abfa92cf89b447a2ba1c8e54af44e23b":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"move"}},"aff6b9205b534273a829d5602f2964f6":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapStyleModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"1.2.0","_view_name":"StyleView","cursor":"grab"}},"dc8c027e5db04f3194f67f517af970d6":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletMapModel","state":{"_dom_classes":[],"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletMapModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletMapView","bottom":0,"bounce_at_zoom_limits":true,"box_zoom":true,"center":[34.6252978589571,-77.34580993652344],"close_popup_on_click":true,"controls":["IPY_MODEL_1a64c55178194cd5918335bd0381b3b0","IPY_MODEL_e76d1d07ac1e4ea2857b37671fd4e0e5"],"crs":{"custom":false,"name":"EPSG3857"},"default_style":"IPY_MODEL_464bb495eda64fa7a7b5290adaff4e9e","double_click_zoom":true,"dragging":true,"dragging_style":"IPY_MODEL_abfa92cf89b447a2ba1c8e54af44e23b","east":0,"fullscreen":false,"inertia":true,"inertia_deceleration":3000,"inertia_max_speed":1500,"interpolation":"bilinear","keyboard":true,"keyboard_pan_offset":80,"keyboard_zoom_offset":1,"layers":["IPY_MODEL_f76c98b1700942de9df4d8a193dedfcc"],"layout":"IPY_MODEL_798d07869101457cb89ab048d9f3f3cd","left":9007199254740991,"max_zoom":18,"min_zoom":1,"modisdate":"yesterday","north":0,"options":["bounce_at_zoom_limits","box_zoom","center","close_popup_on_click","double_click_zoom","dragging","fullscreen","inertia","inertia_deceleration","inertia_max_speed","interpolation","keyboard","keyboard_pan_offset","keyboard_zoom_offset","max_zoom","min_zoom","scroll_wheel_zoom","tap","tap_tolerance","touch_zoom","world_copy_jump","zoom","zoom_animation_threshold","zoom_delta","zoom_snap","zoom_start"],"right":0,"scroll_wheel_zoom":false,"south":0,"style":"IPY_MODEL_aff6b9205b534273a829d5602f2964f6","tap":true,"tap_tolerance":15,"top":9007199254740991,"touch_zoom":true,"west":0,"window_url":"","world_copy_jump":false,"zoom":10,"zoom_animation_threshold":4,"zoom_delta":1,"zoom_snap":1,"zoom_start":12}},"e76d1d07ac1e4ea2857b37671fd4e0e5":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletAttributionControlModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletAttributionControlModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletAttributionControlView","options":["position","prefix"],"position":"bottomright","prefix":"ipyleaflet"}},"f76c98b1700942de9df4d8a193dedfcc":{"model_module":"jupyter-leaflet","model_module_version":"^0.13.5","model_name":"LeafletTileLayerModel","state":{"_model_module":"jupyter-leaflet","_model_module_version":"^0.13.5","_model_name":"LeafletTileLayerModel","_view_count":null,"_view_module":"jupyter-leaflet","_view_module_version":"^0.13.5","_view_name":"LeafletTileLayerView","attribution":"Map data (c) <a href=\"https://openstreetmap.org\">OpenStreetMap</a> contributors","base":true,"bottom":true,"detect_retina":false,"loading":false,"max_native_zoom":18,"max_zoom":19,"min_native_zoom":0,"min_zoom":1,"name":"","no_wrap":false,"opacity":1,"options":["attribution","detect_retina","max_native_zoom","max_zoom","min_native_zoom","min_zoom","no_wrap","tile_size","tms"],"popup":null,"popup_max_height":null,"popup_max_width":300,"popup_min_width":50,"show_loading":false,"tile_size":256,"tms":false,"url":"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png","visible":true}}},"version_major":2,"version_minor":0}
 </script>
 
 

@@ -11,6 +11,7 @@ execute:
 source("setup.R")
 ```
 
+
 ## Which genes should we remove?
 
 Since we're interested in what makes the samples different, we'll start by removing non-informative genes from our samples. For this first pass, we'll say that a gene is non-informative if it isn't present in the majority of samples across both treatments. We'll start by getting the number of non-detects for each gene in each sample group:
