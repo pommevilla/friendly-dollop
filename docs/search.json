@@ -33,7 +33,7 @@
     "href": "sample_python.html#ipyleaflet-example",
     "title": "Quarto + RMD + Github Pages Test",
     "section": "IPyLeaflet Example",
-    "text": "from ipyleaflet import Map\n\nMap(center=[34.6252978589571, -77.34580993652344], zoom=10)\n\n\n{\"model_id\":\"e7ec68c9daf1416583b7606bed02aafa\",\"version_major\":2,\"version_minor\":0}"
+    "text": "from ipyleaflet import Map\n\nMap(center=[34.6252978589571, -77.34580993652344], zoom=10)\n\n\n{\"model_id\":\"dbd4344ab69044158f6ee5c92e259969\",\"version_major\":2,\"version_minor\":0}"
   },
   {
     "href": "statistics.html#which-genes-should-we-remove",
@@ -45,7 +45,7 @@
     "href": "statistics.html#do-treatments-have-a-significant-effect-on-community-composition",
     "title": "A short analysis of impact of treatment on corn and Miscanthus Gigantus\n",
     "section": "Do treatments have a significant effect on community composition?",
-    "text": "X <- data.priming.reduced %>% \n  select(-c(amoA.001:amoA.074))\nY <- data.priming.reduced %>% \n  select(amoA.001:amoA.074)\n\nadonis(Y ~ X$fert_level + X$addition + X$crop + X$timepoint) \n\n\nCall:\nadonis(formula = Y ~ X$fert_level + X$addition + X$crop + X$timepoint) \n\nPermutation: free\nNumber of permutations: 999\n\nTerms added sequentially (first to last)\n\n             Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    \nX$fert_level  1    1.4426 1.44255  56.092 0.37093  0.001 ***\nX$addition    2    0.0327 0.01633   0.635 0.00840  0.679    \nX$crop        1    0.0882 0.08823   3.431 0.02269  0.028 *  \nX$timepoint   1    0.0367 0.03671   1.427 0.00944  0.213    \nResiduals    89    2.2889 0.02572         0.58855           \nTotal        94    3.8890                 1.00000           \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nLooks like fertilization level (and to a lesser extent, crop) significantly impacts community composition."
+    "text": "X <- data.priming.reduced %>% \n  select(-c(amoA.001:amoA.074))\nY <- data.priming.reduced %>% \n  select(amoA.001:amoA.074)\n\nadonis(Y ~ X$fert_level + X$addition + X$crop + X$timepoint) \n\n\nCall:\nadonis(formula = Y ~ X$fert_level + X$addition + X$crop + X$timepoint) \n\nPermutation: free\nNumber of permutations: 999\n\nTerms added sequentially (first to last)\n\n             Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    \nX$fert_level  1    1.4426 1.44255  56.092 0.37093  0.001 ***\nX$addition    2    0.0327 0.01633   0.635 0.00840  0.652    \nX$crop        1    0.0882 0.08823   3.431 0.02269  0.028 *  \nX$timepoint   1    0.0367 0.03671   1.427 0.00944  0.196    \nResiduals    89    2.2889 0.02572         0.58855           \nTotal        94    3.8890                 1.00000           \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nLooks like fertilization level (and to a lesser extent, crop) significantly impacts community composition."
   },
   {
     "href": "statistics.html#gene-wise-anova",
