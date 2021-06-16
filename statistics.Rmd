@@ -117,7 +117,7 @@ data.priming.reduced.long <- data.priming.reduced %>%
   pivot_longer(cols = amoA.001:amoA.074) 
 ```
 
-Create an ANOVA formula for each gene against all the factors. Borrowed heavily from [Kevin Blighe on this BioStars post](https://www.biostars.org/p/295214/#295266)
+Create an ANOVA formula for each gene against all the factors. Borrowed heavily from [Kevin Blighe on this BioStars post](https://www.biostars.org/p/295214/#295266):
 
 ```{r}
 formulae <- lapply(colnames(data.priming.reduced %>% select(amoA.001:amoA.074)), function(x) as.formula(paste0(x, " ~ fert_level * crop * timepoint * addition")))
