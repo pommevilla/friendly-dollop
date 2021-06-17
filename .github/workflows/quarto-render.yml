@@ -39,6 +39,26 @@ jobs:
         echo "which python3: $(which python3)"
         echo "which jupyter: $(which jupyter)"
                 
+    - uses: r-lib/actions/setup-r@v1
+
+    - name: "Install R Packages: Cache packages"
+      uses: actions/cache@v1
+      with:
+        path: ${{ env.RENV_PATHS_ROOT }}
+        key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-renv-
+
+    - name: "Install R Packages: Restore packages"
+      shell: Rscript {0}
+      run: |
+        if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+        renv::restore()
+
+    - name: "Install reticulate"
+      run: |
+        Rscript -e "install.packages('reticulate')"
+
     - name: "Quarto env"
       run: |
         quarto env
