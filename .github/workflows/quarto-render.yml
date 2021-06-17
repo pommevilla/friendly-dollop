@@ -40,6 +40,10 @@ jobs:
         echo "which python3: $(which python3)"
         echo "which jupyter: $(which jupyter)"
                 
+    - name: "Install curl for some reason"
+      run: |
+        sudo apt -y install libcurl4-openssl-dev
+
     - uses: r-lib/actions/setup-r@v1
 
     - name: "Install R Packages: Cache packages"
