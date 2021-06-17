@@ -20,7 +20,7 @@ jobs:
         cut -d '"' -f 4 |
         wget -i -
         #        sudo dpkg -i quarto-0.1-amd64.deb
-        ls quarto*deb | sudo dpkg -i
+        sudo dpkg -i <(ls quarto*deb)
 
     - uses: actions/setup-python@v2
 
