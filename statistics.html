@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Quarto + RMD + Github Pages Test – A short analysis of impact of treatment on corn and Miscanthus Gigantus</title>
+  <title>Quarto + RMD + Github Pages Test – Impact of treatment on abundance of corn and Miscanthus Gigantus</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -129,7 +129,7 @@
 <header id="quarto-header" class="headroom fixed-top">
 <nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <div class="container-fluid d-flex justify-content-between">
-    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline">A short analysis of impact of treatment on corn and <em>Miscanthus Gigantus</em></h1>
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline">Impact of treatment on abundance of corn and <em>Miscanthus Gigantus</em></h1>
     <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
       <i class="bi bi-chevron-right"></i>
     </button>
@@ -167,7 +167,7 @@
   <a href="./index.html" class="">Quarto + RMD + Github Pages Test</a>
 </li>
       <li class="sidebar-item">
-  <a href="./statistics.html" class="active">A short analysis of impact of treatment on corn and *Miscanthus Gigantus*</a>
+  <a href="./statistics.html" class="active">Impact of treatment on abundance of corn and *Miscanthus Gigantus*</a>
 </li>
       <li class="sidebar-item">
   <a href="./biodiversity.html" class="">Biodiversity analysis</a>
@@ -190,14 +190,14 @@
   <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
 <main>
 <header id="title-block-header">
-<h1 class="title d-none d-lg-block display-7">A short analysis of impact of treatment on corn and <em>Miscanthus Gigantus</em></h1>
+<h1 class="title d-none d-lg-block display-7">Impact of treatment on abundance of corn and <em>Miscanthus Gigantus</em></h1>
 </header>
 
 <section id="which-genes-should-we-remove" class="level2">
 <h2 class="anchored" data-anchor-id="which-genes-should-we-remove">Which genes should we remove?</h2>
 <p>Since we’re interested in what makes the samples different, we’ll start by removing non-informative genes from our samples. For this first pass, we’ll say that a gene is non-informative if it isn’t present in the majority of samples across both treatments. We’ll start by getting the number of non-detects for each gene in each sample group:</p>
 <div class="cell">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>non_detect_counts <span class="ot">&lt;-</span> data.raw.long <span class="sc">%&gt;%</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>non_detect_counts <span class="ot">&lt;-</span> data.raw.long <span class="sc">%&gt;%</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(fert_level, amoA) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(CT <span class="sc">==</span> <span class="dv">40</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">non_detect =</span> <span class="st">`</span><span class="at">CT == 40</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
@@ -219,7 +219,7 @@
 </div>
 <p>We can use <code>non_detect_counts</code> to get the number of non-detects from each gene. For example:</p>
 <div class="cell">
-<div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>non_detect_counts <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>non_detect_counts <span class="sc">%&gt;%</span> </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(amoA <span class="sc">==</span> <span class="st">"amoA.001"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-stdout">
 <pre><code># A tibble: 2 x 4
@@ -233,7 +233,7 @@
 <p>This tells us that <em>amoA.001</em> was not detected in 38 of the non-fertilized samples and in 9 of the fertilized samples.</p>
 <p>From here, we’ll remove genes that were not detected in at least 30 samples in both the fertilized and non-fertilized samples. This cutoff is chosen arbitrarily.</p>
 <div class="cell">
-<div class="sourceCode" id="cb5"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>removes <span class="ot">&lt;-</span> non_detect_counts <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>removes <span class="ot">&lt;-</span> non_detect_counts <span class="sc">%&gt;%</span> </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> fert_level, <span class="at">values_from =</span> n, <span class="at">names_prefix =</span> <span class="st">"fert."</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(fert<span class="fl">.0</span> <span class="sc">&gt;</span> <span class="dv">30</span> <span class="sc">&amp;</span> fert<span class="fl">.336</span> <span class="sc">&gt;</span> <span class="dv">30</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> fert<span class="fl">.0</span><span class="sc">:</span>fert<span class="fl">.336</span>, <span class="at">names_to =</span> <span class="st">"fert_level"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>)</span>
@@ -266,7 +266,7 @@
 </div>
 <p>So we see that we’re removing 17 genes. We’ll keep it in a long format so we can visualize them with <code>ggplot</code>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb7"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>removes <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>removes <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">amoA =</span> <span class="fu">str_sub</span>(amoA, <span class="sc">-</span><span class="dv">3</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">favored =</span> <span class="fu">case_when</span>(</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    amoA <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"006"</span>, <span class="st">"038"</span>, <span class="st">"064"</span>, <span class="st">"069"</span>, <span class="st">"071"</span>) <span class="sc">~</span> <span class="st">"Nothing"</span>,</span>
@@ -304,14 +304,14 @@
 </div>
 <p>Finally, let’s remove those non-informative genes from the dataset before doing our statistics.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data.priming.reduced <span class="ot">&lt;-</span> data.priming <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data.priming.reduced <span class="ot">&lt;-</span> data.priming <span class="sc">%&gt;%</span> </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">one_of</span>(removes<span class="sc">$</span>amoA))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="do-treatments-have-a-significant-effect-on-community-composition" class="level2">
 <h2 class="anchored" data-anchor-id="do-treatments-have-a-significant-effect-on-community-composition">Do treatments have a significant effect on community composition?</h2>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> data.priming.reduced <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> data.priming.reduced <span class="sc">%&gt;%</span> </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>))</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> data.priming.reduced <span class="sc">%&gt;%</span> </span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>)</span>
@@ -329,9 +329,9 @@ Terms added sequentially (first to last)
 
              Df SumsOfSqs MeanSqs F.Model      R2 Pr(&gt;F)    
 X$fert_level  1    1.4426 1.44255  56.092 0.37093  0.001 ***
-X$addition    2    0.0327 0.01633   0.635 0.00840  0.684    
-X$crop        1    0.0882 0.08823   3.431 0.02269  0.015 *  
-X$timepoint   1    0.0367 0.03671   1.427 0.00944  0.228    
+X$addition    2    0.0327 0.01633   0.635 0.00840  0.697    
+X$crop        1    0.0882 0.08823   3.431 0.02269  0.023 *  
+X$timepoint   1    0.0367 0.03671   1.427 0.00944  0.244    
 Residuals    89    2.2889 0.02572         0.58855           
 Total        94    3.8890                 1.00000           
 ---
@@ -344,13 +344,13 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <h2 class="anchored" data-anchor-id="gene-wise-anova">Gene-wise anova</h2>
 <p>First pivot dataset to long format:</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data.priming.reduced.long <span class="ot">&lt;-</span> data.priming.reduced <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>data.priming.reduced.long <span class="ot">&lt;-</span> data.priming.reduced <span class="sc">%&gt;%</span> </span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sample_id, field_rep) <span class="sc">%&gt;%</span> </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Create an ANOVA formula for each gene against all the factors. Borrowed heavily from <a href="https://www.biostars.org/p/295214/#295266">Kevin Blighe on this BioStars post</a>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb12"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>formulae <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">colnames</span>(data.priming.reduced <span class="sc">%&gt;%</span> <span class="fu">select</span>(amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>)), <span class="cf">function</span>(x) <span class="fu">as.formula</span>(<span class="fu">paste0</span>(x, <span class="st">" ~ fert_level * crop * timepoint * addition"</span>)))</span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>formulae <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">colnames</span>(data.priming.reduced <span class="sc">%&gt;%</span> <span class="fu">select</span>(amoA<span class="fl">.001</span><span class="sc">:</span>amoA<span class="fl">.074</span>)), <span class="cf">function</span>(x) <span class="fu">as.formula</span>(<span class="fu">paste0</span>(x, <span class="st">" ~ fert_level * crop * timepoint * addition"</span>)))</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">lapply</span>(formulae, <span class="cf">function</span>(x) broom<span class="sc">::</span><span class="fu">tidy</span>(<span class="fu">aov</span>(x, <span class="at">data =</span> data.priming.reduced)))</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">format</span>(formulae)</span>
@@ -362,11 +362,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 <p>We can then visualize the anova results in a heatmap. Here, each column represents a gene, the rows represent the factors being tested by the ANOVA, and the colors indicate the significance of the ANOVA test.</p>
 <div class="cell">
-<div class="sourceCode" id="cb13"><pre class="sourceCode r cell-code"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>anova_results <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>anova_results <span class="sc">%&gt;%</span> </span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sig =</span> <span class="fu">case_when</span>(</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.5</span> <span class="sc">&amp;</span> p.value <span class="sc">&gt;</span> <span class="fl">0.1</span> <span class="sc">~</span> <span class="st">"*"</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.1</span> <span class="sc">&amp;</span> p.value <span class="sc">&gt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="st">"**"</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="st">"***"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> p.value <span class="sc">&gt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="st">"*"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.01</span> <span class="sc">&amp;</span> p.value <span class="sc">&gt;</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="st">"**"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    p.value <span class="sc">&lt;</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="st">"***"</span>,</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"NS"</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gene =</span> <span class="fu">str_sub</span>(gene, <span class="sc">-</span><span class="dv">3</span>)) <span class="sc">%&gt;%</span> </span>
