@@ -2,6 +2,10 @@ project:
   type: site
   title: "friendly-dollop"
   output-dir: _site
+  
+execute:
+  freeze: true
+  warning: false
 
 site:
   title: "Quarto + RMD + Github Pages Test"

@@ -1,10 +1,5 @@
 ---
-title: "A short analysis of impact of treatment on corn and *Miscanthus Gigantus*"
-format: 
-  html:
-    code-background: true
-execute:
-  warning: false
+title: "Impact of treatment on abundance of corn and *Miscanthus Gigantus*"
 ---
 
 ```{r setup, include=FALSE}
@@ -136,9 +131,9 @@ We can then visualize the anova results in a heatmap. Here, each column represen
 ```{r}
 anova_results %>% 
   mutate(sig = case_when(
-    p.value < 0.5 & p.value > 0.1 ~ "*",
-    p.value < 0.1 & p.value > 0.01 ~ "**",
-    p.value < 0.01 ~ "***",
+    p.value < 0.05 & p.value > 0.01 ~ "*",
+    p.value < 0.01 & p.value > 0.001 ~ "**",
+    p.value < 0.001 ~ "***",
     TRUE ~ "NS"
   )) %>% 
   mutate(gene = str_sub(gene, -3)) %>% 
