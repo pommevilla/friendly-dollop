@@ -20,17 +20,17 @@ jobs:
 
         sudo dpkg -i $(ls quarto*deb)
         
-    - name: "Quarto env"
-      run: |
-        quarto env
+    # - name: "Quarto env"
+    #   run: |
+    #     quarto env
 
-    - name: "Quarto capabilities"
-      run: |
-        quarto capabilities
+    # - name: "Quarto capabilities"
+    #   run: |
+    #     quarto capabilities
 
-    - name: "Quarto check"
-      run: |
-        quarto check
+    # - name: "Quarto check"
+    #   run: |
+    #     quarto check
 
     - name: "Render directory"
       run: |
