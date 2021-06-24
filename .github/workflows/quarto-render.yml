@@ -34,25 +34,25 @@ jobs:
     #       echo "requirements.txt not found"
     #     fi
 
-    - name: "Install curl for Bioconductor Installation"
-      run: |
-        sudo apt -y install libcurl4-openssl-dev
+    # - name: "Install curl for Bioconductor Installation"
+    #   run: |
+    #     sudo apt -y install libcurl4-openssl-dev
 
-    - uses: r-lib/actions/setup-r@v1
+    # - uses: r-lib/actions/setup-r@v1
 
-    - name: "Install R Packages: Cache packages"
-      uses: actions/cache@v1
-      with:
-        path: ${{ env.RENV_PATHS_ROOT }}
-        key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-renv-
+    # - name: "Install R Packages: Cache packages"
+    #   uses: actions/cache@v1
+    #   with:
+    #     path: ${{ env.RENV_PATHS_ROOT }}
+    #     key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-renv-
 
-    - name: "Install R Packages: Restore packages"
-      shell: Rscript {0}
-      run: |
-        if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-        renv::restore()
+    # - name: "Install R Packages: Restore packages"
+    #   shell: Rscript {0}
+    #   run: |
+    #     if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+    #     renv::restore()
 
     # - name: "Quarto env"
     #   run: |
