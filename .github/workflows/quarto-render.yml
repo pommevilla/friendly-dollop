@@ -19,50 +19,8 @@ jobs:
         grep "browser_download_url.*deb" | 
         cut -d '"' -f 4 |
         wget -i -
-        #        sudo dpkg -i quarto-0.1-amd64.deb
+
         sudo dpkg -i $(ls quarto*deb)
-
-    - uses: actions/setup-python@v2
-
-    - name: "Install Python deps"
-      run: | 
-        if [ -f requirements.txt ]
-        then
-          grep -iv "win" requirements.txt > TEMP_requirements.txt
-          pip install -r TEMP_requirements.txt
-        else
-          echo "requirements.txt not found; installing minimal reqs"
-          pip install jupyter
-        fi
-    - name: "Check Python installation"
-      run: |
-        echo "which python: $(which python)"
-        echo "which python3: $(which python3)"
-        echo "which jupyter: $(which jupyter)"
-                
-    - name: "Install curl for some reason"
-      run: |
-        sudo apt -y install libcurl4-openssl-dev
-
-    - uses: r-lib/actions/setup-r@v1
-
-    - name: "Install R Packages: Cache packages"
-      uses: actions/cache@v1
-      with:
-        path: ${{ env.RENV_PATHS_ROOT }}
-        key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-renv-
-
-    - name: "Install R Packages: Restore packages"
-      shell: Rscript {0}
-      run: |
-        if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-        renv::restore()
-
-    - name: "Install reticulate"
-      run: |
-        Rscript -e "install.packages('reticulate')"
 
     - name: "Quarto env"
       run: |
