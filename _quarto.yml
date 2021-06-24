@@ -51,4 +51,3 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
-    code-link: true
