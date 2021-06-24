@@ -22,38 +22,6 @@ jobs:
 
         sudo dpkg -i $(ls quarto*deb)
 
-    - uses: actions/setup-python@v2
-
-    - name: "Install Python deps"
-      run: |
-        if [ -f requirements.txt ]
-        then
-          grep -iv "win" requirements.txt > TEMP_requirements.txt
-          pip install -r TEMP_requirements.txt
-        else
-          echo "requirements.txt not found"
-        fi
-
-    - name: "Install curl for Bioconductor Installation"
-      run: |
-        sudo apt -y install libcurl4-openssl-dev
-
-    - uses: r-lib/actions/setup-r@v1
-
-    - name: "Install R Packages: Cache packages"
-      uses: actions/cache@v1
-      with:
-        path: ${{ env.RENV_PATHS_ROOT }}
-        key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-renv-
-
-    - name: "Install R Packages: Restore packages"
-      shell: Rscript {0}
-      run: |
-        if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-        renv::restore()
-
     - name: "Quarto env"
       run: |
         quarto env
