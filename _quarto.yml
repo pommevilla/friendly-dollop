@@ -22,14 +22,14 @@ site:
         file: biodiversity.Rmd
       - text: "Example iPyNb"
         file: sample_python.ipynb
-      - text: "GERMS Lab"
-        url: http://www.germslab.org/
       - text: "Other stuff"
         menu:
           - text: "My Github"
             url: https://github.com/pommevilla/
           - text: "TFT 3.5: 500 Challenger Matches"
             url: https://www.kaggle.com/pvillanueva13/tft-35-500-gm-matches
+          - text: "GERMS Lab"
+            url: http://www.germslab.org/
           
         
   sidebar:
