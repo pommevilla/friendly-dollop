@@ -15,11 +15,11 @@ site:
     background: "dark"
     right:
       - text: "Home"
-        file: index.Rmd
+        file: index.qmd
       - text: "Basic Stats"
-        file: statistics.Rmd
+        file: statistics.qmd
       - text: "Biodiversity"
-        file: biodiversity.Rmd
+        file: biodiversity.qmd
       - text: "Example iPyNb"
         file: sample_python.ipynb
       - text: "Other stuff"
@@ -41,9 +41,9 @@ site:
       - icon: github
         href: https://github.com/pommevilla/friendly-dollop
     contents:
-      - index.Rmd
-      - statistics.Rmd
-      - biodiversity.Rmd
+      - index.qmd
+      - statistics.qmd
+      - biodiversity.qmd
       - sample_python.ipynb
 
 format:
