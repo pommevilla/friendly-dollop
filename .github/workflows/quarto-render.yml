@@ -11,9 +11,30 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: "Install and render quarto"
-      uses: pommevilla/quarto-render@main
-  
+    - name: "Install quarto bin"
+      run: |
+        curl -s https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest | 
+        grep "browser_download_url.*deb" | 
+        cut -d '"' -f 4 |
+        wget -i -
+        sudo dpkg -i $(ls quarto*deb)
+        
+    - name: "Quarto env"
+      run: |
+        quarto env
+
+    - name: "Quarto capabilities"
+      run: |
+        quarto capabilities
+
+    - name: "Quarto check"
+      run: |
+        quarto check
+
+    - name: "Render directory"
+      run: |
+        quarto render --execute-debug 
+
     - name: "Deploy to gh-pages"
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/master'
