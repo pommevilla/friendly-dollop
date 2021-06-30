@@ -1,1 +1,0 @@
-Sitemap: https://docs.rstudio.com/ide/server-pro/sitemap.xml
