@@ -1,0 +1,16 @@
+## Migration
+
+When changing database providers, you **must** migrate your existing database data from your current database provider to the new provider to prevent unexpected data loss.
+
+The following steps should be taken to perform a successful migration from SQLite to PostgreSQL:
+
+1. Create an empty database called `rstudio` in PostgreSQL (or any custom name according to your RStudio configuration below). Ensure the connection credentials work for the new database.
+2. Stop RStudio.
+3. Switch to PostgreSQL by modifying the *`/etc/rstudio/database.conf`* file. If you are storing the SQLite database in a different location be sure to keep the `directory` option in the file during the migration.
+4. Run the command `sudo rstudio-server migrate-db`. Watch for the output and confirm that the migration was successful.
+5. Once the data has been imported to the new database, restart RStudio.
+
+::: {.callout-note}
+The migration from PostgreSQL to SQLite is not currently supported.
+:::
+

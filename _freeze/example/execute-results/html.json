@@ -1,0 +1,16 @@
+{
+  "hash": "b3b18ff7a7debcaa61edbe3432f63f81",
+  "result": {
+    "markdown": "--- \ntitle: \"RStudio Workbench\"\ndate: \"2021-06-20\"\n---\n\nOne plus two is 3.\n\nToday's date is 2021-06-20.",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "dependencies": {
+      "type": "includes",
+      "data": []
+    },
+    "preserve": {},
+    "postProcess": null
+  }
+}

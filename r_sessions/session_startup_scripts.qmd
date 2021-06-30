@@ -1,0 +1,26 @@
+## Session Startup Scripts
+
+When an R session starts up, the following scripts are run:
+
+1. Any PAM session modules [Pro]{.pro-feature}
+2. The `/etc/rstudio/rsession-profile` script [Pro]{.pro-feature}
+3. The environment module for the R version in use, if any; see [Extended R Version Definitions](../r_versions/using_multiple_versions_of_r.qmd#extended-r-version-definitions) [Pro]{.pro-feature}
+4. The prelaunch script for the R version in use, if any; see [Extended R Version Definitions](../r_versions/using_multiple_versions_of_r.qmd#extended-r-version-definitions) [Pro]{.pro-feature}
+5. System and user shell profile scripts, such as `.bash_profile` [Pro]{.pro-feature}
+6. The R session itself, inside any supervisor specified by `rsession-exec-command` [Pro]{.pro-feature}
+7. `.Rprofile` and other R initialization scripts; see [Initialization at the Start of a Session](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html) for details
+8. RStudio-internal session startup scripts
+9. The `rstudio.sessionInit` hook
+
+The very last of these provides a way to run code after the R session is fully booted and ready to use; since it only runs in RStudio it can be used to finalize R sessions in RStudio-specific ways, using for example methods in the `rstudioapi` package. Here is an example that prints the RStudio version in new R sessions:
+
+
+
+```r
+# /opt/R/version/lib64/r/etc/Rprofile.site
+setHook("rstudio.sessionInit", function(newSession) {
+  if (newSession)
+    message("Welcome to RStudio ", rstudioapi::getVersion())
+}, action = "append")
+```
+

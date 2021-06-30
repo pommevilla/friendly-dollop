@@ -1,0 +1,74 @@
+## Tutorial API Methods
+
+Methods are asynchronous and do not directly return a result.
+
+If **Report Result** is **true** below then that API will attempt to invoke a **success** or **error** callback when it completes, but this is never guaranteed.
+
+Methods which report a result take an optional final string parameter **callerID** which will be returned in both success and error callbacks. This can be used to correlate calls and responses.
+
+The **RStudio** object supports the following methods:
+
+Method                   | Description                                                                                        | Reports Result
+------------------------ | -------------------------------------------------------------------------------------------------- | ---
+`isReady()` | Is the RStudio API available yet? (has the IDE loaded) | No
+`consoleInput(code)` | Type input in the R console and execute it. | No
+`consoleClear()` | Clear all previous input and output from the console. | No
+`consoleMaximize()` | Maximize the console so it occupies the full height of the IDE. | No
+`executeR(code)` | Execute arbitrary R code within the global environment. | No
+`openFile(file, location)` | Open the specified source file and (optionally) navigate it to a specific location. The `location` parameter can either be a line number (e.g. `42`) or a regular expression delimited by `/` (e.g. `/foo/`). | No
+`helpTopic(topic)` | Navigate the help pane to a topic. The topic should be a namespace qualified reference to package documentation (e.g. `graphics::plot`). Note that help topics defined within the base package do not need qualification. | No
+`helpDoc(doc)` | Show a markdown (.md) or R Markdown (.Rmd) document within the help pane. | No
+`saveAllSourceDocs()`| Save all unsaved source documents. | No
+`quitSession()` | Quit session. User cannot cancel but is prompted to save files and workspace if needed. | No
+`createProjFromGit(repoUrl, projDir, parentDir, [callerID])` | Clone a project from Git and open it. | Yes
+`createNewProj(projDir, parentDir, createRepo, [callerID])` | Create and open a new project. | Yes
+`openProj(projFile, [callerID])` | Open an existing project, can specify existing .Rproj, or just the folder. | Yes
+`getState([callerID])` | Request info on current RStudio IDE state. | Yes
+
+## Example Calls
+Here are some sample JavaScript calls, followed by the response JSON.
+
+### Clone project from github and open it (with callerID = 'abcd')
+
+```js
+createProjFromGit('https://github.com/rstudio/rstudioapi', 'rstudioapi', '~/R', 'abcd');
+```
+
+```json
+{
+  "message":"success",
+  "api":"createProjFromGit",
+  "result":"",
+  "callerID":"abcd"
+}
+```
+
+### Create an new project but don't create a git repo (no callerID)
+
+```js
+createNewProj('myproj', '~/R', false);
+```
+
+```json
+{
+  "message":"success",
+  "api":"createNewProj",
+  "result":""
+}
+```
+
+### Try to open a project that doesn't exist
+
+```js
+openProj('~/myproj', 'abcd');
+```
+
+```json
+{
+  "message":"error",
+  "api":"openProj",
+  "result":"Unable to find .Rproj file in [~/myproj]",
+  "callerID":"abcd"
+}
+```
+

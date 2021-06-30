@@ -1,0 +1,9 @@
+## RStudio Connect Server
+
+Users of RStudio can publish content to [RStudio Connect](https://www.rstudio.com/products/connect/). To do so, they must first specify the RStudio Connect server they wish to use. You can set the default RStudio Connect server URL to use when users are connecting to an account. To do so, use the `default-rsconnect-server` option:
+
+```ini
+# /etc/rstudio/rsession.conf
+default-rsconnect-server=http://connectserver/
+```
+

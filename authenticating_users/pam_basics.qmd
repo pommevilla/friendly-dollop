@@ -1,0 +1,20 @@
+## PAM Basics
+
+Local system accounts used by PAM must follow the system conventions for usernames. For example, usernames are case-sensitive.
+
+PAM profiles are are located in the `/etc/pam.d` directory. Each application can have their own profile, and there is also a default profile used for applications without one (the default profile is handled differently depending on which version of Linux you are running).
+
+To learn more about PAM and the many options and modules available for it see the following:
+
+- [https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system-level_authentication_guide/pluggable_authentication_modules](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system-level_authentication_guide/pluggable_authentication_modules)
+- [http://tldp.org/HOWTO/User-Authentication-HOWTO/x115.html](http://tldp.org/HOWTO/User-Authentication-HOWTO/x115.html)
+- [http://linux.die.net/man/8/pam](http://linux.die.net/man/8/pam)
+
+### PAM & Provisioning
+
+PAM recommendations for user provisioning:
+
+- If you are using PAM authentication to connect to an external authentication provider, you can use a PAM module like [`pam_mkhomedir`](https://linux.die.net/man/8/pam_mkhomedir) to automatically create the users' home directories on login.
+- User provisioning requires PAM sessions to be used is most cases. See the [PAM Sessions](../r_sessions/pam_sessions.qmd) section for details on how RStudio can be configured to use those.
+- If you are using SAML, OpenID or Proxied authentication and local system accounts are automatically created by `sssd`, a PAM configuration with the module [`pam_rootok`](https://linux.die.net/man/8/pam_rootok) must be used, since PAM sessions will be started by RStudio using `root` in the behalf of the actual user.
+

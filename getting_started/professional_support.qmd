@@ -1,0 +1,25 @@
+## Professional Support {.pro-header}
+
+RStudio provides email support to our professional products customers to help troubleshoot issues and answer questions about the software. To focus on building the best products, RStudio does not provide installation or professional services. If you require such assistance, please refer to our certified partners. For more information about the support we provide, please see the [Support Agreement](https://rstudio.com/about/support-agreement).
+
+RStudio support is limited to our professional products. If your question is related to the open-source RStudio Server, R, R code, or specific R packages, please visit <https://community.rstudio.com>.
+
+If your question is related to RStudio Workbench, you can open a support ticket by:
+
+1. Running the diagnostics script:
+
+   ```bash
+   sudo rstudio-server run-diagnostics
+   ```
+   
+   ::: {.callout-note}
+   If you have not been able to download the software, skip this step.
+   :::
+
+
+2. Email <support@rstudio.com> with:
+ - Your name and company
+ - What you are trying to do
+ - What you have tried
+ - Any errors you have received
+ - The diagnostics file produced from step 1

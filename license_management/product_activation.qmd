@@ -1,0 +1,26 @@
+## Product Activation
+
+### Activation Basics
+
+When RStudio Workbench is first installed on a system it operates in evaluation mode for a period of time and then subsequently requires activation for continued use.
+
+To determine the current license status of your system you can use the following command:
+
+```bash
+$ sudo rstudio-server license-manager status
+```
+
+After purchasing a license to RStudio Workbench you'll receive a license key that can be used to activate the license on a given system.
+
+You can activate your license key with the command:
+
+```bash
+$ sudo rstudio-server license-manager activate <product-key>
+```
+
+If you want to move your license of RStudio Workbench to another system you should first deactivate it on the old system with the command:
+
+```bash
+$ sudo rstudio-server license-manager deactivate
+```
+

@@ -1,0 +1,28 @@
+---
+aliases:
+  - access-and-security.html#same-site-cookies
+---
+
+## Same Site cookies
+
+Most browsers have adopted recently a new attribute for cookies called `SameSite` which enforces additional security requirements around the cookie. RStudio does not define this attribute by default but you can use the option `www-same-site` for that purpose.
+
+For example, the value `SameSite=None` is required by certain browsers (i.e. Chrome 84+) for embedding sites into an IFrame or frameset. To ensuring the delivery of RStudio cookies in this scenario, use the value `www-same-site=none`.
+
+```ini
+# /etc/rstudio/rserver.conf
+www-same-site=none
+```
+
+::: {.callout-important}
+`SameSite=None` is insufficient without SSL enabled and may still prevent RStudio from working over non-SSL connections.
+:::
+
+Some browsers will not behave as expected in the presence of the `SameSite=None`; Safari 12 on MacOS 10.14 and iOS 12.x or older notably will not work. To workaround these limitations, RStudio will emit a pair of cookies, one with `SameSite=None` for standard-conforming browsers and a "legacy" cookie without `SameSite` for non-conforming browsers.
+
+You also can use the value `www-same-site=lax` to mark cookies as `SameSite=Lax` what effectively prohibits the use of RStudio embedded into an IFrame or frameset on compliant browsers by blocking all RStudio cookies.
+
+```ini
+# /etc/rstudio/rserver.conf
+www-same-site=lax
+```

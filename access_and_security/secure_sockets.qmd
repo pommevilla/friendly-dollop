@@ -1,0 +1,51 @@
+---
+aliases:
+  - access-and-security.html#secure-sockets-ssl
+---
+
+## Secure Sockets (SSL) {.pro-header}
+
+### SSL Configuration
+
+If your RStudio Workbench is running on a public network then configuring it to use SSL (Secure Sockets Layer) encryption is strongly recommended. You can do this via the `ssl-enabled` setting along with related settings that specify the location of your SSL certificate and key. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+ssl-enabled=1
+ssl-certificate=/var/certs/your_domain_name.crt
+ssl-certificate-key=/var/certs/your_domain_name.key  
+```
+
+The `.crt` file should be encoded in the PEM format; that is, the first line should read `-----BEGIN CERTIFICATE-----`, and the contents should be base64-encoded data. If your certificate is in another format, such as DER or PKCS, use the `openssl` command-line tool to convert it to PEM. For example:
+
+```ini
+openssl x509 -inform DER -outform PEM -text -in your_domain_name.der -out your_domain_name.crt
+```
+
+It's important when installing the certificate `.crt` file that you concatenate together any intermediate certificates (i.e. the generic one from your certificate authority) with the certificate associated with your domain name. For example you could use a shell command of this form to concatenate the CA intermediate certificate to your domain name's certificate:
+
+```bash
+$ cat certificate-authority.crt >> your_domain_name.crt
+```
+
+The resulting file should then be specified in the `ssl-certificate` option.
+
+It's also important to ensure that the file permissions on your SSL certificate key are as restrictive as possible so it can't be read by ordinary users. The file should typically be owned by the `root` user and be set as owner readable and writable. For example:
+
+```bash
+$ sudo chmod 600 /var/certs/your_domain_name.key 
+```
+
+### SSL Protocols
+
+By default RStudio Workbench supports the TLSv1, TLSv1.1, TLSv1.2, and TLSv1.3 protocols for SSL. The list of supported protocols can configured via the `ssl-protocols` option. For example, to use only the TLSv1.1 and TLSv1.2 protocols you would use:
+
+```bash
+# /etc/rstudio/rserver.conf
+ssl-protocols=TLSv1.1 TLSv1.2
+```
+
+The list of supported protocols is space delimited (as illustrated above). Valid protocol values are: `SSLv2`, `SSLv3`, `TLSv1`, `TLSv1.1`, `TLSv1.2`, and `TLSv1.3`.
+
+Note that not all protocols may be available on your system; TLS 1.1 and 1.2 require OpenSSL 1.0.1, and TLS 1.3 requires OpenSSL 1.1.1 built with TLS 1.3 support.
+

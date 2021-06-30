@@ -1,0 +1,55 @@
+## Restricting Access to Specific Users
+
+### Minimum User Id
+
+By default RStudio only allows normal (as opposed to system) users to successfully authenticate. The minimum user id is determined by reading the `UID_MIN` value from the `/etc/login.defs` file. If the file doesn't exist or `UID_MIN` isn't defined within it then a default value of 1000 is used.
+
+You change the minimum user id by specifying the `auth-minimum-user-id` option. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-minimum-user-id=100
+```
+
+Note that it's possible that your PAM configuration is also applying a constraint on user-ids (see the [Default PAM Configuration](pam_authentication.qmd#default-pam-configuration) section above for an example). In this case you should ensure that the `auth-minimum-user-id` is consistent with the value specified in your PAM configuration.
+
+If your users are using very large UIDs (above 1048575/0xFFFFF), it is *strongly* recommended to set the `auth-minimum-user-id` value to enable RStudio to make better assumptions when mapping user identifiers to projects.
+
+### Restricting by Group
+
+You can specify that only users of certain groups are allowed to access RStudio. To do this you use the `auth-required-user-group` setting. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-required-user-group=rstudio-users
+```
+
+You can specify a single group as the above example does or a comma-delimited list of groups. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-required-user-group=analysts,admins,rstudio-users
+```
+
+Note that this change will not take effect until the server is restarted. 
+
+#### Creating and Managing Group Membership
+
+To create a new group you use the `groupadd` command:
+
+```bash
+$ sudo groupadd <groupname>
+```
+
+To add a user to an existing group you use the `usermod` command:
+
+```bash
+$ sudo usermod -a -G <groupname> <username>
+```
+
+Note that it's critical that you include the `-a` flag as that indicates that the group should be added to the user rather than replace the user's group list in it's entirety.
+

@@ -1,0 +1,63 @@
+## PAM Authentication
+
+By default, RStudio authenticates users via the Linux standard PAM API. PAM itself is typically configured by default to authenticate against the system user database (`/etc/passwd`) however it can also be configured to authenticate against a wide variety of other systems including Active Directory, LDAP, and Kerberos.
+
+::: {.callout-note}
+PAM can be used for both authentication as well as to tailor the environment for users with [PAM sessions](../r_sessions/pam_sessions.qmd). This section only describes PAM for the purposes of authentication
+:::
+
+### Default PAM Configuration
+
+**Debian / Ubuntu**
+
+On Debian and Ubuntu systems RStudio does not provide an RStudio specific PAM configuration file. As a result, RStudio uses the `/etc/pam.d/other` profile, which by default inherits from a set of common configuration files:
+
+
+
+```css
+/* /etc/pam.d/other */
+  @include common-auth
+  @include common-account
+  @include common-password
+  @include common-session
+```
+
+If the `/etc/pam.d/other` profile reflects the authentication system and policies that you'd like RStudio to use then no further configuration is required. If you want to create a custom PAM profile for RStudio you would create a file named `/etc/pam.d/rstudio` and specify whatever settings are appropriate. 
+
+**RedHat / CentOS / SUSE**
+
+On RedHat, CentOS and SUSE systems applications without their own PAM profiles are denied access by default. Therefore to ensure that RStudio is running and available after installation a default PAM profile is installed at `/etc/pam.d/rstudio`. This profile is configured to require a user-id greater than 500 and to authenticate users against local system accounts:
+
+
+
+```bash
+; /etc/pam.d/rstudio
+auth      requisite      pam_succeed_if.so uid >= 500 quiet
+auth      required       pam_unix.so nodelay
+account   required       pam_unix.so
+```
+
+This default PAM profile may not reflect the authentication behavior that you want for RStudio. In that case, some customization may be required. If you've already set up another PAM profile (e.g. `/etc/pam.d/login`) with the desired behavior then it may be enough to simply copy that profile over the RStudio one. For example:
+
+```bash
+$ sudo cp /etc/pam.d/login /etc/pam.d/rstudio
+```
+
+### Diagnosing PAM Authentication Problems
+
+If you are unable to log into RStudio there may be an underlying problem with the PAM configuration. The best way to diagnose PAM configuration problems is to use the `pamtester` utility (which is bundled with RStudio). Using `pamtester` enables you to test authentication in an isolated environment as well as to see much more detailed diagnostics.
+
+The `pamtester` utility is located at `/usr/lib/rstudio-server/bin/pamtester`. To invoke it you pass several arguments indicating the PAM profile to test, the user to test for, and whether you want verbose output. For example:
+
+```bash
+$ sudo /usr/lib/rstudio-server/bin/pamtester --verbose rstudio <username> authenticate
+```
+
+You can find more detailed documentation on using `pamtester` here: [http://linux.die.net/man/1/pamtester](http://linux.die.net/man/1/pamtester).
+
+Additionally, RStudio expects the PAM password prompt text when logging in to be `Password:`. If you use a nonstandard password prompt, you must disable strict prompt matching by modifying `/etc/rstudio/rserver.conf` like so:
+
+```r
+auth-pam-require-password-prompt=0
+```
+

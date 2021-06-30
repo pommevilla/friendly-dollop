@@ -1,0 +1,38 @@
+# RStudio IDE Commands
+
+The following table enumerates all of the commands currently supported by RStudio. These command IDs can be used in RStudio API calls such as `rstudioapi::executeCommand`. 
+
+```{r, echo = FALSE}
+contents <- xml2::as_list(xml2::read_xml("../../../src/gwt/src/org/rstudio/studio/client/workbench/commands/Commands.cmd.xml"))
+
+allcommands <- contents$commands[names(contents$commands) == "cmd"]
+
+commands <- data.frame(
+  Id = vapply(allcommands, function(x) { attr(x, "id") }, ""),
+  Description = vapply(allcommands, function(x) {
+    if (!is.null(attr(x, "desc"))) {
+      # Actual description
+      attr(x, "desc")
+    } else if (!is.null(attr(x, "menuLabel"))) {
+      # Menu label (remove accelerators)
+      gsub("_", "", attr(x, "menuLabel"))
+    } else if (!is.null(attr(x, "buttonLabel"))) {
+      # Button label
+      attr(x, "buttonLabel")
+    } else {
+      # No description for command (will not be listed)
+      ""
+    }
+  }, "")
+)
+
+# Filter out commands for which we don't have a description 
+# (these are typically internal commands such as MRU invokers)
+commands <- commands[commands["Description"] != "",]
+
+# Sort and display
+commands <- commands[order(commands$Id),] 
+row.names(commands) <- NULL
+knitr::kable(commands)
+```
+

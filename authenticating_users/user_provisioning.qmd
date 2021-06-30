@@ -1,0 +1,14 @@
+## User Provisioning
+
+It is a common practice in Linux environments to configure [`sssd`](https://sssd.io/) to fetch users and groups from an LDAP or Active Directory server to automate the creation (provisioning) of local system accounts.
+
+In addition to user creation, `sssd` can also be configured to authenticate or authorize users via PAM using the `pam_sss` module.
+
+::: {.callout-note}
+[`nss`](https://en.wikipedia.org/wiki/Name_Service_Switch) is an older alternative to `sssd` that also has LDAP synchronization capabilities. However, differently from `sssd`, it offers no support for authentication.
+:::
+
+::: {.callout-important}
+When a user has an active session in RStudio, changes to his or her local account name (username) or `uid` are not supported and it can lead to unexpected behaviors in RStudio.
+:::
+

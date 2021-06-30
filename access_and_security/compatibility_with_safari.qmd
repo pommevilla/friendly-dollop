@@ -1,0 +1,17 @@
+---
+alias:
+	- access-and-security.html#compatibility-with-safari-13
+---
+
+## Compatibility with Safari 13+
+
+Starting in Safari 13, if you are loading RStudio inside a browser frame on a completely different domain all cookies will be blocked because those will be considered third-party cookies.
+
+Embedding RStudio in a subdomain of the main site causes its cookies to be considered first-party, allowing RStudio to work.
+
+Alternatively, you can place RStudio in the same domain as the main wrapping site but under a different URL path. This requires using a proxy in front of both the main site and RStudio. See [Running with a Proxy](running_with_a_proxy.qmd) below for more information.
+
+::: {.callout-note}
+In the near future, most browsers vendors plan to apply the same restrictions to cookies in some degree.
+:::
+

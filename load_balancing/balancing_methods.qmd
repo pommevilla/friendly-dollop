@@ -1,0 +1,70 @@
+## Balancing Methods
+
+There are four methods available for balancing R sessions across a cluster. The most appropriate method is installation specific and depends on the number of users and type of workloads they create.
+
+### Sessions
+
+The default balancing method is `sessions`, which attempts to evenly distribute R sessions across the nodes of the cluster:
+
+```ini
+[config]
+balancer = sessions
+```
+
+This method allocates new R sessions to the node with the least number of active R sessions. This is a good choice if you expect that users will for the most part have similar resource requirements.
+
+### System Load
+
+The `system-load` balancing method distributes sessions based on the active workload of available nodes:
+
+```ini
+[config]
+balancer = system-load
+```
+
+The metric used to establish active workload is the 5-minute [load average](http://en.wikipedia.org/wiki/Load_\(computing\)), divided by the number of cores on the machine. This is a good choice if you expect widely disparate CPU workloads and want to ensure that machines with high CPU utilization don't receive new sessions.
+
+### User Hash
+
+The `user-hash` balancing method attempts to distribute load evenly and consistently across nodes by hashing the username of clients:
+
+```ini
+[config]
+balancer = user-hash
+```
+
+The hashing algorithm used is [CityHash](http://en.wikipedia.org/wiki/CityHash), which will produce a relatively even distribution of users to nodes. This is a good choice if you want the assignment of users/sessions to nodes to be stable.
+
+### Custom
+
+The `custom` balancing method calls out to external script to make load balancing decisions:
+
+```ini
+[config]
+balancer = custom
+```
+
+When `custom` is specified, RStudio Workbench will execute the following script when it needs to make a choice about which node to start a new session on:
+
+```bash
+/usr/lib/rstudio-server/bin/rserver-balancer
+```
+
+This script will be passed two environment variables:
+
+`RSTUDIO_USERNAME` --- The user on behalf or which the new R session is being created.
+
+`RSTUDIO_NODES` --- Comma separated list of the host and port of available nodes.
+
+The script should return the node to start the new session on using its standard output. Note that the format of the returned node should be identical to its format as passed to the script (i.e. include the host and port).
+
+#### Node Host Format
+
+In earlier versions of RStudio, the custom load balancing script would always be passed a list of raw IP addresses in `RSTUDIO_NODES`; now, `RSTUDIO_NODES` will contain the hosts as specified in the `load-balancer` file.  If you want to specify host names in your `load-balancer` file but work with raw IPs in your custom load balancing script, you can set the following option:
+
+```bash
+# /etc/rstudio/rserver.conf
+resolve-load-balancer-nodes=1
+```
+
+Note that this option is incompatible with SSL unless your servers' SSL certificates contain IP addresses in their CN/SAN.

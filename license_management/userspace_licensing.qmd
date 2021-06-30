@@ -1,0 +1,41 @@
+## Userspace Licensing
+
+In a standard installation of RStudio Workbench, licensing configuration operations require elevated access (e.g. via sudo). This is appropriate given the product will normally be installed and activated by an administrator on behalf of multiple user accounts.
+
+Alternatively, the licensing system may be switched to a "userspace" model where the licensing commands are available to a non-elevated user account. This is a system-wide setting; it is not possible to mix both models on a single system.
+
+### Switching to Userspace Licensing
+
+Before switching, stop the server, and deactivate any existing license-key or license-server.
+
+```bash
+$ sudo rstudio-server stop
+$ sudo rstudio-server license-manager deactivate
+$ sudo rstudio-server license-manager clear-license-server
+```
+
+Next, disable the standard system-level licensing mode by deleting the "verify" file.
+
+```bash
+$ sudo rm /var/lib/rstudio-server/verify
+```
+
+Initialize the license system in userspace mode. Note this command must **not** be run elevated, but as the RStudio server account (normally `rstudio-server`) as described in [Server Account](../access_and_security/server_permissions.qmd#server-account).
+
+```bash
+$ rstudio-server license-manager initialize --userspace
+```
+
+Confirm that the mode was successfully changed.
+
+```bash
+$ rstudio-server license-manager verify
+Trial-Type: Verified
+Status: Evaluation
+Days-Left: 5
+License-Scope: User
+```
+
+The line `License-Scope: User` indicates successful switch to userspace licensing (versus the default setting of `System`).
+
+At this point, the user may perform licensing commands without using "sudo", such as activating a license-key or configuring a license-server.

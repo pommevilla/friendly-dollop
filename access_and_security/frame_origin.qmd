@@ -1,0 +1,25 @@
+---
+aliases:
+  - access-and-security.html#frame-origin
+---
+
+## Frame Origin
+
+For security reasons, RStudio will not load inside a browser frame (such as a frameset or IFrame) by default. You can modify this behavior by using the `www-frame-origin` option. For example, if you would like to host RStudio inside a browser frame at `example.com`, you can tell RStudio to allow this as follows:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-frame-origin=example.com
+```
+
+There are several special values available for the `www-frame-origin` option:
+
+| Value                | Meaning                                            |
+| -------------------- | -------------------------------------------------- |
+| `none`               | The default; do not allow RStudio to load in any frame. |
+| `same`               | Allow RStudio to load in a frame if it has the same origin (host and port) as RStudio. |
+| `any`                | Allow RStudio to load in a frame from any origin (not recommended) |
+| *my-domain.com*      | Allow RStudio to load in a frame at *my-domain.com* |
+
+To interact programmatically with RStudio in an IFrame, see the [Tutorial API](../tutorial_api/tutorial_api.html).
+

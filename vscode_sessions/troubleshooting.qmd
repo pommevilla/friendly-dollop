@@ -1,0 +1,3 @@
+## Troubleshooting
+
+If you experience issues related to running VS Code sessions, you can use the Launcher verification tool which will attempt to launch VS Code sessions and provide diagnostic output about what could be going wrong. For more information, see the [Troubleshooting](../job_launcher/troubleshooting.qmd) section for the Job Launcher integration documentation.

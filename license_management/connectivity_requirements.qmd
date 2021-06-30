@@ -1,0 +1,56 @@
+## Connectivity Requirements
+
+In order to activate or deactivate RStudio Workbench, internet connectivity is required for communication with the licensing server. If your server is behind an internet proxy or not connected to the Internet at all this section describes what's required to successfully activate.
+
+Additionally, your server should have a synchronized system clock, using `ntp` or some other clock syncing service. If the server's clock is sufficiently incorrect, licensing verification will fail.
+
+### Proxy Servers
+
+If your server is behind an internet proxy, you may need to add an additional command line flag indicating the address and credentials required to communicate through the proxy. This may not be necessary if either the `http_proxy` or `all_proxy` environment variable is defined (these are read and used by the license manager when available).
+
+If you do need to specify a proxy server explicitly you can do so using the `--proxy` command line parameter. For example:
+
+```bash
+$ sudo rstudio-server license-manager --proxy=http://127.0.0.1/ activate <product-key>
+```
+
+Proxy settings can include a host-name, port, and username/password if necessary. The following are all valid proxy configurations:
+
+```bash
+http://127.0.0.1/
+http://127.0.0.1:8080/
+http://user:pass@127.0.0.1:8080/
+```
+ 
+If the port is not specified, the license manager will default to using port `1080`.
+
+### Offline Activation
+
+If your system has no connection to the Internet it's also possible to perform an offline activation. To do this, we recommend using our offline activation application which will walk you through the process: [RStudio Offline Activation](http://apps.rstudio.com/offline-activation/)
+
+To activate your license offline, you first generate an offline activation request as follows:
+
+```bash
+$ sudo rstudio-server license-manager activate-offline-request <product-key>
+```
+
+Executing this command will print an offline activation request to the terminal which you should copy and paste and enter into our [offline activation application](https://rs-support.shinyapps.io/offline-activation/) or send to RStudio customer support (<support@rstudio.com>). You will receive a reply with a file attachment that can be used to activate offline as follows:
+
+```bash
+$ sudo rstudio-server license-manager activate-offline <activation-file>
+```
+
+If you are renewing your license or want to move your license of RStudio Workbench to another system you can also perform license deactivation offline. You can do this as follows:
+
+```bash
+$ sudo rstudio-server license-manager deactivate-offline
+```
+
+Executing this command will print an offline deactivation request to the terminal which you should copy and paste and enter into the [offline activation application](https://rs-support.shinyapps.io/offline-activation/) then send to RStudio customer support (<support@rstudio.com>).
+
+You can also perform an offline check of your current license status using the following command:
+
+```bash
+$ sudo rstudio-server license-manager status-offline
+```
+

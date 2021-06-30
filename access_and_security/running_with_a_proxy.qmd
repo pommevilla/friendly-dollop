@@ -1,0 +1,264 @@
+---
+aliases:
+  - access-and-security.html#running-with-a-proxy
+---
+
+## Running with a Proxy
+
+### Overview
+
+If you are running RStudio behind a proxy server you need be sure to configure the proxy server so that it correctly handles all traffic to and from RStudio.   
+
+Beyond the normal reverse proxy configuration you'd apply for any HTTP server application, you also need to ensure that websockets are forwarded correctly between the proxy server and RStudio to ensure that all RStudio functions work correctly. In particular, they're needed to ensure that Shiny applications run from within the IDE work properly - if not, you may find that Shiny applications "gray out" and close without you being able to interact with them.  
+
+It's also important to ensure that your reverse proxy uses a relatively lenient connection timeout; we recommend 60 seconds. Several components of RStudio use [HTTP Long Polling](https://en.wikipedia.org/wiki/Push_technology#Long_polling) to push information to the browser; a connection timeout of 30 seconds or fewer will result in HTTP 504 (gateway timeout) errors from the reverse proxy.
+
+This section describes how to correctly configure a reverse proxy with [Nginx](http://nginx.org/en/) and [Apache](http://httpd.apache.org/).
+
+### Nginx Configuration
+
+On Debian or Ubuntu a version of Nginx that supports reverse-proxying can be installed using the following command:
+
+```bash
+sudo apt-get install nginx
+```
+
+On CentOS or Red Hat you can install Nginx using the following command:
+
+```bash
+sudo yum install nginx
+```
+
+To enable an instance of Nginx running on the same server to act as a front-end proxy to RStudio you would add commands like the following to your `nginx.conf` file. Note that you must add code to proxy websockets in order to correctly display Shiny apps and R Markdown Shiny documents in RStudio. Also note that if you are proxying to a server on a different machine you need to replace references to `localhost` with the correct address of the server where you are hosting RStudio.
+
+```r
+http {
+
+  map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+  }
+  
+  server {
+    listen 80;
+    
+    
+    location / {
+      proxy_pass http://localhost:8787;
+      proxy_redirect http://localhost:8787/ $scheme://$host/;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+      proxy_read_timeout 20d;
+      # Use preferably
+      proxy_set_header X-RStudio-Request $scheme://$host:$server_port$request_uri;
+      # OR existing X-Forwarded headers
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # OR alternatively the Forwarded header (just an example)
+      proxy_set_header Forwarded "host=$host:$server_port;proto=$scheme;";
+    }
+  }
+}
+```
+
+If you want to serve RStudio from a custom path (e.g. /rstudio) you would edit your `nginx.conf` file as shown below:
+
+```r
+http {
+
+  map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+  }
+  
+  server {
+    listen 80;
+    
+    location /rstudio/ {
+      rewrite ^/rstudio/(.*)$ /$1 break;
+      proxy_pass http://localhost:8787;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+      proxy_read_timeout 20d;
+      # Use preferably
+      proxy_set_header X-RStudio-Request $scheme://$host:$server_port$request_uri;
+      proxy_set_header X-RStudio-Root-Path /rstudio
+      # OR let the proxy rewrite the root path
+      proxy_redirect http://localhost:8787/ $scheme://$host/rstudio/;
+      proxy_cookie_path / /rstudio;
+      # OR existing X-Forwarded headers
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      # OR alternatively the Forwarded header (just an example)
+      proxy_set_header Forwarded "host=$host:$server_port;proto=$scheme;";
+    }
+```
+
+::: {.callout-note}
+The header `X-RStudio-Root-Path` and the configuration option `www-root-path` server the same purpose. If either is set RStudio will always return cookies and redirects for the correct path, without requiring rewrite assistance from the proxy. The header value has precedence over the configuration value.
+:::
+
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+www-root-path=/rstudio
+```
+
+After adding these entries you'll then need to restart Nginx so that the proxy settings take effect:
+
+```bash
+sudo /etc/init.d/nginx restart
+```
+
+Note that RStudio needs the `X-RStudio-Request`, `X-Forwarded-[Host|Port|Proto]`, or `Forwarded` headers set for various security reasons, and nginx does not supply this header by default. It must contain the original `Host` value of the request, which is usually set to `$host` in the nginx configuration file.
+
+In some cases, such as when streaming job statuses from the launcher, the default response buffering in nginx can be too slow for delivering real-time updates, especially when configured to use SSL. If job output streams are not working properly from the home page, we recommend disabling response buffering by adding the following line under the `server` directive:
+
+```r
+server {
+  # ... follows previous configuration
+  proxy_buffering off;
+}
+```
+
+### Apache Configuration
+
+To enable an instance of Apache running on the same server to act as a front-end proxy to RStudio you need to use the `mod_proxy` and `mod_proxy_wstunnel` modules. The steps for enabling this module vary across operating systems so you should consult your distribution's Apache documentation for details. Apache as reverse proxy already includes `X-Forwarded-Host` (with port) and `X-Forwarded-Proto` by default.
+
+On Debian and Ubuntu systems Apache can be installed with `mod_proxy` using the following commands:
+
+```bash
+sudo apt-get install apache2
+sudo apt-get install libapache2-mod-proxy-html
+sudo apt-get install libxml2-dev
+```
+
+Then, to update the Apache configuration files to activate `mod_proxy` you execute the following commands:
+
+```bash
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo a2enmod proxy_wstunnel
+```
+
+On CentOS and RedHat systems Apache can be installed with `mod_proxy` and `mod_proxy_wstunnel` by following the instructions here:
+
+<http://httpd.apache.org/docs/2.4/platform/rpm.html>
+
+By default with Apache 2.4, `mod_proxy` and `mod_proxy_wstunnel` should be enabled. You can check this by opening the file `/etc/httpd/conf.modules.d/00-proxy.conf` and making sure the following lines are included and not commented out:
+
+```apache
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
+```
+
+Once you have enabled `mod_proxy` and `mod_proxy_wstunnel` in your Apache installation you need to add the required proxy commands to your `VirtualHost` definition. Note that you will also need to include code to correctly proxy websockets in order to correctly proxy Shiny apps and R Markdown documents within RStudio. Also note that if you are proxying to a server on a different machine you need to replace references to `localhost` with the correct address of the server where you are hosting RStudio.
+
+```apache
+<VirtualHost *:80>
+
+  <Proxy *>
+    Allow from localhost
+  </Proxy>
+
+  RewriteEngine on
+  RewriteCond %{HTTP:Upgrade} =websocket
+  RewriteRule /(.*)     ws://localhost:8787/$1  [P,L]
+  RewriteCond %{HTTP:Upgrade} !=websocket
+  RewriteRule /(.*)     http://localhost:8787/$1 [P,L]
+  ProxyPass / http://localhost:8787/
+  ProxyPassReverse / http://localhost:8787/
+  # Use preferably this (store variable values with dummy rewrite rules)
+  RewriteRule . - [E=req_scheme:%{REQUEST_SCHEME}]
+  RewriteRule . - [E=http_host:%{HTTP_HOST}]
+  RewriteRule . - [E=req_uri:%{REQUEST_URI}]
+  RequestHeader set X-RStudio-Request "%{req_scheme}e://%{http_host}e%{req_uri}e"
+  ProxyRequests Off
+
+</VirtualHost>
+```
+
+Note that if you want to serve RStudio from a custom path (e.g. /rstudio) you would replace the directives described above to:
+
+```apache
+RewriteEngine on
+RewriteCond %{HTTP:Upgrade} =websocket
+RewriteRule /rstudio/(.*)     ws://localhost:8787/$1  [P,L]
+RewriteCond %{HTTP:Upgrade} !=websocket
+RewriteRule /rstudio/(.*)     http://localhost:8787/$1 [P,L]
+ProxyPass /rstudio/ http://localhost:8787/
+# Use preferably this (store variable values with dummy rewrite rules)
+RewriteRule . - [E=req_scheme:%{REQUEST_SCHEME}]
+RewriteRule . - [E=http_host:%{HTTP_HOST}]
+RewriteRule . - [E=req_uri:%{REQUEST_URI}]
+RequestHeader set X-RStudio-Request "%{req_scheme}e://%{http_host}e%{req_uri}e"
+RequestHeader set X-RStudio-Root-Path "/rstudio"
+# Or alternatively
+ProxyPassReverse /rstudio/ http://localhost:8787/
+ProxyPassReverseCookiePath  "/"  "/rstudio"
+ProxyRequests Off
+```
+
+::: {.callout-note}
+The header `X-RStudio-Root-Path` and the configuration option `www-root-path` server the same purpose. If either is set RStudio will always return cookies and redirects for the correct path, without requiring rewrite assistance from the proxy. The header value has precedence over the configuration value.
+:::
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+www-root-path=/rstudio
+```
+
+Finally, after you've completed all of the above steps you'll then need to restart Apache so that the proxy settings take effect:
+
+```bash
+sudo /etc/init.d/apache2 restart
+```
+
+### RStudio Configuration {.pro-header}
+
+If your RStudio Workbench and proxy server are running on the same machine you can also change the port RStudio Workbench listens on from 0.0.0.0 (all remote clients) to 127.0.0.1 (only the localhost). This ensures that the only way to connect to RStudio is through the proxy server. You can do this by adding the `www-address` entry to the **`/etc/rstudio/rserver.conf`** file as follows:
+
+```ini
+www-address=127.0.0.1
+```
+
+Note that you may need to create this config file if it doesn't already
+exist.
+
+### Custom Paths and Path-Rewriting Proxies
+
+In the examples above we have configurations where RStudio is served by the proxy under a custom `/rstudio` path. This is called a path-rewriting proxy setup.
+
+RStudio can use different combinations of HTTP headers and/or options to determine its location when path-rewriting in is use:
+
+- Use `X-RStudio-Request` if possible. This way RStudio knows exacly the address presented in the user's browser.
+  - Otherwise, you must use `X-Forwarded-*` family of headers or the `Forwarded` header.
+- Use `X-RStudio-Root-Path` if possible. This way RStudio knows which portion of the path was added by the proxy.
+  - Alternatively, use the option `www-root-path` for the same effect.
+  - Otherwise, you must use additional options in your proxy configuration to adjust redirects and cookies for the right path.
+
+The most reliable configuration is using `X-RStudio-Request` and `X-RStudio-Root-Path` defined as in the examples above. There's little involvement of the proxy when using these headers.
+
+If you have little experience with proxies but still want to use a custom path, we recommend using the `www-root-path` option in RStudio and at least the headers `X-Forwarded-Host` and `X-Forwarded-Proto`.
+
+Finally, if you want the proxy to have total control of custom path then define the rewrite rules yourself directly in the proxy configuration based on the alternatives suggested in the example above. In this case, do not use the option `www-root-path` or the header `X-RStudio-Root-Path`.
+
+### Customizing Default Proxy {.pro-header}
+
+RStudio Workbench exposes itself over TCP by means of an nginx proxy instance that runs as the `rserver-http` process on the local machine. In some cases, this proxy instance may need to be customized.
+
+In order to customize it, you can create any of the following three files. Each file modifies the nginx configuration at `/var/lib/rstudio-server/conf/rserver-http.conf` in the following way:
+
+* `/etc/rstudio/nginx.http.conf` - allows you to add additional nginx directives under the root `http` node, and should be used for altering basic HTTP settings
+* `/etc/rstudio/nginx.server.conf` - allows you to add additional nginx directives under the `server` node, and should be used for altering basic server settings
+* `/etc/rstudio/nginx.site.conf` - allows you to add additional nginx directives under the `location /` node, and should be used for altering responses sent from RStudio
+
+Simply add the desired nginx configuration in the files above to modify the desired section - the contents of each file is copied into the `rserver-http.conf` template verbatim. Then, restart `rstudio-server` for the changes to take effect.
+
+In most cases, you should not need to create these files and modify the nginx template that is provided.

@@ -1,8 +1,4 @@
---- 
-title: "RStudio Workbench {{< var version >}}"
-subtitle: "Administration Guide"
-date: "`r Sys.Date()`"
----
+## Introduction
 
 RStudio Server enables you to provide a browser based interface (the RStudio IDE) to a version of R running on a remote Linux server. Deploying R and RStudio on a server has a number of benefits, including:
 
@@ -29,3 +25,4 @@ This manual describes *RStudio Workbench*, which adds many enhancements to the o
 - Suspend, terminate, or assume control of user sessions; Impersonate users for assistance and troubleshooting.
 
 The documentation applies to both RStudio Server (Open Source) and RStudio Workbench (Pro), unless the section is specifically marked `Pro`, in which case it only applies to RStudio Workbench.
+

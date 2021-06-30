@@ -1,0 +1,95 @@
+## Server Health Checks
+
+### Enabling Health Checks
+
+You may wish to periodically poll RStudio Workbench to ensure that it's still responding to requests as well as to examine various indicators of server load. You can enable a health check endpoint using the `server-health-check-enabled` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-health-check-enabled=1
+```
+
+After restarting the server, the following health-check endpoint will be available:
+
+```html
+http://<server-address-and-port>/health-check
+```
+
+By default, the output of the health check will appear as follows:
+
+```coldfusion
+active-sessions: 1
+idle-seconds: 0
+cpu-percent: 0.0
+memory-percent: 64.2
+swap-percent: 0.0
+load-average: 4.1
+```
+
+### Customizing Responses 
+
+The response to the health check is determined by processing a template that includes several variables. The default template is:
+
+```coldfusion
+active-sessions: #active-sessions#
+idle-seconds: #idle-seconds#
+cpu-percent: #cpu-percent#
+memory-percent: #memory-percent#
+swap-percent: #swap-percent#
+load-average: #load-average#
+```
+
+You can customize this template to return an alternate format (e.g. XML or JSON) that is parse-able by an external monitoring system. To do this you simply create a template and copy it to **`/etc/rstudio/health-check`** For example, an XML format:
+
+```xml
+<!--/etc/rstudio/health-check-->
+<?xml version="1.0" encoding="UTF-8"?>
+<health-check>
+  <active-sessions>#active-sessions#</active-sessions>
+  <idle-seconds>#idle-seconds#</idle-seconds>
+  <cpu-percent>#cpu-percent#</cpu-percent>
+  <memory-percent>#memory-percent#</memory-percent>
+  <swap-percent>#swap-percent#</swap-percent>
+  <load-average>#load-average#</load-average>
+</health-check>
+```
+
+Or a [Prometheus](https://prometheus.io/docs/introduction/overview/) endpoint. Prometheus is an open-source systems monitoring and alerting toolkit with a custom input format:
+
+```bash
+# /etc/rstudio/health-check
+# HELP active_sessions health_check metric Active RStudio sessions
+# TYPE active_sessions gauge
+active_sessions #active-sessions#
+# HELP idle_seconds health_check metric Time since active RStudio sessions
+# TYPE idle_seconds gauge
+idle_seconds #idle-seconds#
+# HELP cpu_percent health_check metric cpu (percentage)
+# TYPE cpu_percent gauge
+cpu_percent #cpu-percent#
+# HELP memory_percent health_check metric memory used (percentage)
+# TYPE memory_percent gauge
+memory_percent #memory-percent#
+# HELP swap_percent health_check metric swap used (percentage)
+# TYPE swap_percent gauge
+swap_percent #swap-percent#
+# HELP load_average health_check metric cpu load average
+# TYPE load_average gauge
+load_average #load-average#
+```
+
+### Changing the URL
+
+It's also possible to customize the URL used for health checks. RStudio Workbench will use the first file whose name begins with `health-check` in the `/etc/rstudio` directory as the template, and require that the full file name be specified in the URL. For example, a health check template located at the following path:
+
+```bash
+/etc/rstudio/health-check-B64C900E
+```
+
+Would be accessed using this URL:
+
+```html
+http://<server-address-and-port>/health-check-B64C900E
+```
+
+Note that changes to the health check template will not take effect until the server is restarted.

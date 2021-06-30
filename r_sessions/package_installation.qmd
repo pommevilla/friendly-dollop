@@ -1,0 +1,86 @@
+## Package Installation
+
+You can customize the location of user packages installed from CRAN as well as the default CRAN repository. You can also configure the user-interface of the RStudio IDE to discourage end-user package installation in the case where packages are deployed centrally to a site library.
+
+::: {.callout-important}
+The settings discussed in this section are specified in the `/etc/rstudio/rsession.conf` file (rather than the `rserver.conf` file previously referenced).
+:::
+
+
+### User Library
+
+By default R packages are installed into a user-specific library based on the contents of the `R_LIBS_USER` environment variable (more details on this mechanism are here: [http://stat.ethz.ch/R-manual/R-devel/library/base/html/libPaths.html](http://stat.ethz.ch/R-manual/R-devel/library/base/html/libPaths.html)).
+
+It's also possible to configure an alternative default for user package installation using the `r-libs-user` setting. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+r-libs-user=~/R/library/%v
+```
+
+R interprets `%v` to be the `major.minor` version of R; for example the above would cause R 3.6 to use a package library located at `~/R/library/3.6`.
+
+#### Unversioned R Library
+
+R doesn't guarantee ABI compatibility between minor versions, so when you use packages that include compiled code, you will want to ensure that each version of R has its own library. Otherwise, compiled code may cause crashes or other unexpected behavior when R is upgraded.
+
+However, if you do not use any compiled packages, you can share a library between R versions (e.g. just `~/R/library`). This makes it possible to upgrade the major version of R on the server and have user's packages continue to work.
+
+#### Upgrading R
+
+You can read more about package library considerations when upgrading R in the following article: [Upgrading to a New Version of R](https://shiny.rstudio.com/articles/upgrade-R.html)
+
+### Discouraging User Installations {.pro-header}
+
+It may be that you've configured RStudio Workbench with a site package library that is shared by all users. In this case you might wish to discourage users from installing their own packages by removing the package installation UI from the RStudio IDE. To do this you use the `allow-package-installation` setting. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+allow-package-installation=0
+```
+
+Note that this setting merely discourages package installation by removing user-interface elements. It's still possible for users to install packages directly using the `utils::install.packages` function.
+
+### CRAN Repositories
+
+RStudio uses the RStudio CRAN mirror ([https://cran.rstudio.com](https://cran.rstudio.com)) by default. This mirror is globally distributed using Amazon S3 storage so should provide good performance for all locales. You may however wish to override the default CRAN mirror. This can be done with the `r-cran-repos` settings. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+r-cran-repos=http://cran.at.r-project.org/
+```
+
+Whatever the default CRAN mirror is, individual users are still able to set their own default. To discourage this, you can set the `allow-r-cran-repos-edit` settings. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+allow-r-cran-repos-edit=0
+```
+
+Note that even with user editing turned off it's still possible for users to install packages from alternative repositories by directly specifying the `repos` parameter in a call to `install.packages`.
+
+To specify a list of CRAN repos, define a `/etc/rstudio/repos.conf` file containing the primary `CRAN` repo and named secondary repos. For example:
+
+```ini
+# /etc/rstudio/repos.conf
+CRAN=https://cran.rstudio.com
+Australia=https://cran.ms.unimelb.edu.au/
+Austria=https://lib.ugent.be/CRAN/
+```
+
+To change the location of `repos.conf`, use the `r-cran-repos-file` setting. For example, by adding to `rsession.conf`:
+
+```ini
+r-cran-repos-file=/etc/rstudio/mirrors.conf
+```
+
+Optional CRAN repos can be made available for users in RStudio with the `r-cran-repos-url` setting, this setting expects a URL to retrieve a configuration file containing named secondary repos. These secondary repos won't be set by default, but rather, RStudio will list them to users to be manually added to their repo selection. For example:
+
+*http://custom-domain/repos.conf*
+```ini
+Australia=https://cran.ms.unimelb.edu.au/
+Austria=https://lib.ugent.be/CRAN/
+```
+
+Notice that the `allow-r-cran-repos-edit` option can also be used to disallow secondary repos and that `repos.conf` overrides the `r-cran-repos` setting, if specified.
+

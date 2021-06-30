@@ -1,0 +1,26 @@
+## Multiple R Sessions {.pro-header}
+
+RStudio Workbench enables users to have multiple concurrent R sessions on a single server or load balanced cluster of servers (the open-source version of RStudio Server supports only a single session at a time).
+
+### Creating New Sessions
+
+You can start a new R Session using the **New Session** command from the **Session** menu (or the corresponding toolbar button near the top-right of the IDE).
+
+You can also open an existing RStudio project in a new R session by using the **Open Project in New Session** command. When switching projects there is also a button on the right side of the projects menu that lets you specify that the project should be opened in a new session rather than within the current one.
+
+You can review all currently running sessions and switch between them using the **Sessions** toolbar near the top-right of the IDE.
+
+### Session Lifetimes
+
+R Sessions are long-running tasks that continue to be available until you explicitly quit them (you can think of them as you'd think of multiple top-level RStudio windows running on the desktop). This means that you can kickoff a long running job in one session and then switch to another session, revisiting the original session later to check on it's progress. As is also possible on the desktop, you can navigate between different projects and working directories within a session.
+
+Sessions will suspend automatically when they are idle and then be automatically resumed next time they are accessed. To permanently quit a session you can use the **Quit Session** command located on the **File** menu or the corresponding toolbar button at the top right of the IDE.
+
+### Disabling Multiple Sessions
+
+If you wish disable support for multiple sessions you can use the `server-multiple-sessions` option. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-multiple-sessions=0
+```

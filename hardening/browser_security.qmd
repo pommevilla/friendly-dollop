@@ -1,0 +1,36 @@
+## Browser Security
+
+This section summarizes the recommendations in the [Access and Security](../access_and_security/access_and_security.qmd) section.
+
+### Enable Origin Checks
+
+To help mitigate against CSRF attacks, RStudio can automatically reject any request that originated from a domain it doesn't recognize. To enable this check, add the following configuration:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+www-enable-origin-check=1
+www-allow-origin=mysubdomain.mydomain.com
+```
+
+The `www-allow-origin` setting is optional, but is helpful when RStudio is running behind a proxy. See [Additional Security Considerations](../access_and_security/additional_security_considerations.qmd) for details.
+
+### Disable Frame Embedding
+
+By default, RStudio does not permit frame embedding (that is, it will not load inside another web page's `<frameset>` or `<iframe>`). No change is necessary to enforce this, but you can request it explicitly as follows:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-frame-origin=none
+```
+
+### Set SameSite Cookie Header
+
+RStudio does not set the `SameSite` cookie header by default (see [Same Site cookies](../access_and_security/same_site_cookies.qmd) for details). We recommend setting it explicitly. 
+
+```ini
+# /etc/rstudio/rserver.conf
+www-same-site=lax
+```
+

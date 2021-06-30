@@ -1,0 +1,25 @@
+# Overview
+
+**R users require local system accounts regardless of what RStudio authentication method you use.** You must set up local system accounts manually or programmatically and then map authenticating users to these accounts.
+
+For user identification, authentication, and authorization using local system accounts, RStudio relies heavily on Linux [Pluggable Authentication Module (PAM)](http://en.wikipedia.org/wiki/Pluggable_authentication_module). PAM can be used by itself to authenticate users or along with other external authentication mechanisms (e.g., Web Single Sign-On) to authorize existing local system accounts.
+
+::: {.callout-note}
+Not all RStudio products require local system accounts or PAM. For example, RStudio Connect and Shiny Server rely on their own authentication engines and on a single system account for doing their work in most cases, not requiring individualized development environments like the ones offered by RStudio Workbench.
+:::
+
+Here are the various authentication mechanisms supported by RStudio:
+
+| Authentication                                   | RStudio Configuration                                                         |
+|--------------------------------------------------|-------------------------------------------------------------------------------|
+| Local Accounts | [PAM Authentication](pam_authentication.qmd) (via `pam_unix`) |
+| LDAP or Active Directory | [PAM Authentication](pam_authentication.qmd) (via `pam_sss` or `pam_ldap` in older systems) |
+| Kerberos | [PAM Authentication](pam_authentication.qmd) (via `pam_sss` or `pam_krb5` in older systems) |
+| Web Single Sign-On (SSO) | [SAML Single Sign-On Authentication](saml_sso.qmd) or [OpenID Connect Authentication](openid_connect_authentication.qmd) |
+| Others (client-server, e.g., RADIUS) | As supported by various [PAM modules](http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html) |
+| Others (browser-based, e.g., Kerberos [SPNEGO](https://en.wikipedia.org/wiki/SPNEGO) SSO) | [Proxied Authentication](proxied_authentication.qmd) |
+
+::: {.callout-note}
+SAML, OpenID, and Proxied authentication still require [PAM Sessions](../r_sessions/pam_sessions.qmd) to automatically create local system accounts. Without it, local system accounts have to be provisioned manually one-by-one.
+:::
+

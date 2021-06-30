@@ -1,0 +1,149 @@
+## Configuration
+
+In order to set up a database connection, modify the file */etc/rstudio/database.conf*. The file contains documentation about how to use it, and you can simply uncomment any lines that are relevant to your configuration. Note that because the file can contain password data, this file must be user read/write **only** (file mask 600).
+
+### SQLite
+
+By default, RStudio creates a SQLite database for you automatically under the `/var/lib/rstudio-server` directory. For single-node installations, this is sufficient, but as stated before, will not be sufficient for load balanced deployments.
+
+You should **never** specify a SQLite directory that is on shared storage, such as NFS. Per the [SQLite documentation](https://www.sqlite.org/lockingv3.html), this can cause data corruption.
+
+Sample configuration:
+
+```ini
+# /etc/rstudio/database.conf
+provider=sqlite
+
+# Directory in which the sqlite database will be written
+directory=/var/lib/rstudio-server
+```
+
+### PostgreSQL
+
+If you wish to use PostgreSQL, you must create an empty database for RStudio to connect to. You must not share this database with other products or services. If running an HA setup, it is strongly recommended to run the database on a separate server than the RStudio services to ensure maximum availability. The minimum supported PostgreSQL version is 9.5.
+
+RStudio requires PostgreSQL to be configured for password-based authentication. For more details on this and other PostgreSQL fundamentals, see the support article [Install and Configure PostgreSQL for RStudio Workbench / RStudio Server Pro](https://support.rstudio.com/hc/en-us/articles/1500005822102-Install-and-Configure-PostgreSQL-for-RStudio-Server-Pro).
+
+Sample configuration:
+
+```ini
+# /etc/rstudio/database.conf
+# Note: when connecting to a PostgreSQL database, a default empty rstudio database must first be created!
+provider=postgresql
+
+# Specifies the host (hostname or IP address) of the database host
+host=localhost
+
+# Specifies the database to connect to
+database=rstudiodb
+
+# Specifies the TCP port where the database is listening for connections
+port=5432
+
+# Specifies the database connection username
+username=rstudio
+
+# Specifies the database connection password. This may be encrypted with the secure-cookie-key.
+# The encrypted password can be generated using the helper command rstudio-server encrypt-password.
+# It is strongly recommended that you encrypt the password!
+password=test
+
+# Specifies the maximum amount of seconds allowed before a database connection attempt
+# is considered failed. The default if not specified is 10 seconds. Corresponds to the
+# PostgreSQL "connect_timeout=" connection string parameter. 
+connection-timeout-seconds=12
+```
+
+PostgreSQL connection URIs are also supported if preferred. If specifying additional options other than the ones provided above, such as `sslmode`, the use of a URI is required.
+
+For example:
+
+```ini
+# /etc/rstudio/database.conf
+provider=postgresql
+
+# Specifies the connection URL in the form of a postgresql:// connection URL. This can be used if you need
+# to set special database settings that are not available with the other parameters. If set, this parameter will
+# override any other postgresql parameters that have been set, with the exception of the password. A password in 
+# the URI is supported as a convenience but we strongly recommend using the separate password field, which will
+# always replace any password specified in the URI.
+connection-uri=postgresql://rstudio@localhost:5432/rstudiodb?sslmode=allow&options=-csearch_path=public
+```
+
+Available PostgreSQL connection string parameters are documented in the [official PostgreSQL documentation](https://www.postgresql.org/docs/10/libpq-connect.html#LIBPQ-PARAMKEYWORDS).
+
+::: {.callout-note}
+The password in `connection-uri` may contain characters that may need to be URL-encoded to work properly. Avoid encoding the password by using the separate `password` field in the configuration.
+:::
+
+#### SSL
+
+SSL for the PostgreSQL database can be used with RStudio by specifying `sslmode=allow` within the `connection-uri` parameter. The `connection-uri` mode of configuration must be used to specify additional database connection options such as these, beyond the simple name/value pairs that are supported.
+
+For example:
+
+```ini
+# /etc/rstudio/database.conf
+provider=postgresql
+connection-uri=postgresql://postgres@localhost:5432/rstudio?sslmode=allow
+```
+
+#### Schemas
+
+If you need to, you can tell RStudio to restrict itself to keeping its tables within a specific schema. You control this by giving PostgreSQL a search path as part of the URL by adding `options=-csearch_path=<schema-name>` to the `connection-uri`. If it's the only item you're adding, separate it from the rest of the URL with ? (just like the sslmode item above). Otherwise, separate it from other items with '&'.
+
+For example:
+
+```ini
+provider=postgresql
+connection-uri=postgresql://postgres@localhost:5432/rstudio?sslmode=allow&options=-csearch_path=rstudio_schema
+```
+
+RStudio will refuse to start when given a schema that does not already exist. The schema must be owned by the connecting user or by a group that contains the connecting user.
+
+#### PostgreSQL Account
+
+When setting up your PostgreSQL database for use with RStudio, ensure that you do not use the default `postgres` user account that comes with a standard installation. This is to ensure that your database is secure. Always ensure that whichever account that is used to access the database contains a strong password - do **not** use an account that has no password! You should also ensure that only one PostgreSQL user has access to the RStudio database for maximum security.
+
+#### PostgreSQL Password Encryption
+
+A plain-text password in the `password` or `connection-uri` options of the `/etc/rstudio/database.conf` file must only be used temporarily for testing purposes. A warning will be present in RStudio log output when a plain-text password is being used.
+
+We strongly recommend encrypting the password using the command `rstudio-server encrypt-password`. This way, if you have to backup your configuration, save it to a repository or share it with RStudio Support, your PostgreSQL password will be protected.
+
+Use the following steps to encrypt the PostgreSQL password:
+
+- Remove the password from the `connection-uri` option if defined in the `database.conf` file.
+- Run the command `sudo rstudio-server encrypt-password` and enter the PostgreSQL password.
+- Copy the resulting encrypted password printed in the terminal.
+- Add or replace the `password` option in the `database.conf` file using the encrypted password copied above.
+- Restart RStudio. Confirm it operates normally. You should no longer see a warning about plain-text password in RStudio logs.
+
+::: {.callout-note}
+Alternatively, you can also "pipe" your password to the `rstudio-server encrypt-password` command to skip the prompt. Useful when the password is already stored elsewhere. For example:
+
+```bash
+cat passwordfile | sudo rstudio-server encrypt-password
+```
+:::
+
+The password encryption uses the `secure-cookie-key` value. By default RStudio generates this key during installation and stores it in `/var/lib/rstudio-server/secure-cookie-key`.
+
+The same key value must be used for both encryption and decryption. If the key value used to encrypt the PostgreSQL password changes, the password must be re-encrypted with the new key and updated in `/etc/rstudio/database.conf`.
+
+If preparing RStudio configuration files on one system for deployment on other system(s), you must manually generate a key and store it in `/etc/rstudio/secure-cookie-key`, then encrypt the password again, update `/etc/rstudio/database.conf`, and ensure this `secure-cookie-key` file is deployed along with other RStudio configuration files. The technique for creating this file is described in [Generating a Key](../load_balancing/configuration.qmd#generating-a-key).
+
+#### PostgreSQL Connection Testing and Troubleshooting
+
+Once the settings have been entered in `/etc/rstudio/database.conf`, use the `sudo rstudio-server verify-installation` command to test connectivity and quickly view errors and warnings.
+
+### Connection Pool
+
+RStudio will create a pool of connections to the database at startup. The size of this pool defaults to the number of logical CPUs on the host running RStudio Workbench, up to 20. It is not generally recommended that you adjust the size of this pool manually unless you need to address a specific problem, such as exceeding a connection limit on the database or experiencing delays in RStudio Workbench caused by unavailable connections. 
+
+If you do need to adjust the size of the pool, you can do so by setting `pool-size` in `database.conf` as follows:
+
+```ini
+# /etc/rstudio/database.conf
+pool-size=5
+```

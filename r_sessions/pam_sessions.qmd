@@ -1,0 +1,180 @@
+## PAM Sessions {.pro-header}
+
+RStudio Workbench uses PAM (Pluggable Authentication Modules) for both user authentication as well to establish the environment and resources available for R sessions. This is accomplished using the PAM session API. PAM sessions are used for a variety of purposes:
+
+- To initialize environment variables
+- To automatically create local users after authentication or authorization against a directory server.
+- To mount remote drives
+- To initialize and destroy Kerberos tickets
+
+This section explains how to configure and customize PAM sessions with RStudio Workbench.
+
+### Session PAM Profile
+
+For PAM authentication RStudio Workbench uses the either the `/etc/pam.d/other` profile (Debian/Ubuntu) or `/etc/pam.d/rstudio` profile (RedHat/CentOS). However, for launching R sessions a different PAM profile is used. This is because the launching of R sessions may not coincide with authentication (e.g. returning to the site with login credentials cached in a cookie or resuming a suspended session). Therefore, the PAM directive that enables authentication with `root` privilege only (`auth sufficient pam_rootok.so`) needs to be present in the PAM profile.
+
+::: {.callout-note}
+Some `sssd` configuration additionally require PAM account verification as `root` to present on both the `auth` and `account` directives in the PAM profile (`auth sufficient pam_rootok.so` and `account sufficient pam_rootok.so`). Be sure to include this if you see errors when starting new R sessions.
+:::
+
+
+The behavior that RStudio Workbench requires is essentially the same as that of the `su` command (impersonation of a user without a password). Therefore by default RStudio Workbench uses the `/etc/pam.d/su` profile for running R sessions.
+
+The session PAM profile itself is also run whenever the user accesses the home page. Regardless of where the session actually runs (such as on another machine if using [Job Launcher](../job_launcher/job_launcher.html) sessions), the PAM profile is executed on the RStudio Workbench instance itself when opened via the home page.
+
+#### Creating a Custom Profile
+
+The `/etc/pam.d/su` profile has different default behavior depending upon your version of Linux and local configuration. Depending upon what type of behavior you want associated with R sessions (e.g. mounting of disks, setting of environment variables, enforcing of resource limits, etc.) you'll likely want to create a custom profile for R sessions. For example, if you wanted to use a profile named `rstudio-session` you would add this to the configuration file:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-pam-sessions-profile=rstudio-session
+```
+
+Here is in turn what the custom profile might contain in order to enable a few common features of PAM sessions (this is based on a modified version of the default `su` profile on Ubuntu):
+
+
+
+```ini
+# /etc/pam.d/rstudio-session
+# This allows root to su without passwords (this is required)
+auth       sufficient pam_rootok.so
+
+# This module parses environment configuration file(s)
+# and also allows you to use an extended config
+# file /etc/security/pam_env.conf.
+# parsing /etc/environment needs "readenv=1"
+session    required   pam_env.so readenv=1
+
+# Locale variables are also kept into /etc/default/locale in etch
+# reading this file *in addition to /etc/environment* does not hurt
+session    required   pam_env.so readenv=1 envfile=/etc/default/locale
+
+# Enforces user limits defined in /etc/security/limits.conf
+session    required   pam_limits.so
+
+# The standard Unix authentication modules
+@include common-auth
+@include common-account
+@include common-session
+```
+
+#### Custom Profile with Passwords
+
+Note that in the above configuration we rely on `pam_rootok.so` to enable authentication without a password. This is necessary because RStudio doesn't retain the passwords used during the authentication phase.
+
+In some situations however passwords are important for more than just authentication. PAM profiles support a `use_first_pass` directive to forward passwords used during authentication  into other modules (for example, to request a Kerberos ticket with `pam_krb5.so` or to mount an encrypted or remote drive with `pam_mount.so`). For these scenarios RStudio Workbench supports an optional mode to retain passwords after login and then forward them into the PAM session profile. This is enabled via the `auth-pam-sessions-use-password` setting:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-pam-sessions-use-password=1
+```
+
+::: {.callout-note}
+This setting is only available when using [PAM authentication](../authenticating_users/pam_authentication.html).
+:::
+
+In this scenario you should remove the `auth sufficient pam_rootok.so` directive and replace it with whatever authentication directives apply in your environment. You can then employ the `use_first_pass` directive to forward the password as necessary to other modules.
+
+For example, here's a very simple RedHat/CentOS PAM configuration file that uses system default authentication and forwards the password into the `pam_mount.so` module. Note that we are no longer using `pam_rootok.so` because the password is now available when the session is created.
+
+```ini
+# /etc/pam.d/rstudio-session
+# Auth/account (use system auth and forward password to pam_mount)
+auth     include    system-auth
+auth     optional   pam_mount.so use_first_pass
+account  required   pam_unix.so
+
+# Session (read environment variables and enforce limits)
+session  required   pam_env.so readenv=1
+session  required   pam_env.so readenv=1 envfile=/etc/default/locale
+session  required   pam_limits.so
+```
+
+Note that this configuration requires that RStudio Workbench retain user passwords in memory. This retention is done using industry best-practices for securing sensitive in-memory data including disabling ptrace and core dumps, using mlock to prevent paging into the swap area, and overwriting the contents of memory prior to freeing it. When using [Job Launcher](../job_launcher/job_launcher.qmd), the passwords are securely transmitted in encrypted form to different nodes or containers running the R sessions.
+
+::: {.callout-note}
+ Launcher will require TLS/SSL to be configured in order to allow PAM profiles with passwords to be used.
+:::
+
+#### More Resources
+
+If you want to learn more about PAM profile configuration the following are good resources:
+
+- [http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html](http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html)
+- [http://linux.die.net/man/8/pam.d](http://linux.die.net/man/8/pam.d)
+- [http://www.linuxjournal.com/article/2120](http://www.linuxjournal.com/article/2120)
+- [http://www.informit.com/articles/article.aspx?p=20968](http://www.informit.com/articles/article.aspx?p=20968)
+
+### PAM Session Cleanup
+
+By default, RStudio Workbench does not close PAM sessions when their associated R process exits. This is because PAM sessions often initialize and maintain resources that require more persistence that the lifetime of a single R session (e.g. mounted drives, Kerberos tickets, etc.). If a user has multiple active R sessions then closing the PAM session associated with one of them might unmount a drive or revoke a ticket that is still required by another R session.
+
+It is however possible to manually close the PAM session associated with an R session by force suspending it. This can be accomplished in one of two ways:
+
+- By pressing the **Suspend** button on the *Sessions* page of the [Administrative Dashboard](../server_management/administrative_dashboard.qmd).
+
+- By executing a `force-suspend` or `force-suspend-all` command as described in [Suspending Sessions](../server_management/core_administrative_tasks.qmd#suspending-sessions).
+
+If you prefer that PAM sessions be closed whenever their associated R session exits you can use the `auth-pam-sessions-close` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-pam-sessions-close=1
+```
+
+Note that if you specify this setting be aware that depending upon what resources are managed by your PAM sessions it may be incompatible with users running multiple concurrent R sessions (because for example a drive might be unmounted from underneath a running session). In this case you may wish to disable support for multiple R sessions (see the section on [Multiple R Sessions](multiple_r_sessions.qmd) for details on how to do this).
+
+### PAM Sessions with the Job Launcher
+
+When launching sessions via the [Job Launcher](../job_launcher/job_launcher.qmd), you must also configure PAM on any Launcher nodes (for Local or Slurm plugins) and within any containers used (if using Kubernetes). That's because PAM sessions are needed at the point where the R session is run, which for Launcher means some machine/container other than the one where RStudio Workbench is running. The PAM configuration is still required at the RStudio Workbench machine for authentication purposes.
+
+Launcher session PAM profiles run with different permissions at different stages of the session launch pipeline. When a user visits the RStudio home page  for the first time, their PAM session is initiated with root privilege, allowing the session to rely on `pam_rootok.so`, as discussed in the previous sections, and it is opened on the RStudio Workbench instance itself. However, Job Launcher sessions themselves *never* have true root privilege (unlike traditional session launches which have `root` privileges during early initialization), and thus cannot rely on `pam_rootok.so`. Their PAM sessions are opened on the actual instance where the session is running (e.g. a Kubernetes or Slurm node).
+
+It is generally sufficient to simply do all your necessary setup, such as user directory creation, whenever the user accesses the home page for the first time. This means that you can rely on `pam_rootok.so` and do not need password forwarding. However, if you need to also ensure that PAM sessions are created when actual sessions are started (e.g., for Kerberos or `pam_mount`), you will need to enable `auth-pam-sessions-use-password` to forward the user's PAM credentials to the session.
+
+::: {.callout-note}
+When Kerberos or LDAP/Active Diretory are required for PAM sessions, individual Launcher nodes or Kubernetes containers will have to either join the Kerberos domain or be configured to use `sssd` for obtaining LDAP/AD users and groups.
+:::
+
+When forwarding credentials over a TCP connection, we require that Job Launcher connections be secured with SSL to prevent leaking of the credentials. Therefore, if `auth-pam-sessions-use-password` is set for Launcher sessions, you will also need to set `launcher-use-ssl` and configure the Job Launcher to use SSL (see the Job Launcher [SSL Considerations](../job_launcher/configuration.qmd#ssl-considerations) section for more info).
+
+The following sample configuration demonstrates forwarding of PAM user credentials to Job Launcher sessions. This is only recommended if it is absolutely necessary to start PAM sessions whenever Launcher sessions are started, and it is not sufficient to simply start a PAM session whenever the user accesses the homepage for the first time:
+
+```ini
+# /etc/rstudio/rserver.conf
+launcher-sessions-enabled=1
+launcher-use-ssl=1
+auth-pam-sessions-enabled=1
+auth-pam-sessions-profile=rstudio
+auth-pam-sessions-use-password=1
+```
+
+The following sample configuration demonstrates a basic PAM setup where it is sufficient to only start PAM sessions when users visit the homepage, and thus no PAM sessions are started when Launcher sessions are started:
+
+```ini
+# /etc/rstudio/rserver.conf
+launcher-sessions-enabled=1
+auth-pam-sessions-enabled=1
+auth-pam-sessions-profile=rstudio
+```
+
+### Disabling PAM Sessions
+
+If you don't want RStudio Workbench to utilize PAM sessions you can disable this feature using the `auth-pam-sessions-enabled` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-pam-sessions-enabled=0
+```
+
+::: {.callout-warning}
+When using [`sssd`](https://sssd.io/) to automatically provision local system accounts using LDAP or Active Directory, RStudio relies on PAM sessions configured with [`pam_mkhomedir`](https://linux.die.net/man/8/pam_mkhomedir) (or equivalent) to create the home directories of a user that has never logged into the server. Disabling PAM sessions in this scenario may cause permission errors when starting session unless other methods for creating users' home directories are used.
+:::
+
+::: {.callout-important}
+PAM sessions are initially disabled by default when using RStudio Launcher to simplify its initial setup in a multi-node environment. However, many environments still require PAM sesssions and in those cases that needs to be explicitly enabled with Launcher.
+:::
+

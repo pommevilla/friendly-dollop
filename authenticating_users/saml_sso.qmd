@@ -1,0 +1,293 @@
+## SAML Single Sign-On Authentication {.pro-header}
+
+RStudio Workbench can be configured to authenticate users via SAML. This enables users to log in with their existing Single Sign-On (SSO) credentials and to be automatically authenticated to RStudio whenever they are already logged into their Identity Provider (IdP) account.
+
+### Enabling SAML SSO
+
+To enable authentication with SAML you add the `auth-saml` option to the RStudio configuration file `/etc/rstudio/rserver.conf`:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml=1
+```
+
+::: {.callout-important}
+**Once you enable authentication with SAML that becomes the exclusive means of authentication** - you can't concurrently use both PAM and SAML authentication.
+:::
+
+::: {.callout-important}
+SAML authentication still requires [PAM Sessions](../r_sessions/pam_sessions.qmd) and `sssd` to automatically create local system accounts. Without them, local system accounts have to be provisioned manually one-by-one.
+:::
+
+
+### Configuring SAML
+
+To use SAML authentication in RStudio you should configure the parts involved in this order:
+
+- [Configuring RStudio as a Service Provider]
+- [Configuring your Identity Provider with RStudio]
+
+### Configuring RStudio as a Service Provider
+
+RStudio Workbench needs to be configured in order to trust the SAML assertions sent by your IdP.
+
+#### Identity Provider Metadata Setup
+
+::: {.callout-note}
+RStudio Workbench expects the IdP metadata to contain the service name (`EntityID`), the Single Sign-On (SSO) URL and the signing certificate.
+:::
+
+
+The easiest way to configure RStudio Workbench is to point it to the IdP metadata URL. This can be done by adding the option `auth-saml-metadata-url`. This option automatically renews the metadata when it expires but it requires direct connectivity between your server and the IdP.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-metadata-url=https://idp.example.com/saml/metadata
+```
+
+If you want to avoid direct connectivity between your server and the IdP or if that setup is not possible you should use an offline setup. In this scenario, you should download the metadata from your IdP and upload it to your server. Then, add the option `auth-saml-metadata-path` pointing to the file location within your server. This option requires manual intervention if the metadata or the signing certificate expires.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-metadata-path=/path/to/saml/metadata.xml
+```
+
+::: {.callout-warning}
+The metadata URL option has precedence over the metadata file path option. You must remove the URL option first before using the file option.
+:::
+
+If your Identity Provider requires information about RStudio in order to provide metadata, see the [Manual Service Provider Setup] section below for a list of details you may need to provide about your RStudio Workbench server.
+
+#### Manual Identity Provider Setup
+
+If your IdP does not provide metadata or if the metadata has any problems, you should use a manual setup.
+The following required options must be added to your server configuration:
+
+- `auth-saml-idp-entity-id` - An URL to an HTTP(S) endpoint on the IdP, in general the location of its metadata. In very exceptional cases this may not be an URL.
+- `auth-saml-idp-sso-url` - An URL to an HTTP(S) endpoint on the IdP to where your server will send authentication requests.
+- `auth-saml-idp-sign-cert-path` - The path to a PEM file containing the public trust certificate for verifying the assertions' signatures.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-idp-entity-id=https://idp.example.com/saml/metadata
+auth-saml-idp-sso-url=https://idp.example.com/saml/sso
+auth-saml-idp-sign-cert-path=/path/to/saml.cert
+```
+
+::: {.callout-warning}
+The metadata URL and file path options have precedence over the individually configured options. You must remove the metadata options first before using individual settings.
+:::
+
+
+### Configuring your Identity Provider with RStudio
+
+In order to use SAML with RStudio Workbench you also need to register your server with your IdP.
+
+#### SAML Attributes
+
+::: {.callout-important}
+Your IdP must return in the assertion at least one attribute (or `NameID`) matching the user's local account username (lowercase).
+:::
+
+By default, RStudio Workbench will look for an attribute called `Username` (case-sensitive). If you wish to use a different attribute or the assertion's `NameID` value, add the option `auth-saml-sp-attribute-username` with the appropriate value.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-attribute-username=NameID
+```
+
+#### Preconfigured Setups
+
+RStudio Workbench has preconfigured entries in Okta, OneLogin and Azure. In some cases, all you need to provide is the URL to your server. Please refer to the documentation on these vendors for more information.
+
+#### Service Provider Metadata Setup
+
+RStudio Workbench provides its own Service Provider (SP) SAML metadata at the `/saml/metadata` endpoint. For example, if your server is running at https://server.example.com, its metadata can be found at `https://server.example.com/saml/metadata`. 
+
+Your IdP may ask for the metadata URL or the metadata file. For the latter, you should download the metadata file and upload it to your IdP.
+
+#### Manual Service Provider Setup
+
+If your IdP requires a manual configuration, the basic information about your server is in the SAML metadata.
+
+::: {.callout-note}
+The SAML metadata primarily contains information about the service name (`EntityID`) and the assertion consumer service (ACS) URL.
+:::
+
+
+If you cannot start RStudio configured with SAML because your IdP must be configured first, you may be asked the following information:
+
+- *RStudio Entity ID*: This value is the same URL as the metadata endpoint used for [Service Provider Metadata Setup]. For example, https://server.example.com/saml/metadata
+- *RStudio Assertion Consumer Service URL*: RStudio expects SAML assertions at the `/saml/acs` endpoint. For example, https://server.example.com/saml/acs
+- If encryption is used, you will need to provide the encryption certificate used by RStudio, see [SAML Encryption] below. RStudio supports most common forms of encryption used with SAML.
+- If your Identity Provider expects signed requests from RStudio, you will need to provide the signing certificate used by RStudio, see [SAML Request Signing] below. Any signing algorithm you choose in your IdP must match RStudio's configuration.
+- [SAML Attributes] as mentioned above.
+- Also, information requested about [Unsupported SAML Options] in RStudio should be left blank.
+
+### Advanced Options
+
+Depending on your IdP capabilities you may need to add a few more options to your server:
+
+- `auth-saml-idp-post-binding`: By default RStudio Workbench will redirect to your IdP for authentication requests. With the value `1`, this option makes it use an HTTP POST instead. This option can also be used with a metadata file or URL if your IdP supports both redirect and POST.
+- `auth-saml-sso-initiation`: By default RStudio Workbench will be able to initiate an authentication with SAML (SP-initiated) or to acceept an ad-hoc assertion (IdP-initiated). If you prefer just one of these flows, use this options with either `sp` or `idp` values. When set to `idp` users will be sent to the configured IdP SSO URL if a SP-initiated flow is attempted.
+- `auth-saml-sp-name-id-format`: By default RStudio Workbench will accept any NameID Format. Add this options with the values `persistent`, `transient`, `emailaddress`, or `unspecified` to make RStudio Workbench request and expect a particular format from the IdP.
+
+::: {.callout-warning}
+`auth-saml-sp-name-id-format=transient` and `auth-saml-sp-attribute-username=NameID` will not be accepted as a valid combination. It would lead to undetermined usernames in each attempt.
+:::
+
+Here are some examples of valid configurations of the aforementioned advanced options:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-idp-post-binding=1
+auth-saml-idp-sso-url=https://idp.example.com/saml/sso
+```
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sso-initiation=idp
+auth-saml-idp-sso-url=https://idp.example.com/login
+```
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-name-id-format=persistent
+```
+
+### SAML Encryption
+
+To enable support for encrypted SAML assertions, you will need a key pair in the form of a public certificate file and a private RSA key, both in PEM format.
+
+The following options should be added to your server:
+
+- `auth-saml-sp-encryption-key-path`: The path to a PEM file containing the private RSA key for decrypting the assertion.
+- `auth-saml-sp-encryption-cert-path`: The path to a PEM file containing the public certificate for encrypting the assertion. The contents of this file will be present in your server metadata after configured. You may also be asked to upload this certificate to the IdP instead.
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-encryption-key-path=/path/to/saml.key
+auth-saml-sp-encryption-cert-path=/path/to/saml.cert
+```
+
+::: {.callout-warning}
+These key pair files are similar to the ones used for SSL/TLS. However, for security reasons you must never use your server's own SSL/TLS key and certificate for SAML encryption.
+:::
+
+This example allows the creation of a simple self-signed public certificate and private key pair that can be used for encryption for the server "localhost" (you should use your server public facing hostname instead):
+
+```ini
+openssl req -x509 -newkey rsa:2048 -keyout saml.key -out saml.cert -days 365 -nodes -subj "/CN=localhost"
+```
+
+### SAML Request Signing
+
+::: {.callout-note}
+In most situations, SAML authentication request signing is not required or even supported. Be sure your IdP requires signing before using this functionality.
+:::
+
+To enable support for signed SAML authentication requests, you need to set a signing method in your server configuration with the option `auth-saml-sp-request-signing-method`. The algorithms `sha1`, `sha256`, or `sha512` are supported. When in doubt, try `sha256` first which offers a good balance between security and compatibility.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-request-signing-method=sha256
+```
+
+::: {.callout-note}
+By using one of the signing methods listed above the RStudio metadata will contain a `"signing"` certificate and will have the attribute `AuthnRequestsSigned` with the `true` value.
+:::
+
+
+You will also need a key pair in the form of a public certificate file and a private RSA key, both in PEM format. If you are using [SAML Encryption], the already configured encryption key pair will also be used for request signing.
+
+::: {.callout-important}
+RStudio only accepts a single key pair. You can use a key pair for **both** encryption and signing requests or one just for signing. Different key pairs for signing and encryption are not currently supported.
+:::
+
+
+If you are not currently using SAML encryption, the following options should be added to your server:
+
+- `auth-saml-sp-signing-key-path` - The path to a PEM file containing the private RSA key for decrypting the assertion.
+- `auth-saml-sp-signing-cert-path` - The path to a PEM file containing the public certificate for encrypting the assertion. The contents of this file will be present in your server metadata after configured. You may also be asked to upload this certificate to the IdP instead.
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-signing-key-path=/path/to/signing.key
+auth-saml-sp-signing-cert-path=/path/to/signing.cert
+```
+
+::: {.callout-warning}
+These key pair files are similar to the ones used for SSL/TLS. However, for security reasons you must never use your server's own SSL/TLS key and certificate for SAML encryption.
+:::
+
+
+This example allows the creation of a simple self-signed public certificate and private key pair that can be used for encryption for the server "localhost" (you should use your server public facing hostname instead):
+
+```ini
+openssl req -x509 -newkey rsa:2048 -keyout saml.key -out saml.cert -days 365 -nodes -subj "/CN=localhost"
+```
+
+### Unsupported SAML Options
+
+RStudio Workbench supports at least a subset of SAML called [Interoperable SAML](http://saml2int.org/).
+Notably, certain functionalities are currently absent:
+
+- Single Logout
+- Certificate chain validation
+- RelayState URL handling (not part of the SAML standard)
+
+### Proxy Considerations
+
+If you are running RStudio behind a proxy, you will need to configure your proxy in a way that RStudio can tell the SAML IdP to redirect back to the correct location. There are number of options to choose from as described in [Running with a Proxy](../access_and_security/running_with_a_proxy.html).
+
+The use of the `X-RStudio-Request` header in your proxy is recommended and the only method which works behind a path-rewriting proxy. In this case, the proxy must set the `X-RStudio-Request` header to the exact complete URL as requested by the browser. For example if your proxy was set up to serve RStudio requests at `https://testdomain.com/rstudio/` and an incoming request for `/home` came in, your proxy should set `X-RStudio-Request: https://testdomain.com/rstudio/home` which would allow RStudio to know about the added path prefix `/rstudio`.
+
+If your proxy does not add path prefixes, RStudio is also compatible with two options using commonly available HTTP proxy headers:
+
+- The headers `X-Forwarded-Host`, `X-Forwarded-Proto`, and `X-Forwarded-Port`.
+- Or the header `Forwarded` with `host`, and `proto` values.
+
+When using path-rewriting proxies, it's also recommended to use either the header `X-RStudio-Root-Path` or the option `www-root-path` to indicate the path defined for RStudio by the proxy. For example, if your URL to RStudio is `www.example.com/rstudio` your proxy should send the header `X-RStudio-Root-Path: /rstudio` or you should use:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-root-path=/rstudio
+```
+
+If none of the headers above are set by the proxy, RStudio will attempt to redirect back to the address present in the `Host` header and it will determine the protocol (`http` or `https`) based on its current configuration.
+
+If you are running behind a proxy but cannot set headers for whatever reason, and `www-root-path` is not the right choice, you can use the `auth-sp-saml-base-uri` option in the RStudio configuration file to accomplish the same purpose:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-saml-sp-base-uri=http://testdomain.com/rstudio/
+```
+
+### Load Balancing Considerations
+
+Because RStudio stores SAML authentication context in server memory during the authentication flow, the entire authentication flow must be completed on a single server. If you're using an external load balancer in front of RStudio, you will experience authentication errors if the HTTP requests associated with the authentication flow are not all routed to the same server.
+
+For this reason, you **must enable sticky sessions** in your external load balancer when using SAML authentication. This feature is sometimes called "sticky cookies" or "session affinity". Consult the documentation for your load balancing software for details; for example if you're using the Amazon Web Services Application Load Balancer (AWS ALB), more information can be found in [Sticky Sessions for your Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/sticky-sessions.html).
+
+### Outgoing Proxies
+
+Some SAML authentication features require RStudio to make a call to an external service over HTTP or HTTPS; for example, to perform provider metadata discovery. If your environment requires an HTTP or HTTPS proxy for outbound requests, you must set the appropriate proxy environment variables for RStudio's server process so that it uses the proxy when making the request. 
+
+One way to do this is to add the variables to the `env-vars` file as follows:
+
+```ini
+# /etc/rstudio/env-vars
+HTTP_PROXY=http://192.168.1.1:8080
+HTTPS_PROXY=http://192.168.1.1:8080
+NO_PROXY=localhost,192.168.1.10
+```
+
+### Troubleshooting
+
+Additional information about the SAML flow and the received assertion may be written to the logs.
+Be sure to configure `rserver` logs to output `info` level messages in `/etc/rstudio/logging.conf` to see these entries.
+

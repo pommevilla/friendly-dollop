@@ -1,0 +1,15 @@
+## Management Script
+
+RStudio management tasks are performed using the `rstudio-server` utility (installed under `/usr/sbin`). This utility enables the stopping, starting, and restarting of the server, enumeration and suspension of user sessions, taking the server offline, as well as the ability to hot upgrade a running version of the server.
+
+For example, to restart the server you can use the following command:
+
+```bash
+$ sudo rstudio-server restart
+```
+
+Note that on some systems (including RedHat/CentOS 5 and SLES 11) the `sudo` utility doesn't have the `/usr/sbin` directory in it's path by default. For these systems you can use a full path to the management script. For example:
+
+```bash
+$ sudo /usr/sbin/rstudio-server restart
+```

@@ -1,0 +1,134 @@
+## Installation
+
+### General Installation
+
+In order to add VS Code integration to RStudio Workbench, you must first install the open-source `code-server` wrapper. This wrapper allows access to VS Code via a web server in a browser, allowing Workbench to create VS Code sessions and proxy them through the browser.
+
+To install, simply run the command `rstudio-server install-vs-code <path to installation directory>`. This will install the `code-server` binary, and automatically configure `/etc/rstudio/vscode.conf`. 
+
+VS Code utilizes extensions to provide support for different languages and other features, such as custom themes. Normally extensions are managed by a user who installs them through an extension marketplace onto their desktop. For RStudio Workbench, you need to decide if users will be able to install extensions individually themselves, or if you will provide a global installation of extensions. User installation of extensions provides the most flexibility and is consistent with a user’s desktop experience. However, if RStudio Workbench will be in a restricted or airgapped network, admins may need to install extensions globally for users.
+
+The default configuration will allow users to manage their own extensions; if use of a global extensions directory is desired, then it may be passed as an option to the install-vs-code command. Alternatively, `vscode.conf` can be manually updated to include `--extensions-dir` after it has been created. For example, to install everything at `/opt/code-server` with per-user extensions directories:
+
+``` {.bash}
+# likely need root privilege to install to /opt
+sudo rstudio-server install-vs-code /opt/code-server
+```
+
+To install everything at `/opt/code-server` with a global extensions directory at `/opt/code-server/extensions`:
+
+``` {.bash}
+# likely need root privilege to install to /opt
+sudo rstudio-server install-vs-code /opt/code-server --extensions-dir=/opt/code-server/extensions
+```
+
+Any arguments after the installation directory will be added to the `args` entry in `vscode.conf`, which is supplied to the `code-server` binary when the session is started. Note that if a global extensions directory is provided this way, this command will also automatically install the RStudio Workbench VS Code extension as described in the [Installing the RStudio Workbench Extension] section.
+
+Once the installation completes, you'll need to restart the RStudio service for it to detect availability of VS Code sessions.
+
+::: {.callout-note}
+You must also install code-server on all Launcher nodes (for Local or Slurm plugins) and within any containers used (if using Kubernetes).
+:::
+
+### Installing the RStudio Workbench Extension
+
+#### Requirements
+
+The RStudio Workbench extension requires `code-server` 3.9.3. While later versions may work as expected, compatibility is only guaranteed with version 3.9.3. The `install-vs-code-ext` command can upgrade `code-server` automatically for you if you include the `-d` flag with the directory that `code-server` should be installed in. For example, your command may look like this:
+
+``` {.bash}
+rstudio-server install-vs-code-ext -d /opt/code-server
+```
+
+#### Installation
+
+If using a global extensions directory, the `install-vs-code-ext` script can be used to install the latest version of the extension. This script is run while upgrading RStudio Workbench, but may fail with a warning if the version requirement is not met.
+
+If allowing user extension directories, and the requirements above are met, the extension will be installed on a per user basis when the user launches their first VS Code session.
+
+### Manual Installation
+
+`code-server` can be installed manually, if desired. Additionally, if you have opted for a global extensions directory you can also opt to manually install the RStudio Workbench VS Code extension, and it may be necessary to manually install any other extensions that you require, if users will not have write access to the extensions directory.
+
+#### Manually Installing `code-server`
+
+If you'd like to install `code-server` manually, simply download the `code-server` Linux distributable (available at <https://rstd.io/vs-code-server-3-9-3>) and extract it to the desired location on the RStudio Workbench host(s).
+
+For example, to manually install `code-server` under `/opt`:
+
+``` {.bash}
+# create directory to house code-server
+mkdir /opt/code-server
+cd /opt/code-server
+
+# download the code server package
+wget https://rstd.io/vs-code-server-3-9-3 -O vs-code-server.tar.gz
+
+# extract code-server binary
+tar zxvf vs-code-server.tar.gz --strip 1
+
+# remove the archive
+rm vs-code-server.tar.gz
+```
+
+#### Manually Installing the RStudio Workbench VS Code Extension
+
+When VS Code sessions are configured with a global extensions directory, it is possible to manually install the VS Code extension rather than using the provided `install-vs-code-ext` script. If VS Code sessions are not configured with a global extensions directory, the RStudio Workbench VS Code Extension will be automatically installed the first time a user launches a VS Code session. It is still possible to manually install the extension in this circumstance, however the operation will have to be performed for every user.
+
+The RStudio Workbench VS Code extension can be downloaded from <https://rsw-vscode-extension.s3.amazonaws.com/rstudio-workbench-1.0.4.vsix>. The current latest version is 1.0.4.
+
+For example, to install the RStudio Workbench VS Code extension to the global extension directory `/opt/code-server/extensions`:
+
+```{.bash}
+# Ensure the extension directory exists
+mkdir -p /opt/code-server/extensions
+cd /opt/code-server/extensions
+
+# Download the extension
+export RSW_EXT_VERSION=1.0.4
+wget https://rsw-vscode-extension.s3.amazonaws.com/rstudio-workbench-${RSW_EXT_VERSION}.vsix -O rstudio-workbench-${RSW_EXT_VERSION}.vsix
+
+# Install the extension
+/opt/code-server/code-server --extensions-dir /opt/code-server/extensions --install-extension ./rstudio-workbench-${RSW_EXT_VERSION}.vsix
+```
+
+
+To install the extension manually on behalf of a particular user, when not using a global installation directory, run the following commands as the desired user:
+
+```{.bash}
+# Ensure the extension directory exists
+mkdir -p "${XDG_DATA_HOME:-~/.local/share}/rstudio"
+cd "${XDG_DATA_HOME:-~/.local/share}/rstudio"
+
+# Download the extension
+export RSW_EXT_VERSION=1.0.4
+wget https://rsw-vscode-extension.s3.amazonaws.com/rstudio-workbench-${RSW_EXT_VERSION}.vsix -O rstudio-workbench-${RSW_EXT_VERSION}.vsix
+
+# Install the extension
+/opt/code-server/code-server --install-extension ./rstudio-workbench-${RSW_EXT_VERSION}.vsix
+```
+
+::: {.callout-note} 
+Installing the extension manually when a global installation directory is not in use will require you to repeat the operation for every user.
+:::
+
+#### Manually Installing Language Extensions
+
+When VS Code sessions are configured with a global extensions directory, users without write access to this directory will not be able to install extensions and the extensions marketplace will be disabled. Otherwise, users are able to manage their own extensions, and installs must be performed on a per user basis by the user. There are three ways in which extensions can be installed:
+
+1.  Install the extension through `code-server`'s hosted repository. This can be done from within a VS Code session via the UI. Alternatively, this can be done via the command line with the following command, with the `--extensions-dir` argument omitted when a global directory is not in use:
+
+``` {.bash}
+/opt/code-server/code-server --extensions-dir /opt/code-server/extensions --install-extension <extension name>
+```
+
+2.  Download an extension in VSIX format from an online marketplace such as [Open VSX](https://open-vsx.org). Then, install it using the `--install-extension` command like the example above, passing the VSIX file path as the extension name. Note that if the latest version of the extension is incompatible with the version of `code-server`, it will fail to install. You can try using an older version of the extension in this case.
+
+::: {.callout-note}
+It is against VS Code's Terms of Service to use the official Marketplace extensions with third party tools like `code-server`. We strongly recommend using a free and open source alternative like Open VSX.
+:::
+
+3.  Build the extension from source. There are several extensions freely available on GitHub that can be built into a VSIX file yourself and then installed via the `--install-extension` command. Building third party extensions from source is outside of the scope of this document.
+
+RStudio does not provide support for external extensions. If you have questions or issues we encourage you to check Stack Overflow, the extension's repository, or the `code-server` repository.
+

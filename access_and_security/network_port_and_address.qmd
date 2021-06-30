@@ -1,0 +1,22 @@
+---
+aliases:
+  - access-and-security.html#network-port-and-address
+---
+
+## Network Port and Address
+
+After initial installation RStudio accepts connections on port 8787. If you wish to listen on a different another port you can modify the `www-port` option. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-port=80
+```
+
+By default RStudio binds to address 0.0.0.0 (accepting connections from any remote IP). You can modify this behavior using the `www-address` option. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-address=127.0.0.1
+```
+
+Note that changes to the configuration will not take effect until the server is restarted. 

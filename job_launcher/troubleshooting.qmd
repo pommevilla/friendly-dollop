@@ -1,0 +1,15 @@
+## Troubleshooting {#launcher-troubleshooting}
+
+If you experience issues related to running Launcher sessions, adhoc jobs, Jupyter sessions, or VS Code sessions, you can use the Launcher verification tool which will attempt to launch jobs and provide diagnostic output about what could be going wrong. To run the verification process, run the following command:
+
+```ini
+sudo rstudio-server verify-installation --verify-user=user
+```
+
+Replace the `--verify-user` value with a valid username of a user that is setup to run RStudio Workbench in your installation. This will cause the test jobs to be started under their account, allowing the verification tool to check additional aspects of launching jobs, including mounting the user's home directories into containers. You can also specify a specific test to run by using the `--verify-test` flag, like so:
+
+```ini
+sudo rstudio-server verify-installation --verify-user=user --verify-test=r-sessions
+```
+
+The above example will only test R Sessions, skipping adhoc jobs and Jupyter/VS Code sessions. The parameter can be one of `r-sessions`, `adhoc-jobs`, `jupyter-sessions`, or `vscode-sessions`. If the parameter is unspecified, all tests will be run.

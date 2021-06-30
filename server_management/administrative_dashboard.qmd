@@ -1,0 +1,91 @@
+## Administrative Dashboard {.pro-header}
+
+RStudio Workbench includes an administrative dashboard with the following features:
+
+1) Monitoring of active sessions and their CPU and memory utilization;
+2) The ability to suspend, forcibly terminate, or assume control of any active session;
+3) Historical usage data for individual server users (session time, memory, CPU, logs);
+4) Historical server statistics (CPU, memory, active sessions, system load); and
+5) Searchable server log (view all messages or just those for individual users)
+6) The ability to lock users, preventing them from signing in to RStudio
+
+The dashboard can be an invaluable tool in understanding server usage and capacity as well as to diagnose and resolve problems.
+
+Note that at this time, historical monitoring is not available for sessions spawned via the Job Launcher.
+
+### Enabling the Dashboard
+
+The administrative dashboard is accessed at the following URL:
+
+```html
+http://<server-address>/admin
+````
+
+The administrative dashboard is disabled by default. To enable it you set the `admin-enabled` option. You can also specify that only users of certain group have access to the dashboard using the `admin-group` option. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+admin-enabled=1
+admin-group=rstudio-admins
+```
+You can specify a single group as the above example does or a comma-delimited list of groups. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+admin-group=server-admins,rstudio-admins,domain-admins
+```
+
+Note that changes to the configuration will not take effect until the server is restarted. 
+
+### Administrator Superusers
+
+You can further designate a certain user or group of users as administrative "superusers". Superusers have the following additional privileges:
+
+1) Suspend or terminate active sessions
+2) Assume control of active sessions (e.g. for troubleshooting)
+3) Login to RStudio as any other server user
+
+Administrative superusers do not have root privilege on the system, but rather have a narrow set of delegated privileges that are useful in managing and supporting the server. You can define the users with this privilege using the `admin-superuser-group` setting. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+admin-superuser-group=rstudio-superuser-admins
+```
+Note that as with the admin groups above, you can specify a single group as the above example does or a comma-delimited list of groups. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+admin-superuser-group=rstudio-superuser-admins,domain-admins
+```
+
+Changes to the configuration will not take effect until the server is restarted. Admin superusers can also be added via the command line. See [Adding users to the user database](core_administrative_tasks.qmd#adding-users-to-the-user-database).
+
+#### User Impersonation Restrictions
+
+Note that the ability to login as other users and assume control of existing sessions is not available if you are authenticating with [SAML SSO](../authenticating_users/saml_sso.qmd), [Google Accounts](../authenticating_users/google_accounts.qmd) or proxied authentication. This is because these authentication mechanisms use a different user-identity mechanism which isn't compatible with the way that user session impersonation is implemented.
+
+### Server Log Time Zone
+
+You can control the time zone in which the server logs are displayed in the admin dashboard by the use of the `admin-monitor-log-use-server-time-zone` option. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+admin-monitor-log-use-server-time-zone=1
+```
+
+Setting this option to `1` will display the server logs in the server's time zone. The default value of `0` will display the log times in UTC.
+
+### Licensing Considerations
+
+If you have been granted a license which has a limit on the total number of users that may use RStudio (i.e. named user licensing), you will need to control user access to the server. Each unique user that signs in to RStudio will count against your available user limit. If too many users sign in and attempt to use the system, new users will be denied, as the license limit will be reached. 
+
+If this occurs, please contact [sales@rstudio.com](mailto:sales@rstudio.com) to purchase additional users.
+
+For more information on licensing, see [License Management](../license_management/license_management.qmd).
+

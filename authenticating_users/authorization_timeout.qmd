@@ -1,0 +1,38 @@
+## Authorization Timeout
+
+### Inactivity Timeout
+
+By default, user authorization will expire after 60 minutes of inactivity, requiring the user to sign in again to continue using their sessions. This is configurable by changing the `auth-timeout-minutes` setting in */etc/rstudio/rserver.conf*. For example, to sign users out after 20 minutes of inactivity instead:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-timeout-minutes=20
+```
+
+This setting supersedes the `auth-stay-signed-in-days` setting discussed below in [Stay Signed In], as it provides additional security by ensuring that users that are not actively using the system do not stay signed in. However, if you wish to allow users to stay signed in for many days at a time and disable the authorization timeout completely, set `auth-timeout-minutes` to 0, which will cause the `auth-stay-signed-in-days` setting's behavior to be used instead.
+
+Whenever a user is signed out, the database will be updated to store recently logged out/invalidated cookies, preventing the use of credential replay attacks.
+
+### Stay Signed In
+
+Users have an option to stay signed in across browser sessions when using PAM or Google authentication methods. By default when choosing the stay signed in option users will remain signed in for 30 days. You can modify this behavior using the `auth-stay-signed-in-days` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-stay-signed-in-days=7
+```
+
+::: {.callout-warning}
+This setting is deprecated in favor of the `auth-timeout-minutes` setting for additional security. See [Inactivity Timeout] above for more information.
+:::
+
+Note that for this setting to take effect, `auth-timeout-minutes` must be set to 0.
+
+If you want to prevent users from being able to stay signed in, you can prevent the "Stay Signed In" option from being shown to them by using the `auth-stay-signed-in` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-stay-signed-in=0
+```
+
+Setting this option to `0` will result in users being prompted to log in each time they start a new browser session (i.e., logins will only be valid as long as the browser process in which they originated in remains running).

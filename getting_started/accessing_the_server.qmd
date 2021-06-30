@@ -1,0 +1,47 @@
+## Accessing the Server
+
+### Logging In 
+
+By default RStudio runs on port 8787 and accepts connections from all remote clients. After installation you should therefore be able to navigate a web browser to the following address to access the server:
+
+```html
+http://<server-ip>:8787
+```
+
+RStudio will prompt for a username and password and will authenticate access using the PAM authentication scheme configured for the server. Some notes related to user authentication:
+
+- RStudio will not permit logins by system users (those with ids < 100).
+- By default on Debian/Ubuntu the system default PAM profile (`/etc/pam.d/other`) will be used (this can be customized by creating an RStudio PAM profile at `/etc/pam.d/rstudio`).
+- By default on RedHat/CentOS and SLES an RStudio PAM profile (`/etc/pam.d/rstudio`) that authenticates using the system username/password database will be used (this can be customized by editing the profile as appropriate).
+- User credentials are encrypted using RSA as they travel over the network.
+
+Additional details on customizing RStudio authentication are provided in [Authenticating Users](../authenticating_users/authenticating_users.qmd). Details on customizing the port and enabling SSL are covered in [Access and Security](../access_and_security/access_and_security.qmd).
+
+### Troubleshooting Problems
+
+If you are unable to access the server after installation, you should run the `verify-installation` command to output additional diagnostics:
+
+```bash
+$ sudo rstudio-server verify-installation
+```
+
+This command will start the server and run and connect to an R session. Note that this will test the correct installation of RStudio and ensure that it can connect to a locally installed version of R. However, it won't test whether networking or authentication problems are preventing access to the server. 
+
+If problems persist, you can consult the system log to see if there are additional messages there. On Debian/Ubuntu systems this will typically be located at:
+
+```html
+/var/log/syslog
+```
+
+On RedHat/CentOS systems this will typically be located at:
+
+```html
+/var/log/messages
+```
+
+For RStudio Workbench, you can also consult the server log to see if there are any errors reported there. This log is located at:
+
+```html
+/var/lib/rstudio-server/monitor/log/rstudio-server.log
+```
+

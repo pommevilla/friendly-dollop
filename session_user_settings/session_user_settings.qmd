@@ -1,0 +1,44 @@
+---
+title: "Session User Settings"
+---
+
+The following table enumerates the settings supported in the user (or system) `rstudio-prefs.json` file, along with their type, allowable values, and defaults. 
+
+
+```{r, echo=FALSE}
+# Read the schema from the repo
+json <- jsonlite::read_json("../../../src/cpp/session/resources/schema/user-prefs-schema.json")
+
+# Loop over each property to form a data frame
+props <- data.frame(
+  Property = names(json$properties),
+  Description = vapply(json$properties, function(x) { x$description }, ""),
+  Type = vapply(json$properties, function(x) { 
+    if (is.null(x$enum))
+       x$type 
+    else
+       paste0(x$type, " (", paste(x$enum, collapse = ", "), ")")
+    }, ""),
+  Default = vapply(json$properties, function(x) {
+    if (is.null(x$default))
+      ""
+    else if (identical(x$type, "object"))
+      ""
+    else if (identical(x$type, "array")) {
+      if (length(x$default) > 0) {
+        paste(x$default, collapse = ", ")
+      } else {
+        "Empty"
+      }
+    }
+    else
+      as.character(x$default)
+  }, ""),
+  stringsAsFactors = FALSE
+)
+
+# Sort, clear row names, and display
+props <- props[order(props$Property),] 
+row.names(props) <- NULL
+knitr::kable(props)
+```

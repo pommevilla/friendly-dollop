@@ -1,0 +1,14 @@
+## Session Initialization
+
+In the preceding sections, we described how to allow the server to discover multiple versions of R to be used by the user. The R environment is loaded before the session begins execution, and several files are executed along the way that can cause problems with your R Environment if any variables are incorrectly set.
+
+When a session is launched, the following steps occur:
+
+1. If the file `/etc/rstudio/rsession-profile` exists, it is sourced.
+2. If the R Version being loaded specifies a module to load, the user's `~/.bashrc` file is sourced and the module is loaded using the `module load` command.
+3. If the R version being loaded specifies a prelauch script to run, it is sourced.
+4. A bash login shell is created, which sources the `~/.bash_profile`, `~/.bash_login` or the `~/.profile` script, whichever is found first to exist (in that order).
+5. The session is launched with the environment constructed in steps 1-4.
+
+As you can see, there are many different scripts which can affect the R environment which gets initialized when starting a new session, so play close attention to how these scripts could be affecting your particular environment.
+

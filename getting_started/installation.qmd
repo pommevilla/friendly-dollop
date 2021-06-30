@@ -1,0 +1,27 @@
+## Installation
+
+### Prerequisites
+
+#### System and Platform Requirements
+
+RStudio Workbench runs on most modern Linux distributions, and can be accessed in most modern browsers. See the following link for detailed information on supported server and browser platforms as well as recommended minimal CPU, RAM, and disk storage requirements.
+
+[RStudio Workbench System Requirements](https://docs.rstudio.com/rsp/requirements/)
+
+#### R Versions
+
+RStudio requires a previous installation of R version 3.0.1 or higher; see below for instructions on installing R on your specific Linux distribution.
+
+We recommend installing multiple versions of R. An environment with multiple versions of R helps you provide a stable, reproducible environment for your R developers. Install R using the directions at <https://docs.rstudio.com/resources/install-r/>.
+
+#### User Home Directories
+
+RStudio interacts frequently with user home directories. If you mount home directories with NFS, we recommend using the `async` mount option along with a modern, high-throughput network connection that can support many simultaneous clients. If you'd like your users to be able to share their projects with each other, see the section on [Project Sharing](../r_sessions/project_sharing.qmd) for additional NFS requirements.
+
+::: {.callout-note}
+Due to its high latencies, we strongly discourage the use of EFS (Elastic File System) for home and shared directories within AWS. If EFS is used, RStudio will experience highly degraded performance. We recommend using a traditional NFSv3 or NFSv4 mount instead.
+:::
+
+#### Database Connectivity
+
+Since version 1.4, RStudio also requires database connectivity. In most cases, no additional configuration is needed - a SQLite database will be created and used automatically. However, if you are running a load-balanced setup, you will be required to set up a PostgreSQL database for RStudio Workbench to connect to; if one is not configured, the service will refuse to start. If you are using load balancing, make sure that you have an available PostgreSQL database to use **before** installation! See the [Database](../database/database.qmd) section for more information.

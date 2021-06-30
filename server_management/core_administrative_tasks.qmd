@@ -1,0 +1,320 @@
+## Core Administrative Tasks
+
+### Configuration Files
+
+RStudio uses several configuration files all located within the `/etc/rstudio` directory. Configuration files and folders include:
+
+|                      |                                                    |
+| -------------------- | -------------------------------------------------- |
+| rserver.conf         | Core server settings |
+| rsession.conf        | Settings related to individual R sessions |
+| notifications.conf   | Notifications to be delivered to user sessions [Pro]{.pro-feature} |
+| logging.conf         | Configuration of the logging system including logger type, location, and level |
+| crash-handler.conf   | Configuration of the crash handling system (see [Automated Crash Reporting](automated_crash_reporting.qmd)) |
+| database.conf        | Configuration of the database that RStudio will store data in (see [Database](../database/database.qmd)) |
+| ngnix.http.conf      | Extra HTTP configuration for nginx [Pro]{.pro-feature} |
+| ngnix.server.conf    | Extra server configuration for nginx [Pro]{.pro-feature} |
+| ngnix.site           | Extra site configuration for nginx [Pro]{.pro-feature} |
+| profiles             | User and group resource limits  [Pro]{.pro-feature}|
+| r-versions           | Manual specification of additional versions of R  [Pro]{.pro-feature}|
+| ip-rules             | IP access rules (allow or deny groups of IP addresses)  [Pro]{.pro-feature}|
+| load-balancer        | Load balancing configuration  [Pro]{.pro-feature}|
+| health-check         | Template for content to return for server health checks  [Pro]{.pro-feature}|
+| google-accounts      | Mappings from Google accounts to local accounts  [Pro]{.pro-feature}|
+| file-locks           | Configuration for file locking |
+| env-vars             | Additional environment variables to set during server startup |
+| login.html           | Custom HTML for login page |
+| themes/              | Custom editor color schemes |
+| fonts/               | Fonts for RStudio's R console and code editor |
+| keybindings/         | Custom IDE keybindings |
+| snippets/            | Editor snippet files |
+| templates/           | Default templates for new files created in the IDE |
+| dictionaries/        | Custom spelling languages and dictionaries |
+
+The `rserver.conf` and `rsession.conf` files are created by default during installation however the other config files are optional so need to be created explicitly. It should be noted that the `rsession.conf` file must be readable by each RStudio user, so it should be given appropriate permissions (e.g. 644).
+
+The `notifications.conf` and `r-versions` files are created, but their entries are commented out as an example.
+
+Whenever making changes to configuration files you need to restart the server for them to take effect. You can do this using the `restart` command of the server management utility:
+
+```bash
+$ sudo rstudio-server restart
+```
+
+### Alternate Configuration File Location
+
+RStudio can be instructed to use a directory other than `/etc/rstudio` for hosting configuration files using the XDG standard environment variable `XDG_CONFIG_DIRS`. This can be useful when running RStudio in a container and mounting configuration at runtime. It can also be helpful for setting up alternate configurations for testing or troubleshooting purposes without running the risk of corrupting a known-good production configuration.
+
+For the example below, presume that you'd like RStudio's configuration to live in `/mnt/config/rstudio`. 
+
+#### Create the Directory
+
+First, create the directory that needs to host configuration (this can of course be skipped when mounting). Make sure that the rstudio-server service account can read content in this directory. 
+
+```bash
+$ mkdir -p /mnt/config/rstudio
+$ chmod 755 /mnt/config/rstudio
+```
+
+#### Copy Configuration
+
+Presuming that you'd like to start with your existing configuration, copy all of the configuration files and folders from your existing configuration set to your new configuration. You can do this as follows:
+
+```bash
+$ cp -r /etc/rstudio/* /mnt/config/rstudio/
+```
+
+#### Configure Service
+
+Because RStudio runs as a system service, you must use your system's service manager to change its environment. If your Linux distribution uses the `systemd` init system, run `sudo systemctl edit rstudio-server`. In the editor, add the following section to the file (replacing `/mnt/config` with your choice of root). Note that the `rstudio` folder is not included in this path; this is a configuration root directory that will be respected by other applications that use the XDG standard.
+
+```ini
+[Service]
+Environment="XDG_CONFIG_DIRS=/mnt/config"
+```
+
+If you wish to set RStudio's configuration folder directly, use the `RSTUDIO_CONFIG_DIR` environment variable instead. For example, to use `/mnt/config/rstudio` as the configuration folder:
+
+```ini
+[Service]
+Environment="RSTUDIO_CONFIG_DIR=/mnt/config/rstudio"
+```
+
+`RSTUDIO_CONFIG_DIR` is also useful if you do not wish other XDG-compliant applications to be affected by the environment variable. If set, it takes precedence over `XDG_CONFIG_DIRS`. 
+
+If your Linux distribution does not use the `systemd` init system, consult the documentation for your Linux distribution to learn which init system it uses and the appropriate method for setting environment variables for the `rstudio-server` service.
+
+#### Change and Restart
+
+Finally, make any configuration changes you'd like in your new configuration folder, and then restart the server to use the new configuration files.
+
+```bash
+$ sudo rstudio-server restart
+```
+
+To return to the configuration in `/etc/rstudio`, just remove the `Environment` directive added above and restart the service.
+
+### Configuring the Run-Time Data Directory
+
+RStudio needs to write several temporary files while running to function properly. The directory at which these files is written can be set by the `server-data-dir` configuration option by modifying `/etc/rstudio/rserver.conf` like so:
+
+```r
+server-data-dir=/var/run/rstudio-server
+```
+
+The data directory defaults to `/var/run/rstudio-server` but you can change it to any directory. The specified location must be readable by any users of RStudio.
+
+### Setting Environment Variables
+
+You can set environment variables for RStudio's server process using the `env-vars` configuration file. This is an alternative to setting the environment variables using your system's service manager. For example, to set the `HTTP_PROXY` and `XDG_DATA_HOME` environment variables for the server process:
+
+
+
+```ini
+# /etc/rstudio/env-vars
+# Set proxy for outbound HTTP requests
+HTTP_PROXY=http://192.168.1.1
+
+# Store user data on mounted external storage
+XDG_DATA_HOME=/mnt/storage/$USER
+```
+
+The `env-vars` file is reloaded, and the environment variables set again, when the server process receives a `SIGHUP` signal. See [Reloading Configuration](../r_versions/using_multiple_versions_of_r.qmd#reloading-configuration) for an example.
+
+::: {.callout-note}
+This technique cannot be used to set the specific environment variables `XDG_CONFIG_DIRS` or `RSTUDIO_CONFIG_DIR`, because those variables control where configuration files are loaded from, and `env-vars` is *itself* a configuration file. Use your system's service manage to set those variables as described in [Alternate Configuration File Location].
+:::
+
+::: {.callout-note}
+With the exception of XDG variables, environment variables set for the server process are not generally forwarded to individual R sessions. To set environment variables such as `HTTP_PROXY` for all R sessions on the server, use [Renviron.site](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html) or set them in one of the scripts executed when R sessions are initialized (see [Profile Script Execution]).
+:::
+
+
+### Stopping and Starting
+
+During installation RStudio is automatically registered as a daemon which starts along with the rest of the system. The exact nature of this will depend on the init system in use on your system:
+
+- On systems using systemd (such as Debian 7, Ubuntu 15, and RedHat/CentOS 7), this registration is performed as a systemd script at `/etc/systemd/system/rstudio-server.service`. 
+- On systems using Upstart (such as older versions of Debian and Ubuntu, and RedHat/CentOS 6), this registration is performed using an Upstart script at `/etc/init/rstudio-server.conf`. 
+- On systems using init.d, including RedHat/CentOS 5, an init.d script is installed at `/etc/init.d/rstudio-server.`
+
+To manually stop, start, and restart the server you use the following commands:
+
+```bash
+sudo rstudio-server stop
+sudo rstudio-server start
+sudo rstudio-server restart
+```
+
+To check the current stopped/started status of the server:
+
+```bash
+$ sudo rstudio-server status
+```
+
+### Reloading Configuration Values
+
+To reload the server's configuration without restarting it, use the `reload` command:
+
+```bash
+$ sudo rstudio-server reload
+```
+
+Alternately, you can send a `SIGHUP` to the `rserver` process, using a command like `kill -s SIGHUP $PID`, where `$PID` is the process ID of the `rserver` process.
+
+Note that most configuration values cannot be applied without a full restart. The following are the values and settings that will be reloaded when you send `SIGHUP` or execute the `reload` command:
+
+1. **Logging configuration** (`logging.conf`), as described in [Logging](logging.qmd).
+2. **Environment variables** (`env-vars`), as described in [Setting Environment Variables].
+3. **Load balancing settings** (`load-balancer`), as described in [Load Balancing](../job_launcher/load_balancing.qmd).
+4. **nginx configuration** (`nginx.*.conf`), as described in [Customizing Default Proxy](../access_and_security/running_with_a_proxy.qmd#customizing-default-proxy).
+5. **Custom R version settings** (`r-versions`), as described in [Extended R Version Definitions](../r_versions/using_multiple_versions_of_r.html#extended-r-version-definitions).
+6. **Product license data**, as described in [License Management](../license_management/license_management.qmd).
+
+### Managing Active Sessions
+
+There are a number of administrative commands which allow you to see what sessions are active and request suspension of running sessions.
+
+To list all currently active sessions:
+
+```bash
+$ sudo rstudio-server active-sessions
+```
+
+#### Suspending Sessions
+
+When R sessions have been idle (no processing or user interaction) for a specified period of time (2 hours by default) RStudio suspends them to disk to free up server resources. When the user next interacts with their session it is restored from disk and the user resumes right back where they left off. This is all done seamlessly such that users aren't typically aware that a suspend and resume has occurred.
+
+To manually suspend an individual session:
+
+```bash
+$ sudo rstudio-server suspend-session <pid>
+```
+
+To manually suspend all running sessions:
+
+```bash
+$ sudo rstudio-server suspend-all
+```
+
+The suspend commands also have a "force" variation which will send an interrupt to the session to request the termination of any running R command:
+
+```bash
+$ sudo rstudio-server force-suspend-session <pid>
+$ sudo rstudio-server force-suspend-all
+```
+
+The `force-suspend-all` command should be issued immediately prior to any reboot so as to preserve the data and state of active R sessions across the restart.
+
+#### Killing Sessions
+
+If you are for any reason unable to cooperatively suspend an R session using the commands described above you may need to force kill the session. Force killing a session results in SIGKILL being sent to the process, causing an immediate termination.
+
+To force kill an individual session:
+
+```bash
+$ sudo rstudio-server kill-session <pid>
+```
+
+To force kill all running sessions:
+
+```bash
+$ sudo rstudio-server kill-all
+```
+
+Note that these commands should be exclusively reserved for situations where suspending doesn't work as force killing a session can cause user data loss (e.g. unsaved source files or R workspace content). 
+
+### Listing users {.pro-header}
+
+You can list all of the users that have signed in to RStudio Workbench by running the following command:
+
+```bash
+$ sudo rstudio-server list-users
+```
+
+### Adding users to the user database {.pro-header}
+
+Normally, when users sign in to RStudio Workbench for the first time, they are automatically added to the RStudio user database. However, you can manually add them via script if you need to. This is useful for designating specific users as administrators to allow them access to the administration panel without requiring them to belong to the administration group. This can be done by running the following command:
+
+```bash
+$ sudo rstudio-server add-user <username> <0 or 1>
+```
+
+Specifying a 0 in the above command will add the user without admin privilege; specify a 1 to grant admin privilege.
+
+::: {.callout-note}
+Users set as administrators in this way will be `Admin Superusers`. See [Administrator Superusers](administrative_dashboard.qmd#administrator-superusers).
+:::
+
+### Changing the admin status of a user {.pro-header}
+
+You can also change the admin status of a particular existing user:
+
+```bash
+$ sudo rstudio-server set-admin <username> <0 or 1>
+```
+
+### Locking and unlocking users {.pro-header}
+
+If you are using RStudio Workbench under a named user license, you can lock and unlock specific users to disallow or reallow access to the server. Locking a user will prevent them from signing in to RStudio, but will preserve their files. Locked users do not count against the named user limit on your license.
+
+This feature may be used when a user leaves the organization or otherwise no longer needs access to RStudio Workbench on a permanent basis.
+
+To lock a user, click on the user on the *Users* admin page, and then click the *Lock* button in the upper right-hand corner of the screen.
+
+You can also lock users via the server management utility:
+
+```bash
+$ sudo rstudio-server lock-user <username>
+$ sudo rstudio-server unlock-user <username>
+```
+
+Note that RStudio's [Software License Descriptions](https://rstudio.com/about/software-license-descriptions/) only allow this feature to be used to permanently terminate a named user's access.
+
+### Taking the Server Offline
+
+If you need to perform system maintenance and want users to receive a friendly message indicating the server is offline you can issue the following command:
+
+```bash
+$ sudo rstudio-server offline
+```
+
+When the server is once again available you should issue this command:
+
+```bash
+$ sudo rstudio-server online
+```
+
+When the server is taken offline all R sessions will be suspended and no new sessions can be started. Session data will be saved but any running computations will be terminated.
+
+### Upgrading to a New Version
+
+If you perform an upgrade of RStudio and an existing version of the service is currently running, then the upgrade process will also ensure that active sessions are immediately migrated to the new version. This includes the following behavior:
+
+- Running R sessions are suspended so that future interactions with the server automatically launch the updated R session binary
+- Currently connected browser clients are notified that a new version is available and automatically refresh themselves.
+- The core server binary is restarted
+ 
+When load balancing is configured upgrading multiple nodes may cause brief glitches if you upgrade each server one at a time. This is due to the possibility of two servers with different versions trying to coordinate. If some downtime is acceptable, we recommend taking all nodes offline before upgrading.
+
+To upgrade to a new version of RStudio you simply install the new version:
+
+:::{.panel-tabset}
+# Debian/Ubuntu
+
+```bash
+$ sudo gdebi <rstudio-package.deb>
+```
+
+# RedHat/CentOS:
+
+```bash
+$ sudo yum install <rstudio-package.rpm>
+```
+
+# openSUSE/SLES:
+
+```bash
+$ sudo zypper install <rstudio-package.rpm>
+```
+:::

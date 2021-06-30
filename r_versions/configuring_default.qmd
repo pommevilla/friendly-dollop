@@ -1,0 +1,55 @@
+## Configuring the Default Version of R
+
+When multiple versions of R are installed you will need to specify which version
+is the default one for new R sessions. This can be done automatically via the
+system PATH. However, several other mechanisms are provided when more flexibility
+is required.
+
+### Single Default Version of R
+
+RStudio uses the version of R pointed to by the output of the following command:
+
+```bash
+$ which R
+```
+
+The `which` command performs a search for the R executable using the system PATH. RStudio will therefore by default bind to the same version that is run when R is executed from a terminal.
+
+For versions of R installed by system package managers this will be `/usr/lib/R`. For versions of R installed from source this will typically (but not always) be `/usr/local/lib/R`.
+
+If you want to override which version of R is used, then you can use the `rsession-which-r` setting. For example:
+
+
+
+```bash
+# /etc/rstudio/rserver.conf
+rsession-which-r=/usr/local/lib/R
+```
+
+**Note:** This change will not take effect until the server is restarted. 
+
+### Default Version Per User or Group
+
+You can use the [User and Group Profiles](../r_sessions/user_and_group_profiles.html) feature to specify distinct default versions of R for various users and groups. For example, the following profile configuration uses R 3.1.0 as the system default, R 3.2.0 for the `powerusers` group, and R 3.0.2 for the user `jsmith`:
+
+```ini
+[*]
+r-version = /opt/R/3.1.0
+
+[@powerusers]
+r-version = /opt/R/3.2.0
+
+[jsmith]
+r-version = /opt/R/3.0.2
+```
+
+Note that `r-version` specifies the full path to the directory where R is installed.
+
+### User Configurable Default Version
+
+Users can also configure their own default version of R. This is done using the **General** pane of the **Global Options** dialog:
+
+![Set Default R Version](../images/SetDefaultRVersion.png)
+
+See the [Disabling Use of Multiple Versions](using_multiple_versions_of_r.qmd#disabling-use-of-multiple-versions) section for details on how to disable version switching entirely either system-wide or on a per-user or per-group basis.
+

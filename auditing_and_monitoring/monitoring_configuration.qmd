@@ -1,0 +1,62 @@
+## Monitoring Configuration
+
+### System and Per-User Resources
+
+RStudio Workbench monitors the use of resources (CPU, memory, etc.) on both a per-user and system wide basis. By default, monitoring data is written to a set of [RRD](http://oss.oetiker.ch/rrdtool/) files and can be viewed using the [Administrative Dashboard](../server_management/administrative_dashboard.qmd). 
+
+The storage of system monitoring data requires about 20MB of disk space and the storage of user monitoring data requires about 3.5MB per user. This data is stored by default at `/var/lib/rstudio-server/monitor`. If you have a large number of users you may wish to specify an alternate volume for monitoring data. You can do this using the `monitor-data-path` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+monitor-data-path=/monitor-data
+```
+
+You also might wish to disable monitoring with RRD entirely. You can do this using the `monitor-rrd-enabled` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+monitor-rrd-enabled=0
+```
+
+Note that changes to the configuration will not take effect until the server is restarted.
+
+#### Analyzing RRD files
+
+The RRD files powering RStudio's Administrative Dashboard are available for your own analysis, too. You can find them in `/var/lib/rstudio-server/monitor/rrd` (unless you've changed `monitor-data-path` as described above); they store all the metrics you can see on the dashboard, so you can use the information for your own reports and insights.
+
+More information on how to read and visualize RRD data from R is available in the following blog post:
+
+[Reading and analysing log files in the RRD database format](https://rviews.rstudio.com/2018/06/20/reading-rrd-files/)
+
+### Using Graphite
+
+If you are managing several servers it might be convenient to send server monitoring data to a centralized database and graphing facility as opposed to local RRD files. You can do this by configuring the server to send monitoring data to [Graphite](http://graphite.wikidot.com/) (or any other engine compatible with the Carbon protocol). This can be done in addition to or entirely in place of RRD.
+
+There are four settings that control interaction with Graphite:
+
+|                    |                                                            |
+|--------------------|--------------------------------------------------|
+| **`monitor-graphite-enabled`**    | Write monitoring data to Graphite (defaults to `0`) |
+| **`monitor-graphite-host`**       | Host running Graphite (defaults to `127.0.0.1`) |
+| **`monitor-graphite-port`**       | Port Graphite is listening on (defaults to `2003`) |
+| **`monitor-graphite-client-id`**  | Optional client ID for sender |
+
+For example, to enable Graphite monitoring on a remote host with the default Graphite port you would use these settings:
+
+```ini
+# /etc/rstudio/rserver.conf
+monitor-graphite-enabled=1
+monitor-graphite-host=134.47.22.6
+```
+
+If you are using a service like hosted graphite.com that requires that you provide an API key as part of reporting metrics you can use the `monitor-graphite-client-id` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+monitor-graphite-enabled=1
+monitor-graphite-host=carbon.hostedgraphite.com
+monitor-graphite-client-id=490662a4-1d8c-11e5-b06d-000c298f3d04
+```
+
+Note that changes to the configuration will not take effect until the server is restarted. 
+

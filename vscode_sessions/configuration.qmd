@@ -1,0 +1,101 @@
+## Configuration
+
+### VS Code Configuration
+
+Configuration of VS Code sessions is handled via the config file `/etc/rstudio/vscode.conf`. Note that this file is not automatically created by RStudio and must be created manually or with the `install-vs-code` script, as VS Code sessions are disabled by default. The following table lists the various configuration options that are available to be specified in the `vscode.conf` configuration file:
+
+**/etc/rstudio/vscode.conf**
+
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| Config Option                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Default Value                                  |       |
++=================================+===============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+================================================+=======+
+| enabled                         | Enables launching of VS Code sessions.                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 0 (disabled)                                   |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| exe                             | Path to the `code-server` executable. VS Code sessions rely on the open source `code-server` project. For more information, see the [project site](https://github.com/cdr/code-server)                                                                                                                                                                                                                                                                                                        | /opt/code-server/bin/code-server               |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| version                         | The version of VS Code `code-server` being used. If set to `auto`, the version is automatically detected by running the `code-server` version command. If VS Code is being launched via the Launcher and is not installed locally, you are strongly encouraged to set this to the version in use. Running against multiple different `code-server` versions simultaneously in different Launcher clusters is not supported - they must all be running the same version, or issues will occur. | cur. \| auto                                   |     | |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| args                            | Arguments to be passed to the `code-server` launch command. You can supply an `--extensions-dir=` to point to previously installed extensions via this parameter. If no `--host` argument is supplied, a default of `--host=0.0.0.0` will be assumed.                                                                                                                                                                                                                                             | | `--host=0.0.0.0`                               | |     |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| session-clusters                | Comma-delimited list of available Job Launcher clusters for launching VS Code sessions. Leave blank to specify all clusters.                                                                                                                                                                                                                                                                                                                                                                  |                                                |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| default-session-cluster         | The default Job Launcher cluster to use when launching a VS Code session.                                                                                                                                                                                                                                                                                                                                                                                                                     |                                                |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| default-session-container-image | The default container image to use when launching a containerized VS Code session.                                                                                                                                                                                                                                                                                                                                                                                                            |                                                |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| session-container-images        | Comma-delimited list of images that may be used for running VS Code sessions.                                                                                                                                                                                                                                                                                                                                                                                                                 |                                                |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| vscode-session-path             | Path to the VS Code Session launcher executable/script. It is recommended that you do not change this unless you know what you're doing, and you need to point to a different script.                                                                                                                                                                                                                                                                                                         | /usr/lib/rstudio-server/bin/vscode-session-run |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+| session-no-profile              | Enables/disables running of bash profile scripts when starting VS Code sessions.                                                                                                                                                                                                                                                                                                                                                                                                              | 0 (run profile scripts)                        |       |
++---------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------+-------+
+
+For example, your `vscode.conf` file might look like the following:
+
+``` {.ini}
+# /etc/rstudio/vscode.conf
+exe=/usr/bin/code-server
+enabled=1
+default-session-cluster=Kubernetes
+default-session-container-image=rstudio:vscode-session
+```
+
+### VS Code code-server Versions
+
+Currently, RStudio Workbench supports `code-server` 3.9.3. Due to differences between `code-server` versions, RStudio Workbench needs to know the versions of `code-server` that is in use. It can be automatically detected by RStudio Workbench on start up by running the `code-server` command, or can be specified by using the `version` setting in */etc/rstudio/vscode.conf*. Automatic version detection is done if the default value of `auto` is used.
+
+If you are running VS Code in a remote cluster like Kubernetes, you will need to manually specify the version of `code-server` if it is not locally installed or is not running the same version as the remote cluster. Due to version differences, running against multiple different versions of `code-server` in different Launcher clusters simultaneously is not supported - the versions must match in all clusters.
+
+You can manually specify the version number like so:
+
+```ini
+# /etc/rstudio/vscode.conf
+version=3.9.3
+```
+
+### VS Code User Settings
+
+By default, `code-server` writes VS Code user settings under `~/.local/share/code-server`. This can be changed by adding the `user-data-dir` path argument to the VS Code options, like so:
+
+```ini
+# /etc/rstudio/vscode.conf
+exe=/usr/bin/code-server
+args=--host=0.0.0.0 --verbose
+user-data-dir=<desired user path>
+```
+
+Note that the <desired user path> specified in the configuration can contain the `~` to represent the user's home directory.
+
+Whenever a VS Code session is launched, RStudio automatically merges the user settings template file at `/etc/rstudio/vscode-user-settings.json` with the user's settings file. This file should be a valid JSON file that contains desired VS Code user settings. Any matching settings that already exist in the user settings file are not overridden, allowing users the freedom to customize their environment. You should use the `vscode-user-settings.json` file to provide them with a simple baseline configuration.
+
+If you installed VS Code via the `sudo rstudio-server install-vs-code` command, a simple template is created for you automatically which instructs VS Code to use the bash shell by default and to disable automatic extension updates. The generated file looks like the following:
+
+*/etc/rstudio/vscode-user-settings.json*
+``` {.json}
+{
+      "terminal.integrated.shell.linux": "/bin/bash",
+      "extensions.autoUpdate": false,
+      "extensions.autoCheckUpdates": false
+}
+```
+
+### Launcher Configuration
+
+When creating containerized VS Code sessions via the Job Launcher, you will need to specify mount points as appropriate to mount the users' home drives and any other desired paths. In order for sessions to run properly within containers, it is **required** to mount the home directories into the containers.
+
+For more information, see [Launcher Mounts](../job_launcher/configuration.qmd#launcher-mounts). Note that you can specify the `Workbench` with `VS Code` to configure mount entries that should only be mounted for VS Code sessions.
+
+::: {.callout-note}
+Only a user's home folder is visible within VS Code sessions. To access other folders, create symbolic links to them within the home folder.
+:::
+
+### Container Configuration
+
+When running VS Code sessions in containers, such as by using the Kubernetes Job Launcher plugin, you will need to ensure that the image(s) used to launch VS Code sessions contain, at minimum, the following:
+
+1)  `code-server` 3.9.3 binary
+2)  RStudio Workbench session binaries
+3)  If creating container users (see [Server Configuration](../job_launcher/configuration.qmd#server-configuration)), you must have the `libuser1-dev` or `libuser-devel` packages, depending on your platform to install the libuser library and development tools.
+
+For ease of use, it is recommended that you use the [`r-session-complete` Docker image](https://hub.docker.com/r/rstudio/r-session-complete) as a base for any VS Code session images you intend to create.
+

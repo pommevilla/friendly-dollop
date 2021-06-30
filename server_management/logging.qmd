@@ -1,0 +1,68 @@
+## Logging
+
+RStudio provides the ability to change various facets of its logging functionality, such as changing the logger type (syslog vs file) on a per-binary or per-section basis. In most configurations, it is recommended that you do not change the logging configuration, but in some circumstances it is desirable to turn on debug logging to help troubleshoot issues.
+
+### Configuration File
+
+The logging configuration file is located at `/etc/rstudio/logging.conf`. It allows you to specify logging options in a hierarchy of three different types:
+
+1) Global (`[*]`)
+2) Per-binary (`[@binary name]`)
+3) Per log section (`[log section name]`)
+
+For example:
+
+```ini
+# /etc/rstudio/logging.conf
+[*]
+log-level=info
+logger-type=syslog
+
+[@rserver]
+log-level=debug
+logger-type=file
+max-size-mb=10
+
+[file-locking]
+log-dir=/var/log/file-locking
+log-file-mode=600
+```
+
+This configuration specifies that by default, all logging should be sent to `syslog` at `info` level or higher. Debug logging is enabled for the `rserver` binary specifically, where logs are written to file with a maximum log file size of 10MB, in the default `/var/log/rstudio-server` directory. File locking logging is also specifically redirected to a different logging directory, `/var/log/file-locking`, with a specific file creation mode of `600`. All logging sections named `file-locking` which occur in the `rserver` process will be logged to file, whereas the same logging sections in other binaries will continue to be logged to `syslog`.
+
+The following settings may be specified in `/etc/rstudio/logging.conf`:
+
+Config Option            | Description                                                                                        | Default Value
+------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------
+log-level                | The minimum log level to capture. Can be one of `debug`, `info`, `warn`, or `error`.               | `warn`
+logger-type              | The type of logger to use. Can be one of `stderr`, `syslog`, or `file`.                            | `syslog`
+
+When using the file logger, the following can also be specified:
+
+Config Option            | Description                                                                                        | Default Value
+------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------
+log-dir                  | The log directory to store log files in. The resulting log file name is based on the binary name (and optionally the process ID). | `/var/log/rstudio-server`
+log-file-mode            | The filemode to use when creating the log file. Must be a valid POSIX octal file mode.             | `666` (All read/write)
+log-file-include-pid     | Whether to include the process id in the filename. Useful for differentiating between multiple processes of the same name. Can be `0` (false) or `1` (true) | `0` (false)
+rotate                   | Whether or not to rotate the log file as it reaches maximum size. Can be `0` (false) or `1` (true) | `1` (true)
+max-size-mb              | Maximum allowable size of the file before it is rotated. Only applicable if rotate is enabled.     | `2` (MB)
+
+#### List of Logging Sections
+
+The following is a list of logging sections that may be used within the logging configuration file.
+
+Section Name              | Description
+------------------------- | --------------------------------------------------------------------------
+file-locking              | Logging of file locking operations, such as processes acquiring and releasing locks.
+
+
+#### Reloading Configuration
+
+In order to reload the logging settings during run-time of a process, simply send the `SIGHUP` signal to the desired process, and the logging configuration will be reloaded for that binary.
+
+For example, to send the `SIGHUP` signal to the `rserver` process after changing the configuration file:
+
+```bash
+pidof rserver | sudo xargs kill -s SIGHUP
+```
+

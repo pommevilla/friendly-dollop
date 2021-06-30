@@ -1,0 +1,297 @@
+## Configuration {#lb-configuration}
+
+### Requirements
+
+There are several requirements for nodes within RStudio clusters:
+
+1. All nodes must run the same version of RStudio Workbench.
+
+2. Server configurations (i.e. contents of the `/etc/rstudio` directory) must be identical.
+
+3. User accounts must be accessible from each node and usernames and user ids must be identical on all nodes. The same applies for any groups used by RStudio users, and also to the rstudio service user account.
+
+4. The clocks on all nodes must be synchronized.
+
+5. User home directories must be accessible via **shared storage** (e.g.
+   all nodes mounting the same NFS volume).
+   
+   ::: {.callout-note}
+   Due to high latencies, use of EFS (Elastic File System) for home directories     within AWS is strongly discouraged. If EFS is used, RStudio will experience highly degraded performance. We recommend using a traditional NFSv3 or NFSv4 mount instead.
+   :::
+
+6. An explicit server-wide shared storage path also must be defined. See the [Shared Storage](../r_sessions/project_sharing.qmd#shared-storage) section for additional details. 
+
+7. RStudio must be configured to use a [PostgreSQL](../database/configuration.qmd#postgresql) database, and an empty database must be present for RStudio to write important cross-node state. If you have previously run RStudio with a [SQLite](../database/configuration.qmd#sqlite) database, it is strongly advised that you execute the database [Migration](../database/migration.qmd#migration) to the PostgreSQL database first. For more information, see [Database](../database/database.qmd).
+
+### Defining Nodes
+
+To define a cluster node, two configuration files need to be provided:
+
+```bash
+/etc/rstudio/load-balancer
+/etc/rstudio/secure-cookie-key
+```
+
+The first of these defines the available nodes and load balancing strategy. The second defines a shared key used for signing cookies (in single node configurations this key is generated automatically, however with multiple nodes explicit coordination is required. The same secure-cookie-key value **must** be used on each node).
+
+For example, to define a cluster with two nodes that load balances based the number of actively running R sessions you could use the following configuration:
+
+```bash
+; /etc/rstudio/load-balancer
+[config]
+
+balancer = sessions
+
+[nodes]
+
+server1.example.com
+server2.example.com
+```
+
+```bash
+# /etc/rstudio/secure-cookie-key
+a55e5dc0-d6ae-11e3-9334-000c29635f71
+```
+
+The secure cookie key file above is only an example; you need to generate your own unique key to share among the nodes in your cluster.
+
+### Key File Requirements
+
+The following are the requirements for the secure cookie key file:
+
+- The key value must have a minimum length of 128 bits (16 bytes/characters). RStudio won't start if the key is too weak.
+- The key file must have restrictive permissions (i.e. 0600) to protect its contents from other users.
+- The key file must be identical on all nodes in a load-balanced cluster, so that the nodes can communicate with each other.
+- The key must have a secret value that cannot be guessed. Randomly generating the value is recommended; see below for one mechanism for doing so.
+
+### Generating a Key 
+
+You can create a secure cookie key using the `uuid` utility as follows:
+
+```bash
+sudo sh -c "echo `uuid` > /etc/rstudio/secure-cookie-key"
+sudo chmod 0600 /etc/rstudio/secure-cookie-key
+```
+
+This is the recommended method, but any mechanism that generates a unique, random value will work.
+
+You do not need to generate a `secure-cookie-key` file on each server; generate it once, and copy it to each node along with the rest of the `/etc/rstudio` directory.
+
+This secure cookie key will also be used for encrypting and decrypting the PostgreSQL database password, if applicable. See [PostgreSQL Password Encryption](../database/configuration.qmd#postgresql-password-encryption) for more details.
+
+#### Key File Location
+
+You may optionally change the path of the secure-cookie-key by changing the `secure-cookie-key-file` setting in `rserver.conf`, though it is not necessary. Changing the path in this manner is only recommended in very specific circumstances when running the launcher with both RStudio Workbench and Package Manager simultaneously. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+secure-cookie-key-file=/mnt/rstudio/secure-cookie-key
+```
+
+In addition, an explicit server-wide shared storage path must be defined (this is used for inter-node synchronization). This path is defined in the `/etc/rstudio/rserver.conf` file. For example:
+
+
+
+```ini
+# /etc/rstudio/rserver.conf
+server-shared-storage-path=/shared/rstudio-server/shared-storage
+```
+
+For convenience, this path will often be located on the same volume used for shared home directory storage (e.g. at path `/home/rstudio-server/shared-storage`).
+
+### Launcher Considerations
+
+If you are running RStudio Workbench load balancing in addition to using Launcher sessions, you will need to ensure that the `/etc/rstudio/launcher.pub` and `/etc/rstudio/launcher.pem` files match on all Workbench nodes in the cluster. Failure to do so will prevent users from being able to connect to their sessions from Workbench nodes other than where their sessions were initiated.
+
+For more information, see [RStudio Workbench Integration](../job_launcher/configuration.html#rstudio-workbench-integration).
+
+### File Locking
+
+In order to synchronize the creation of sessions across multiple nodes RStudio Workbench uses a cross-node locking scheme. This scheme relies on the clocks on all nodes being synchronized. RStudio Workbench includes a `locktester` utility which you can use to verify that file locking is working correctly. To use the `locktester` you should login (e.g. via SSH or telnet) to at least two nodes using the same user account and then invoke the utility from both sessions as follows:
+
+```bash
+$ /usr/lib/rstudio-server/bin/locktester
+```
+
+The first node you execute the utility from should indicate the types of locks it was able to acquire, for example:
+
+```
+* Acquired advisory lock
+* Acquired link-based lock
+```
+
+After the message is printed the process will pause so that it can retain the lock (you can cause it to release the lock by interrupting it e.g. via Ctrl+C).
+
+The second and subsequent nodes you execute the utility will attempt to acquire the lock. A message will be printed to the console indicating which type of locks are supported, for example:
+
+
+```
+* Acquired advisory lock
+* Unable to acquire link-based lock
+
+Your filesystem appears to support link-based locks.
+```
+
+In this example, advisory locks are not supported (because both nodes were able to acquire an advisory lock), but link-based locks are. See [Lock Configuration] for more information on configuring lock types.
+
+If you interrupt the first node (e.g. via Ctrl+C) the lock will be released and you can then acquire it from the other nodes.
+
+If either of the following occurs then there is an issue with file locking capabilities (or configuration) that should be addressed prior to using load balancing:
+
+1) All nodes successfully acquire the file lock (i.e. more than one node can hold it concurrently).
+2) No nodes are able to acquire the file lock.
+
+If either of the above conditions hold then RStudio won't be able to correctly synchronize the creation of R sessions throughout the cluster (potentially resulting in duplicate sessions and lost data due to sessions overwriting each others state).
+
+#### Lock Configuration
+
+RStudio's file locking scheme can be configured using a file at `/etc/rstudio/file-locks`. Valid entries are:
+
+- `lock-type=[linkbased|advisory]`
+- `refresh-rate=[seconds]`
+- `timeout-interval=[seconds]`
+- `enable-logging=[0|1]`
+- `log-file=[path]`
+
+The default locking scheme, `linkbased`, uses a file locking scheme whereby locks are considered acquired when the process successfully hardlinks a dummy file to a location within the folder RStudio uses for client state (typically `~/.local/share/rstudio`). This scheme is generally more robust with older network file systems, and the locks should survive temporary filesystem mounts / unmounts.
+
+The `timeout-interval` and `refresh-rate` options can be used to configure how often the locks generated in the `linkbased` locking scheme are refreshed and reaped. By default, a process refreshes any locks it owns every 20 seconds, and scans for stale locks every 30 seconds. If an `rsession` process crashes, it can leave behind stale lock files; those lock files will be cleaned up after they expire by any newly-launched `rsession` processes.
+
+`advisory` can be selected to use advisory file locks (using e.g. `fcntl()` or `flock()`). These locks are robust, but are not supported by all network file systems.
+
+If you are having issues with file locking, you can set `enable-logging=1`, and set the `log-file` option to a path where output should be written. When logging is enabled, RStudio will report its attempts to acquire and release locks to the log file specified by `log-file`. When `log-file` is unset, log entries will be emitted to the system logfile, typically located at `/var/log/messages` or `/var/lib/syslog`.
+
+### Managing Nodes
+
+#### Starting Up
+
+After creating your configuration files you should ensure that these files (along with all other configuration defined in `/etc/rstudio`) are copied to all nodes in the cluster. Assuming that the server is already installed and running on each node, you can then apply the load balancing configuration by restarting the server:
+
+```bash
+sudo rstudio-server restart
+```
+
+#### Current Status
+
+Once the cluster is running you can inspect its state (which sessions are running where) using the load balancing status HTTP endpoint. For example, when running the server on the default port (8787):
+
+```bash
+curl http://localhost:8787/load-balancer/status
+```
+
+Note that the status endpoint is accessed using localhost rather than an external IP address. This is because this endpoint is IP restricted to only be accessible within the cluster, so needs to be accessed directly from one of the nodes.
+
+The `status` endpoint will return output similar to the following:
+
+```bash
+192.168.55.101:8787  Load: 0.45, 0.66, 0.32
+   12108 - jdoe
+   12202 - kmccurdy
+
+192.168.55.102:8787  Load: 1, 0.75, 0.31
+   3404 - bdylan
+
+192.168.55.103:8787 (unreachable)  Load: 0, 0, 0
+
+192.168.55.104:8787 (offline)  Load: 0.033, 0.38, 0.24
+```
+
+This output will show all of the nodes in the cluster. Each node is indicated by its address and an optional status indicating whether the node is unreachable or offline. If the node does not indicate a status, then it is healthy and servicing requests. Following the node address is its CPU `Load`, indicated by three decimal values indicating the last known 1-minute, 5-minute, and 15-minute load averages, represented as a fraction of total CPU load. On subsequent output lines, each RStudio IDE session that is running on that particular node is listed along with its process ID and running user.
+
+An unreachable node indicates an issue connecting to it via the network. In most cases, this indicates that the `rstudio-server` service is not running on the node and should be troubleshooted by viewing any startup issues in the system logs for that particular node (see [Diagnostics] if the service is running and healthy). An offline node is one that was specifically put into offline mode via the command `sudo rstudio-server offline`, which causes it to stop servicing new sessions.
+
+#### Adding and Removing Nodes
+
+To temporarily remove a node from the cluster you can simply stop it:
+
+```bash
+sudo rstudio-server stop
+```
+
+R sessions running on that node will be automatically moved to another active node. Note that only the session state is moved, not the running processes. To restore the node you can simply start it back up again:
+
+```bash
+sudo rstudio-server start
+```
+
+Note that removing nodes does not require changing the list of defined nodes in `/etc/rstudio/load-balancer` (traffic is automatically routed around nodes not currently running).
+
+To add new nodes, simply add the nodes to the `/etc/rstudio/load-balancer` configuration file and send the `SIGHUP` signal to the `rserver` process (e.g., via `sudo rstudio-server reload`). It is recommended that this should be done to all nodes in the cluster, but depending on your routing configuration, at a minimum the node selected as the "main" node MUST be updated and signaled to start routing traffic to the new node(s).
+
+When removing nodes from the configuration file via the `SIGHUP` signal, you must ensure that any removed nodes have their processes stopped by running `sudo rstudio-server stop` on that node. Alternatively, you can suspend any actively running sessions by running `sudo rstudio-server suspend-all` on the node to be removed. Failure to do this will cause existing sessions running on the removed node to be stuck in an inaccessible state, and users will not be able to connect to those sessions.
+
+Reloading the load balancer configuration will also cause the `rserver-http` proxy configuration to be updated as well, which affects the RStudio's running HTTP server. It is recommended that you do not make any other HTTP-related changes when updating the load balancer configuration unless you are aware of the potential side-effects!
+
+### Troubleshooting
+
+If users are having difficulty accessing RStudio in a load balanced configuration it's likely due to one of the load balancing requirements not being satisfied. This section describes several scenarios where a failure due to unsatisfied requirements might occur.
+
+#### Node network instability
+
+Some scenarios may causes RStudio to wait a long time for a node to respond due to network instability. You can limit how long is this waiting period with the `timeout` option, which is set to 10 seconds by default. This disable this timeout and use the system defaults, set it to zero.
+
+
+
+```bash
+; /etc/rstudio/load-balancer
+[config]
+
+balancer = sessions
+timeout = 5
+...
+```
+
+#### SSL
+
+If one of the nodes is temporarily using a self-signed or otherwise functional but invalid certificate the load balancer may fail to use that node. You can skip SSL certificate verification by disabling the option `verify-ssl-certs`, which is only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes.
+
+
+
+```bash
+; /etc/rstudio/load-balancer
+[config]
+
+balancer = sessions
+verify-ssl-certs = 0
+...
+```
+
+#### User Accounts Not Synchronized
+
+One of the load balancing requirements is that user accounts must be accessible from each node and usernames and user ids must be identical on all nodes. If a user has the same username but *different* user ids on different nodes then permissions problems will result when the same user attempts to access shared storage using different user-ids.
+
+You can determine the ID for a given username via the `id` command. For example:
+
+```bash
+id -u jsmith
+```
+
+#### NFS Volume Mounting Problems
+
+If NFS volumes containing shared storage are unmounted during an RStudio session that session will become unreachable. Furthermore, unmounting can cause loss or corruption of file locks (see section below). If you are having problems related to accessing user directories then fully resetting the connections between RStudio nodes and NFS will often resolve them. To perform a full reset:
+
+1) Stop RStudio on all nodes (`sudo rstudio-server stop`).
+
+2) Fully unmount the NFS volume from all nodes.
+
+3) Remount the NFS volume on all nodes.
+
+4) Restart RStudio on all nodes (`sudo rstudio-server start`).
+
+#### File Locking Problems
+
+Shared user storage (e.g. NFS) must support file locking so that RStudio can synchronize access to sessions across the various nodes in the cluster. File locking will not work correctly if the clocks on all nodes in the cluster are not synchronized. This condition may be surfaced as 502 HTTP errors. You can verify that file locking is working correctly by following the instructions in the [File Locking] section above.
+
+#### Diagnostics
+
+To troubleshoot more complicated load balancing issues, RStudio can output detailed diagnostic information about internal load balancing traffic and state. You can enable this by using the `diagnostics` setting as follows:
+
+```ini
+[config]
+diagnostics = tmp
+```
+
+Set this on *every* server in the cluster, and restart the servers to apply the change. This will write a file `/tmp/rstudio-load-balancer-diagnostics` on each server containing the diagnostic information.
+
+The value `stderr` can be used in place of `tmp` to send diagnostics from the `rserver` process to standard error instead of a file on disk; this is useful if your RStudio Workbench instance runs non-daemonized.
+

@@ -1,0 +1,68 @@
+## Tutorial API Callbacks
+
+As seen in the examples above, the callback returns JSON. The following are examples of calls that trigger callbacks.
+
+Method                   | Description                                   | Example payload
+------------------------ | --------------------------------------------- | -----------------------------------------------------
+getState | response from `getState` | See examples below
+error | a prior API call failed | {"message": "error", "api": "createProjFromGit", "result": "access denied", "callerID": "abcd"}
+success | a prior API call succeeded | {"message": "success", "api": "createProjFromGit", "callerID": "abcd"}
+
+There are also callbacks sent directly by RStudio (i.e. not in response to Tutorial API calls).
+
+Method                   | Description                                   | Example payload
+------------------------ | --------------------------------------------- | -----------------------------------------------------
+fileSave | contents of a file loaded in RStudio IDE were saved (including auto-save of content and/or metadata) | {"message": "fileSave"}
+sessionDisconnect | connection between RStudio IDE and its rsession process was closed | {"message": "sessionDisconnect"}
+sessionSuspend | the rsession process has been suspended | {"message": "sessionSuspend"}
+
+## getState
+
+The `getState()` method returns the path to the currently loaded .Rproj (if any) and any git remotes.
+
+The results come via the callback. Here are some examples.
+
+### Project with remotes
+
+```json
+{
+  "message": "getState",
+  "callerID": "abcd",
+  "project": "~/aaa/aaa.Rproj",
+  "remotes": [
+    {
+      "active": true,
+      "remote": "origin",
+      "type": "fetch",
+      "url": "https://github.com/rstudio/aaa"
+    },
+    {
+      "active": true,
+      "remote": "origin",
+      "type": "push",
+      "url": "https://github.com/rstudio/aaa"
+    }
+  ]
+}
+```
+
+### Project with no remotes
+
+```json
+{
+  "message": "getState",
+  "callerID": "abcd",
+  "project": "~/localproj/localproj.Rproj",
+  "remotes": []
+}
+```
+
+### No project and no remotes
+```json
+{
+  "message": "getState",
+  "callerID": "abcd",
+  "project": null,
+  "remotes": []
+}
+```

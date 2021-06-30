@@ -1,0 +1,46 @@
+## R Session Security
+
+RStudio includes a number of options which can help harden the surface of the RStudio IDE itself. The settings in this section all apply to the IDE's user interface for R sessions. 
+
+Remember that RStudio is an interface to R itself, which has a variety of tools that can access the file system and shell as the user themselves. Follow security best practices by relying on operating system-level permissions, not front end restrictions, to guard access to sensitive content and files.
+
+### Limit Idle Time
+
+By default, RStudio allows users to be idle for up to an hour before automatically signing them out. If your users work with sensitive data, you may wish to decrease this.
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-timeout-minutes=20
+```
+
+See [Inactivity Timeout](../authenticating_users/authorization_timeout.qmd#inactivity-timeout) for details.
+
+### Restrict System Directory Access
+
+RStudio can optionally prevent users from browsing to system directories; see [Restricted Directories](../r_sessions/directory_management.qmd#restricted-directories) for details. Enable this feature as follows:
+
+```ini
+# /etc/rstudio/rsession.conf
+restrict-directory-view=1
+```
+
+### Disable External Publishing {.pro-header}
+
+RStudio includes support for publishing to several external services, including RPubs and Shinyapps.io. If your users work with sensitive information, you should disable publishing to these services as follows:
+
+```ini
+# /etc/rstudio/rsession.conf
+allow-external-publish=0
+```
+
+### Disable Other Features {.pro-header}
+
+The are a few other features you should consider disabling. We have not included them in our [Example Secure Configuration](example_secure_configuration.qmd) because they can impede productivity for end users.
+
+- **Disable shell access** (`allow-shell=0`); disables the Terminal tab used to execute system commands
+- **Disable file downloads** (`allow-file-downloads=0`); disables downloading files using the Files pane
+- **Disable file uploads** (`allow-file-uploads=0`); disables uploading files using the Files pane
+- **Disable package installation** (`allow-package-installation=0`); disables the user interface for installing R packages
+
+Note that regardless of the values of these settings, users can execute system commands, install packages, and upload and download content using R itself.
+

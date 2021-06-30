@@ -1,0 +1,4 @@
+# Overview
+
+RStudio supports multiple database options. Currently, the supported databases are SQLite and PostgreSQL. When running RStudio Workbench in a load balanced configuration, you *must* use a PostgreSQL database, as SQLite is insufficient for managing state between multiple nodes.
+

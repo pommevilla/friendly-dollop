@@ -1,0 +1,123 @@
+## Google Accounts (deprecated) {.pro-header}
+
+::: {.callout-note}
+While it is still possible to configure this authentication method, note that in future releases of RStudio, this authentication method will migrate to use OpenID Connect instead; Google itself uses OpenID as an underlying authentication mechanism. Additionally, RStudio Desktop Pro clients will be unable to connect to RStudio Workbench when it is configured to use Google Authentication due to new restrictions from Google - see [Google's Notice](https://developers.googleblog.com/2020/08/guidance-for-our-effort-to-block-less-secure-browser-and-apps.html) for more information.
+:::
+
+RStudio Workbench can be configured to authenticate users via Google Accounts. This enables users to log in with their existing Gmail or Google Apps credentials and to be automatically authenticated to RStudio whenever they are already logged into their Google account.
+
+### Registering with Google
+
+In order to use Google Accounts with RStudio Workbench you need to register your server with Google for OAuth 2.0 Authentication. You do this by creating a new "Project" for your server in the *Google Developer Console*:
+
+<https://console.developers.google.com/>
+
+Once you've created a project you go to the *Credentials* area of *APIs and auth* and choose to **Create New Client ID**:
+
+![Create Client Id](../images/CreateClientID.png)
+
+
+You'll then be presented with a dialog used to create a new client ID:
+
+![Create Client Id](../images/CreateClientIDDialog.png)
+
+You should select "Web application" as the application type and provide two URLs that correspond to the server you are deploying on. The screenshot above uses `https://www.example.com` as the host, you should substitute your own domain and port (if not using a standard one like 80 or 443) in your configuration.
+
+This will result in two values which you'll need to provide as part of the RStudio Workbench configuration: `client-id` and `client-secret` (they'll be displayed in the *Google Developer Console* after you complete the dialog).
+
+### Enabling Google Accounts
+
+To enable authentication with Google Accounts you add the `auth-google-accounts` option to the RStudio configuration file:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-google-accounts=1
+```
+
+**Once you enable authentication with Google Accounts that becomes the exclusive means of authentication (you can't concurrently use both PAM and Google Account authentication).**
+
+In addition, you need to add a configuration file (`/etc/rstudio/google-client-secret`) containing the `client-id` and `client-secret` that you received when registering your site with Google. For example, the configuration file might look like this:
+
+
+
+```ini
+# /etc/rstudio/google-client-secret
+client-id=lllllllllllll-xxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+client-secret=BhCC6rK7Sj2ZtPH0ord7lO1w
+```
+
+The `/etc/rstudio/google-client-secret` file should have user read/write file permissions (i.e., 0600) to protect it's contents from other users. You can ensure this as follows:
+
+```bash
+$ sudo chmod 0600 /etc/rstudio/google-client-secret
+```
+
+::: {.callout-important}
+The above `client-id` and `client-secret` aren't the actual values you'll use. Rather, you should substitute the values that you obtained from Google when registering your site for OAuth authentication.
+:::
+
+### Translating to Local Accounts
+
+#### Creating Matching Accounts
+
+Once a user is authenticated via Google Accounts it's necessary to map their Google Accounts identity to a local system account. The default and most straightforward way to do this is to create a local account with a username identical to their Google email address.
+
+If you choose to create local accounts that match Google email addresses, be sure to use only lowercase characters in the account name since Google email addresses are transformed to lower-case prior to matching them to local account names.
+
+One problem with creating local accounts that match Google email addresses is that they often contain characters that are invalid by default within Linux usernames (e.g. @ or .). On Debian/Ubuntu systems it's possible to force the system to create a user with these characters. Here's an example of creating a user with a username that contains typically invalid characters:
+
+```bash
+$ sudo adduser --force-badname <username>
+```
+
+::: {.callout-important}
+ The `--force-badname` option is only available on Debian/Ubuntu systems and is not available on RedHat/CentOS or SLES systems.
+:::
+
+
+If the users you are creating will only be accessing the server via RStudio, you may also want to disable their ability to log in as a normal interactive user and to specify that they have no password. For example:
+
+```bash
+$ sudo adduser --force-badname --disabled-login --disabled-password <username>
+```
+
+#### Using an Account Mappings File
+
+Alternatively, you map create local accounts that do not match Google email addresses and then specify a mapping of Google accounts to local accounts via the `/etc/rstudio/google-accounts` configuration file. For example:
+
+```ini
+# /etc/rstudio/google-accounts
+john.smith@gmail.com=jsmith
+sally.jones@gmail.com=sjones
+```
+
+Note that changes to the `google-accounts` configuration file take effect immediately and do not require a server restart.
+
+
+### Proxy Considerations
+
+If you are running RStudio behind a proxy, you will need to configure your proxy in a way that RStudio can tell the Google Web Services to redirect back to the correct location. There are number of options to choose from as described in [Running with a Proxy](../access_and_security/running_with_a_proxy.qmd).
+
+The use of the `X-RStudio-Request` header in your proxy is recommended and the only method which works behind a path-rewriting proxy. In this case, the proxy must set the `X-RStudio-Request` header to the exact complete URL as requested by the browser. For example if your proxy was set up to serve RStudio requests at `https://testdomain.com/rstudio/` and an incoming request for `/home` came in, your proxy should set `X-RStudio-Request: https://testdomain.com/rstudio/home` which would allow RStudio to know about the added path prefix `/rstudio`.
+
+If your proxy does not add path prefixes, RStudio is also compatible with two options using commonly available HTTP proxy headers:
+
+- The headers `X-Forwarded-Host`, `X-Forwarded-Proto`, and `X-Forwarded-Port`.
+- Or the header `Forwarded` with `host`, and `proto` values.
+
+When using path-rewriting proxies, it's also recommended to use either the header `X-RStudio-Root-Path` or the option `www-root-path` to indicate the path defined for RStudio by the proxy. For example, if your URL to RStudio is `www.example.com/rstudio` your proxy should send the header `X-RStudio-Root-Path: /rstudio` or you should use:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-root-path=/rstudio
+```
+
+If none of the headers above are set by the proxy, RStudio will attempt to redirect back to the address present in the `Host` header and it will determine the protocol (`http` or `https`) based on its current configuration.
+
+If you are running behind a proxy but cannot set headers for whatever reason, and `www-root-path` is not the right choice, you can use the `auth-google-accounts-redirect-base-uri` option in the RStudio configuration file to accomplish the same purpose:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-google-accounts-redirect-base-uri=http://testdomain.com/rstudio/
+```
+

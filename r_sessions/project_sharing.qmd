@@ -1,0 +1,169 @@
+## Project Sharing {.pro-header}
+
+### Overview
+
+Project Sharing is a feature of RStudio Workbench that enables users to work together on RStudio projects. When enabled, a project owner may select any number of other RStudio Workbench users as project collaborators. RStudio Workbench manages the permissions of files in the project to ensure that all collaborators can access them, enables multiple collaborators to edit a file simultaneously, and lets collaborators see who else is working inside a project with them.
+
+### Prerequisites
+
+Due to high latencies, use of EFS (Elastic File System) for project sharing directories within AWS is strongly discouraged. If EFS is used, RStudio will experience highly degraded performance. We recommend using a traditional NFSv3 or NFSv4 mount instead.
+
+The following sections outline additional prerequisites that your file system must meet.
+
+#### Access Control Lists
+
+To use Project Sharing, the directories hosting the projects to be shared must be on a volume that supports Access Control Lists (ACLs). RStudio uses ACLs to grant collaborators access to shared projects; ordinary file permissions are not modified.
+
+Instructions for enabling ACLs vary by Linux distribution and filesystem type (see the [Guide to enabling ACLs on Ubuntu](https://help.ubuntu.com/community/FilePermissionsACLs) or [RedHat](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Storage_Administration_Guide/ch-acls.html), for example). RStudio supports both NFSv3 (POSIX compatible) and NFSv4 ACLs.
+
+#### Shared Projects Root Directory
+
+RStudio cannot grant access to shared projects in arbritary locations. This would lead to unintended changes to the file system ACLs.
+
+By default only projects stored within the users' home directories can be shared. If you want share projects in a different location you can configure RStudio with an additional root directory for all users:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-project-sharing-root-dir=/projects
+```
+
+#### Project Sharing and NFS
+
+If you plan to use Project Sharing with NFS-mounted volumes, there are several caveats you should be aware of.
+
+- We recommend mounting NFS with the `noac` mount option. Without this option, NFS caches file attributes, so it may not be possible for users working simultaneously in a project to know whether they're seeing each others' latest changes. The `noac` option does reduce performance, however, so we recommend testing to choose the right trade off for your environment.
+
+- Some features which automatically update when directory contents change will not update on NFS. For instance, users may need to manually refresh the Files pane to see new files added by collaborators.
+
+- ACL support on NFS is more complicated than ACL support on local file systems. Read [ACLs on Linux NFS](http://wiki.linux-nfs.org/wiki/index.php/ACLs) for a discussion of the issues; guidance for configuring specific NFS versions is provided below.
+
+##### Determining NFS Version
+
+Project Sharing works with versions 3 and 4 of the NFS protocol. However, some additional configuration may be necessary depending on the NFS version and underlying filesystem. To determine your NFS client version, run the following command on your RStudio Workbench instance:
+
+```bash
+$ nfsstat -m
+```
+You should see `vers=3.0` in the output if you're using NFSv3, and `vers=4.0` if you're using NFSv4. Extra RStudio configuration is required for NFSv4 clients (see below).
+
+##### NFSv3
+
+To use NFSv3 access control lists, you will need to ensure that the filesystem is mounted with the `acl` attribute, and modify `/etc/fstab` if necessary to persist the attributes.
+
+Note that many Linux distributions now have ACLs enabled by default in which case no special configuration is required. You can use the `tune2fs` command to inspect the attributes with which your filesystem is mounted (`user_xattr` and `acl` are required for project sharing).
+
+On most systems this is the default, so you need only ensure that `noacl` is not present. It's also necessary for the file system on the NFS server to itself be appropriately configured for ACL support; see the section above on Access Control Lists for guidance. Not all file servers that support the NFSv3 protocol also support POSIX compatible ACLs.
+
+To test for POSIX compatible ACLs, you can use the `setfacl` command as follows:
+
+```bash
+setfacl -m u:user2:x /home/user1/project
+```
+
+where `/home/user1/project` is the full path to a directory owned by `user1`, and `user2` is another valid user on the system.
+
+Because many Linux systems support POSIX compatible ACLs on the native filesystem, RStudio uses them by default. You can also specify them explicitly as follows:
+
+```ini
+# /etc/rstudio/rsession.conf
+nfs-acl-version=nfsv3
+```
+
+##### NFSv4
+
+Version 4 of the NFS protocol uses a very different permissions and ACL model from Version 3. Not all NFSv4 servers support or expose the NFSv4 ACL model, so check with the server administrator to determine whether the capability exists and/or can be enabled.
+
+**Testing for support**
+
+To test NFSv4 ACL support, you can use the `nfs4_setfacl` command as follows:
+
+```bash
+nfs4_setfacl -a A::user2@domain:rax /home/user1/project
+```
+
+where `/home/user1/project` is the full path to a directory owned by `user1`, `user2` is another valid user on the system, and `domain` is your system's user domain. Verify that this command succeeds, and that the new ACL entry for `user2@domain` is visible when you retrieve it:
+
+```bash
+nfs4_getfacl /home/user1/project
+```
+
+This presumes that your environment supports using user/domain pairs as security principals. While most environments do, there are two different ways to specify security principals in NFSv4 ACLs: by **user name and domain** (preferred) or **user ID**. RStudio can use either, but you'll need to choose one appropriate for your network environment. If unsure, examine the output of the `nfs4_getfacl` operation described above. The security principal (the part after e.g., `A::` on each line) will be displayed as either a large integer (UID) or in `username@domain` format.
+
+**Using user name and domain security principals**
+
+NFSv4 ACLs differ from NFSv3 ACLs in that they can associate a *domain* with each user named in the access control list. This is typically the same as the domain part of the machine's host name, but can be any string that the NFSv4 client and server agree on. On Linux systems, the domain can be set in `/etc/idmapd.conf`.
+
+Tell RStudio the NFSv4 domain you want to use as follows:
+
+```ini
+# /etc/rstudio/rsession.conf
+nfs-acl-version=nfsv4
+nfs4-principal-type=username
+nfs4-domain=mydomain.com
+```
+
+**Using user ID security principals**
+
+In some environments, it may not be possible to resolve fully qualified `user@domain` security principals on all of the nodes running RStudio Workbench. This is common on e.g., Kubernetes nodes which are not domain-joined. In this case, it's possible to use raw User ID (UID) values as security principals in the access control list. You can tell RStudio to write raw UIDs as security principals in NFSv4 access control lists as follows:
+
+```ini
+nfs-acl-version=nfsv4
+nfs4-principal-type=uid
+```
+
+#### User Visibility
+
+Projects can only be shared with users with provisioned local system accounts unless LDAP is used for local account provisioning.
+
+The RStudio user database is scanned to list Project Sharing users. This method of user scanning avoids making calls to the system to determine the available users, and prevents making queries to the system password database (such as LDAP). However, it only lists users who have previously logged in to RStudio. To instead show all users on the server, set the following configuration to scan the system password database:
+
+```ini
+# /etc/rstudio/rsession.conf
+project-sharing-enumerate-server-users=1
+```
+
+When scanning via the system password database, if you're using [sssd](https://fedoraproject.org/wiki/Features/SSSD) with LDAP, you may need to enable user enumeration so that RStudio Workbench can search the directory to create a list of users you can share a project with. To do this, set the following in your *sssd.conf* file:
+
+```ini
+[domain/<domainname>]
+enumerate = true
+```
+
+Alternatively, the `auth-required-user-group` setting can be used. This setting allows RStudio Workbench to enumerate only the members of the named groups rather than the entire user directory. Therefore, if you cannot enable user enumeration on your LDAP provider, you can instead create a group containing all RStudio users and supply it as the `auth-required-user-group`.
+
+You can read more about user enumeration in the [sssd FAQ](https://docs.pagure.org/SSSD.sssd/users/faq.html#when-should-i-enable-enumeration-in-sssd-or-why-is-enumeration-disabled-by-default).
+
+#### Shared Storage
+
+To use Project Sharing, a directory must be specified to which all users on the server can read and write. It must also have the [sticky bit](https://en.wikipedia.org/wiki/Sticky_bit) set, so that users cannot remove each others' content. In a single-server installation, RStudio uses this location by default:
+
+```bash
+/var/lib/rstudio-server/shared-storage
+```
+
+In a load-balanced configuration, however, RStudio does not provide a default, so it is necessary to provision a path both visible to and writable by all users on the system (typically on the same filesystem on which home directories are mounted). This path can be supplied to RStudio Workbench via the `server-shared-storage-path` option, for example:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-shared-storage-path=/shared/rstudio-server/shared-storage
+```
+
+The `server-shared-storage-path` option (described above) configures the path used for shared project storage. Note that this storage contains only *links* to shared projects, not the projects themselves, so requires a very small amount of physical storage.
+
+##### Launcher Considerations
+
+When configuring RStudio Workbench to work with the RStudio Job Launcher, it is recommended to configure the [Shared Storage] path in a location that will be reachable both by the RStudio Workbench instance and each Launcher Session. See the [Launcher Sessions](../job_launcher/configuration.qmd#launcher-sessions) section for more details.
+
+#### Proxy Settings
+
+If you are running RStudio Workbench with a proxy, you'll need to make sure that your proxy is correctly configured to pass websocket connections through in order for all Project Sharing features to work. See the [Running with a Proxy](../access_and_security/running_with_a_proxy.qmd) section for more on this.
+
+### Disabling Project Sharing
+
+Project Sharing is enabled by default however you can disable it using the `server-project-sharing` option, for example:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-project-sharing=0
+```
+

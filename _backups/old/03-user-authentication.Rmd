@@ -1,0 +1,933 @@
+---
+knit: bookdown::preview_chapter
+---
+
+# Authenticating Users
+
+**R users require local system accounts regardless of what RStudio authentication method you use.** You must set up local system accounts manually or programmatically and then map authenticating users to these accounts.
+
+For user identification, authentication, and authorization using local system accounts, RStudio relies heavily on Linux [Pluggable Authentication Module (PAM)](http://en.wikipedia.org/wiki/Pluggable_authentication_module). PAM can be used by itself to authenticate users or along with other external authentication mechanisms (e.g., Web Single Sign-On) to authorize existing local system accounts.
+
+> **Note:** *Not all RStudio products require local system accounts or PAM. For example, RStudio Connect and Shiny Server rely on their own authentication engines and on a single system account for doing their work in most cases, not requiring individualized development environments like the ones offered by RStudio Workbench.*
+
+Here are the various authentication mechanisms supported by RStudio:
+
+| Authentication                                   | RStudio Configuration                                                         |
+|--------------------------------------------------|-------------------------------------------------------------------------------|
+| Local Accounts | [PAM Authentication] (via `pam_unix`) |
+| LDAP or Active Directory | [PAM Authentication] (via `pam_sss` or `pam_ldap` in older systems) |
+| Kerberos | [PAM Authentication] (via `pam_sss` or `pam_krb5` in older systems) |
+| Web Single Sign-On (SSO) | [SAML Single Sign-On Authentication] or [OpenID Connect Authentication] |
+| Others (client-server, e.g., RADIUS) | As supported by various [PAM modules](http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html) |
+| Others (browser-based, e.g., Kerberos [SPNEGO](https://en.wikipedia.org/wiki/SPNEGO) SSO) | [Proxied Authentication] |
+
+> **Note:** SAML, OpenID, and Proxied authentication still require [PAM Sessions] to automatically create local system accounts. Without it, local system accounts have to be provisioned manually one-by-one.
+
+## User Provisioning
+
+It is a common practice in Linux environments to configure [`sssd`](https://sssd.io/) to fetch users and groups from an LDAP or Active Directory server to automate the creation (provisioning) of local system accounts.
+
+In addition to user creation, `sssd` can also be configured to authenticate or authorize users via PAM using the `pam_sss` module.
+
+> **Note:** [`nss`](https://en.wikipedia.org/wiki/Name_Service_Switch) is an older alternative to `sssd` that also has LDAP synchronization capabilities. However, differently from `sssd`, it offers no support for authentication.
+
+> **Important:** When a user has an active session in RStudio, changes to his or her local account name (username) or `uid` are not supported and it can lead to unexpected behaviors in RStudio.
+
+## PAM Basics
+
+Local system accounts used by PAM must follow the system conventions for usernames. For example, usernames are case-sensitive.
+
+PAM profiles are are located in the `/etc/pam.d` directory. Each application can have their own profile, and there is also a default profile used for applications without one (the default profile is handled differently depending on which version of Linux you are running).
+
+To learn more about PAM and the many options and modules available for it see the following:
+
+- [https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system-level_authentication_guide/pluggable_authentication_modules](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system-level_authentication_guide/pluggable_authentication_modules)
+- [http://tldp.org/HOWTO/User-Authentication-HOWTO/x115.html](http://tldp.org/HOWTO/User-Authentication-HOWTO/x115.html)
+- [http://linux.die.net/man/8/pam](http://linux.die.net/man/8/pam)
+
+### PAM & Provisioning
+
+PAM recommendations for user provisioning:
+
+- If you are using PAM authentication to connect to an external authentication provider, you can use a PAM module like [`pam_mkhomedir`](https://linux.die.net/man/8/pam_mkhomedir) to automatically create the users' home directories on login.
+- User provisioning requires PAM sessions to be used is most cases. See the [PAM Sessions] section for details on how RStudio can be configured to use those.
+- If you are using SAML, OpenID or Proxied authentication and local system accounts are automatically created by `sssd`, a PAM configuration with the module [`pam_rootok`](https://linux.die.net/man/8/pam_rootok) must be used, since PAM sessions will be started by RStudio using `root` in the behalf of the actual user.
+
+## Authentication Migration
+
+It is possible to migrate between the supported authentication mechanisms.
+
+### Migrating from PAM
+
+Your local system accounts currently used with PAM can be used for Single Sing-On (SSO) authentication with SAML or OpenID. Ensure that:
+
+- The existing PAM configuration is configured for [PAM & Provisioning], as suggested above.
+- RStudio is configured with [PAM Sessions] if your local system accounts are maintained by `sssd`.
+- RStudio is configured with the appropriate SSO authentication mechanism.
+- The configured SAML attribute or OpenID claim for username from your Identity Management system matches the names of your **existing** local system accounts.
+
+> **Important:** If PAM was used with Kerberos, please note that the credential forwarding functionality offered by Kerberos is only possible with PAM and it cannot be leveraged directly by RStudio when using SSO.
+
+### Migrating to PAM
+
+Since all other authentication methods already leverage PAM in some degree, there's no actual migration to PAM. You should only make sure PAM is configured for authenticating the existing users and configure RStudio to use PAM.
+
+### Migrating from Proxied authentication
+
+Your local system accounts currently used with Proxied authentication can be used for Single Sing-On (SSO) authentication with SAML or OpenID. Ensure that:
+
+- If RStudio is placed under a different path by the proxy (e.g., `example.com/rstudio`), be sure to check the "Proxy Considerations" sections under [SAML Single Sign-On Authentication] or [OpenID Connect Authentication] for additional options your proxy or RStudio configuration may need.
+- RStudio is configured with the appropriate SSO authentication mechanism.
+- The configured SAML attribute or OpenID claim for username match the names of your **existing** local system accounts as they were sent by the proxy in the HTTP header for username.
+
+### Migrating to Proxied authentication
+
+> **Note:** This migration is not recommended unless none of the other existing authentication mechanisms are sufficient for your organization's needs.
+
+If [Migrating from PAM], you can follow the same recommendations listed above for SSO, noting that the HTTP header for username must match existing accounts. If migrating from SAML or OpenID, the same observation on the HTTP header for username applies.
+
+### Migrating from Google accounts
+
+Migrating from Google accounts is similar to [Migrating from PAM] to SSO, or [Migrating to PAM].
+
+**Google accounts have been deprecated and we strongly recommend against migrating to this authentication.**
+
+> **Note:** If you are currently using Google accounts for authentication, the migration from Google accounts to OpenID using Google itself as the OpenID provider is not yet supported. We recommend to keep using Google accounts or migrating to some other **non-Google** SSO authentication.
+
+## PAM Authentication
+
+By default, RStudio authenticates users via the Linux standard PAM API. PAM itself is typically configured by default to authenticate against the system user database (`/etc/passwd`) however it can also be configured to authenticate against a wide variety of other systems including Active Directory, LDAP, and Kerberos.
+
+> **Note:** PAM can be used for both authentication as well as to tailor the environment for users with [PAM sessions]. This section only describes PAM for the purposes of authentication.
+
+### Default PAM Configuration
+
+**Debian / Ubuntu**
+
+On Debian and Ubuntu systems RStudio does not provide an RStudio specific PAM configuration file. As a result, RStudio uses the `/etc/pam.d/other` profile, which by default inherits from a set of common configuration files:
+
+*/etc/pam.d/other*
+
+```css
+  @include common-auth
+  @include common-account
+  @include common-password
+  @include common-session
+```
+
+If the `/etc/pam.d/other` profile reflects the authentication system and policies that you'd like RStudio to use then no further configuration is required. If you want to create a custom PAM profile for RStudio you would create a file named `/etc/pam.d/rstudio` and specify whatever settings are appropriate. 
+
+**RedHat / CentOS / SUSE**
+
+On RedHat, CentOS and SUSE systems applications without their own PAM profiles are denied access by default. Therefore to ensure that RStudio is running and available after installation a default PAM profile is installed at `/etc/pam.d/rstudio`. This profile is configured to require a user-id greater than 500 and to authenticate users against local system accounts:
+
+*/etc/pam.d/rstudio*
+
+```bash
+auth      requisite      pam_succeed_if.so uid >= 500 quiet
+auth      required       pam_unix.so nodelay
+account   required       pam_unix.so
+```
+
+This default PAM profile may not reflect the authentication behavior that you want for RStudio. In that case, some customization may be required. If you've already set up another PAM profile (e.g. `/etc/pam.d/login`) with the desired behavior then it may be enough to simply copy that profile over the RStudio one. For example:
+
+```bash
+$ sudo cp /etc/pam.d/login /etc/pam.d/rstudio
+```
+
+### Diagnosing PAM Authentication Problems
+
+If you are unable to log into RStudio there may be an underlying problem with the PAM configuration. The best way to diagnose PAM configuration problems is to use the `pamtester` utility (which is bundled with RStudio). Using `pamtester` enables you to test authentication in an isolated environment as well as to see much more detailed diagnostics.
+
+The `pamtester` utility is located at `/usr/lib/rstudio-server/bin/pamtester`. To invoke it you pass several arguments indicating the PAM profile to test, the user to test for, and whether you want verbose output. For example:
+
+```bash
+sudo /usr/lib/rstudio-server/bin/pamtester --verbose rstudio <username> authenticate
+```
+
+You can find more detailed documentation on using `pamtester` here: [http://linux.die.net/man/1/pamtester](http://linux.die.net/man/1/pamtester).
+
+Additionally, RStudio expects the PAM password prompt text when logging in to be `Password:`. If you use a nonstandard password prompt, you must disable strict prompt matching by modifying `/etc/rstudio/rserver.conf` like so:
+
+```r
+auth-pam-require-password-prompt=0
+```
+
+## Restricting Access to Specific Users
+
+### Minimum User Id
+
+By default RStudio only allows normal (as opposed to system) users to successfully authenticate. The minimum user id is determined by reading the `UID_MIN` value from the `/etc/login.defs` file. If the file doesn't exist or `UID_MIN` isn't defined within it then a default value of 1000 is used.
+
+You change the minimum user id by specifying the `auth-minimum-user-id` option. For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-minimum-user-id=100
+```
+
+Note that it's possible that your PAM configuration is also applying a constraint on user-ids (see the [Default PAM Configuration] section above for an example). In this case you should ensure that the `auth-minimum-user-id` is consistent with the value specified in your PAM configuration.
+
+If your users are using very large UIDs (above 1048575/0xFFFFF), it is *strongly* recommended to set the `auth-minimum-user-id` value to enable RStudio to make better assumptions when mapping user identifiers to projects.
+
+### Restricting by Group
+
+You can specify that only users of certain groups are allowed to access RStudio. To do this you use the `auth-required-user-group` setting. For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-required-user-group=rstudio-users
+```
+
+You can specify a single group as the above example does or a comma-delimited list of groups. For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-required-user-group=analysts,admins,rstudio-users
+```
+
+Note that this change will not take effect until the server is restarted. 
+
+#### Creating and Managing Group Membership
+
+To create a new group you use the `groupadd` command:
+
+```bash
+$ sudo groupadd <groupname>
+```
+
+To add a user to an existing group you use the `usermod` command:
+
+```bash
+$ sudo usermod -a -G <groupname> <username>
+```
+
+Note that it's critical that you include the `-a` flag as that indicates that the group should be added to the user rather than replace the user's group list in it's entirety.
+
+## SAML Single Sign-On Authentication {.pro-header}
+
+RStudio Workbench can be configured to authenticate users via SAML. This enables users to log in with their existing Single Sign-On (SSO) credentials and to be automatically authenticated to RStudio whenever they are already logged into their Identity Provider (IdP) account.
+
+### Enabling SAML SSO
+
+To enable authentication with SAML you add the `auth-saml` option to the RStudio configuration file:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml=1
+```
+
+**Once you enable authentication with SAML that becomes the exclusive means of authentication (you can't concurrently use both PAM and SAML authentication).**
+
+> **Important:** SAML authentication still requires [PAM Sessions] and `sssd` to automatically create local system accounts. Without them, local system accounts have to be provisioned manually one-by-one.
+
+### Configuring SAML
+
+To use SAML authentication in RStudio you should configure the parts involved in this order:
+
+- [Configuring RStudio as a Service Provider]
+- [Configuring your Identity Provider with RStudio]
+
+### Configuring RStudio as a Service Provider
+
+RStudio Workbench needs to be configured in order to trust the SAML assertions sent by your IdP.
+
+#### Identity Provider Metadata Setup
+
+> **Note:** RStudio Workbench expects the IdP metadata to contain the service name (`EntityID`), the Single Sign-On (SSO) URL and the signing certificate.
+
+The easiest way to configure RStudio Workbench is to point it to the IdP metadata URL. This can be done by adding the option `auth-saml-metadata-url`. This option automatically renews the metadata when it expires but it requires direct connectivity between your server and the IdP.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-metadata-url=https://idp.example.com/saml/metadata
+```
+
+If you want to avoid direct connectivity between your server and the IdP or if that setup is not possible you should use an offline setup. In this scenario, you should download the metadata from your IdP and upload it to your server. Then, add the option `auth-saml-metadata-path` pointing to the file location within your server. This option requires manual intervention if the metadata or the signing certificate expires.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-metadata-path=/path/to/saml/metadata.xml
+```
+
+> **Warning:** The metadata URL option has precedence over the metadata file path option. You must remove the URL option first before using the file option.
+
+If your Identity Provider requires information about RStudio in order to provide metadata, see the [Manual Service Provider Setup] section below for a list of details you may need to provide about your RStudio Workbench server.
+
+#### Manual Identity Provider Setup
+
+If your IdP does not provide metadata or if the metadata has any problems, you should use a manual setup.
+The following required options must be added to your server configuration:
+
+- `auth-saml-idp-entity-id` - An URL to an HTTP(S) endpoint on the IdP, in general the location of its metadata. In very exceptional cases this may not be an URL.
+- `auth-saml-idp-sso-url` - An URL to an HTTP(S) endpoint on the IdP to where your server will send authentication requests.
+- `auth-saml-idp-sign-cert-path` - The path to a PEM file containing the public trust certificate for verifying the assertions' signatures.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-idp-entity-id=https://idp.example.com/saml/metadata
+auth-saml-idp-sso-url=https://idp.example.com/saml/sso
+auth-saml-idp-sign-cert-path=/path/to/saml.cert
+```
+
+> **Warning:** The metadata URL and file path options have precedence over the individually configured options. You must remove the metadata options first before using individual settings.
+
+### Configuring your Identity Provider with RStudio
+
+In order to use SAML with RStudio Workbench you also need to register your server with your IdP.
+
+#### SAML Attributes
+
+> **Important:** Your IdP must return in the assertion at least one attribute (or `NameID`) matching the user's local account username (lowercase).
+
+By default, RStudio Workbench will look for an attribute called `Username` (case-sensitive). If you wish to use a different attribute or the assertion's `NameID` value, add the option `auth-saml-sp-attribute-username` with the appropriate value.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-attribute-username=NameID
+```
+
+#### Preconfigured Setups
+
+RStudio Workbench has preconfigured entries in Okta, OneLogin and Azure. In some cases, all you need to provide is the URL to your server. Please refer to the documentation on these vendors for more information.
+
+#### Service Provider Metadata Setup
+
+RStudio Workbench provides its own Service Provider (SP) SAML metadata at the `/saml/metadata` endpoint. For example, if your server is running at https://server.example.com, its metadata can be found at `https://server.example.com/saml/metadata`. 
+
+Your IdP may ask for the metadata URL or the metadata file. For the latter, you should download the metadata file and upload it to your IdP.
+
+#### Manual Service Provider Setup
+
+If your IdP requires a manual configuration, the basic information about your server is in the SAML metadata.
+
+> **Note:** The SAML metadata primarily contains information about the service name (`EntityID`) and the assertion consumer service (ACS) URL.
+
+If you cannot start RStudio configured with SAML because your IdP must be configured first, you may be asked the following information:
+
+- RStudio Entity ID: This value is the same URL as the metadata endpoint used for [Service Provider Metadata Setup]. For example, https://server.example.com/saml/metadata
+- RStudio Assertion Consumer Service URL: RStudio expects SAML assertions at the `/saml/acs` endpoint. For example, https://server.example.com/saml/acs
+- If encryption is used, you will need to provide the encryption certificate used by RStudio, see [SAML Encryption] below. RStudio supports most common forms of encryption used with SAML.
+- If your Identity Provider expects signed requests from RStudio, you will need to provide the signing certificate used by RStudio, see [SAML Request Signing] below. Any signing algorithm you choose in your IdP must match RStudio's configuration.
+- [SAML Attributes] as mentioned above.
+- Also, information requested about [Unsupported SAML Options] in RStudio should be left blank.
+
+### Advanced Options
+
+Depending on your IdP capabilities you may need to add a few more options to your server:
+
+- `auth-saml-idp-post-binding` - By default RStudio Workbench will redirect to your IdP for authentication requests. With the value `1`, this option makes it use an HTTP POST instead. This option can also be used with a metadata file or URL if your IdP supports both redirect and POST.
+- `auth-saml-sso-initiation` - By default RStudio Workbench will be able to initiate an authentication with SAML (SP-initiated) or to acceept an ad-hoc assertion (IdP-initiated). If you prefer just one of these flows, use this options with either `sp` or `idp` values. When set to `idp` users will be sent to the configured IdP SSO URL if a SP-initiated flow is attempted.
+- `auth-saml-sp-name-id-format` - By default RStudio Workbench will accept any NameID Format. Add this options with the values `persistent`, `transient`, `emailaddress`, or `unspecified` to make RStudio Workbench request and expect a particular format from the IdP.
+
+> **Warning:** `auth-saml-sp-name-id-format=transient` and `auth-saml-sp-attribute-username=NameID` will not be accepted as a valid combination. It would lead to undetermined usernames in each attempt.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-idp-post-binding=1
+auth-saml-idp-sso-url=https://idp.example.com/saml/sso
+```
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sso-initiation=idp
+auth-saml-idp-sso-url=https://idp.example.com/login
+```
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-name-id-format=persistent
+```
+
+### SAML Encryption
+
+To enable support for encrypted SAML assertions, you will need a key pair in the form of a public certificate file and a private RSA key, both in PEM format.
+
+The following options should be added to your server:
+
+- `auth-saml-sp-encryption-key-path` - The path to a PEM file containing the private RSA key for decrypting the assertion.
+- `auth-saml-sp-encryption-cert-path` - The path to a PEM file containing the public certificate for encrypting the assertion. The contents of this file will be present in your server metadata after configured. You may also be asked to upload this certificate to the IdP instead.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-encryption-key-path=/path/to/saml.key
+auth-saml-sp-encryption-cert-path=/path/to/saml.cert
+```
+
+> **Warning:** These key pair files are similar to the ones used for SSL/TLS. However, for security reasons you must never use your server's own SSL/TLS key and certificate for SAML encryption.
+
+This example allows the creation of a simple self-signed public certificate and private key pair that can be used for encryption for the server "localhost" (you should use your server public facing hostname instead):
+
+```
+openssl req -x509 -newkey rsa:2048 -keyout saml.key -out saml.cert -days 365 -nodes -subj "/CN=localhost"
+```
+
+### SAML Request Signing
+
+> **Note:** In most situations, SAML authentication request signing is not required or even supported. Be sure your IdP requires signing before using this functionality.
+
+To enable support for signed SAML authentication requests, you need to set a signing method in your server configuration with the option `auth-saml-sp-request-signing-method`. The algorithms `sha1`, `sha256`, or `sha512` are supported. When in doubt, try `sha256` first which offers a good balance between security and compatibility.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-request-signing-method=sha256
+```
+
+> **Note:** By using one of the signing methods listed above the RStudio metadata will contain a `"signing"` certificate and will have the attribute `AuthnRequestsSigned` with the `true` value.
+
+You will also need a key pair in the form of a public certificate file and a private RSA key, both in PEM format. If you are using [SAML Encryption], the already configured encryption key pair will also be used for request signing.
+
+> **Important:** RStudio only accepts a single key pair. You can use a key pair for **both** encryption and signing requests or one just for signing. Different key pairs for signing and encryption are not currently supported.
+
+If you are not currently using SAML encryption, the following options should be added to your server:
+
+- `auth-saml-sp-signing-key-path` - The path to a PEM file containing the private RSA key for decrypting the assertion.
+- `auth-saml-sp-signing-cert-path` - The path to a PEM file containing the public certificate for encrypting the assertion. The contents of this file will be present in your server metadata after configured. You may also be asked to upload this certificate to the IdP instead.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-signing-key-path=/path/to/signing.key
+auth-saml-sp-signing-cert-path=/path/to/signing.cert
+```
+
+> **Warning:** These key pair files are similar to the ones used for SSL/TLS. However, for security reasons you must never use your server's own SSL/TLS key and certificate for SAML encryption.
+
+This example allows the creation of a simple self-signed public certificate and private key pair that can be used for encryption for the server "localhost" (you should use your server public facing hostname instead):
+
+```
+openssl req -x509 -newkey rsa:2048 -keyout saml.key -out saml.cert -days 365 -nodes -subj "/CN=localhost"
+```
+
+### Unsupported SAML Options
+
+RStudio Workbench supports at least a subset of SAML called [Interoperable SAML](http://saml2int.org/).
+Notably, certain functionalities are currently absent:
+
+- Single Logout
+- Certificate chain validation
+- RelayState URL handling (not part of the SAML standard)
+
+### Proxy Considerations
+
+If you are running RStudio behind a proxy, you will need to configure your proxy in a way that RStudio can tell the SAML IdP to redirect back to the correct location. There are number of options to choose from as described in [Running with a Proxy].
+
+The use of the `X-RStudio-Request` header in your proxy is recommended and the only method which works behind a path-rewriting proxy. In this case, the proxy must set the `X-RStudio-Request` header to the exact complete URL as requested by the browser. For example if your proxy was set up to serve RStudio requests at `https://testdomain.com/rstudio/` and an incoming request for `/home` came in, your proxy should set `X-RStudio-Request: https://testdomain.com/rstudio/home` which would allow RStudio to know about the added path prefix `/rstudio`.
+
+If your proxy does not add path prefixes, RStudio is also compatible with two options using commonly available HTTP proxy headers:
+
+- The headers `X-Forwarded-Host`, `X-Forwarded-Proto`, and `X-Forwarded-Port`.
+- Or the header `Forwarded` with `host`, and `proto` values.
+
+When using path-rewriting proxies, it's also recommended to use either the header `X-RStudio-Root-Path` or the option `www-root-path` to indicate the path defined for RStudio by the proxy. For example, if your URL to RStudio is `www.example.com/rstudio` your proxy should send the header `X-RStudio-Root-Path: /rstudio` or you should use:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+www-root-path=/rstudio
+```
+
+If none of the headers above are set by the proxy, RStudio will attempt to redirect back to the address present in the `Host` header and it will determine the protocol (`http` or `https`) based on its current configuration.
+
+If you are running behind a proxy but cannot set headers for whatever reason, and `www-root-path` is not the right choice, you can use the `auth-sp-saml-base-uri` option in the RStudio configuration file to accomplish the same purpose:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-saml-sp-base-uri=http://testdomain.com/rstudio/
+```
+
+### Outgoing Proxies
+
+Some SAML authentication features require RStudio to make a call to an external service over HTTP or HTTPS; for example, to perform provider metadata discovery. If your environment requires an HTTP or HTTPS proxy for outbound requests, you must set the appropriate proxy environment variables for RStudio's server process so that it uses the proxy when making the request. 
+
+One way to do this is to add the variables to `env-vars` as follows:
+
+*/etc/rstudio/env-vars*
+
+```ini
+HTTP_PROXY=http://192.168.1.1:8080
+HTTPS_PROXY=http://192.168.1.1:8080
+NO_PROXY=localhost,192.168.1.10
+```
+
+### Troubleshooting
+
+Additional information about the SAML flow and the received assertion may be written to the logs.
+Be sure to configure `rserver` logs to output `info` level messages in `/etc/rstudio/logging.conf` to see these entries.
+
+## OpenID Connect Authentication {.pro-header}
+
+RStudio Workbench can be configured to authenticate users via OpenID Connect. This enables users to log in with their existing Single Sign-On (SSO) credentials and to be automatically authenticated to RStudio whenever they are already logged into their OpenID Provider (OP) account.
+
+### Enabling OpenID Connect
+
+To enable authentication with OpenID you add the `auth-openid` option to the RStudio configuration file:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-openid=1
+```
+
+**Once you enable authentication with OpenID, that becomes the exclusive means of authentication (you can't concurrently use both PAM and OpenID authentication).**
+
+> **Important:** OpenID authentication still requires [PAM Sessions] and `sssd` to automatically create local system accounts. Without them, local system accounts have to be provisioned manually one-by-one.
+
+### Configuring your OpenID Provider
+
+In order to use OpenID with RStudio Workbench you need to register your server on your OP first.
+
+> **Note:** RStudio Workbench supports the OAuth2 "Authorization Code" flow with OpenID.
+
+#### OpenID URLs
+
+RStudio Workbench expects an OAuth2 callback in order to complete the OpenID authentication. The endpoint responsible for handling this callback from the OP is localted at `/openid/callback`. For example, if your RStudio Workbench server is hosted at `https://rstudio.example.com/` the callback URL will be `https://rstudio.example.com/openid/callback`. While registering RStudio Workbench on your OpenID Provider, this URL will be requested. Your server URL may also be requested as part of that setup.
+
+#### Client Credentials
+
+As part of the RStudio Workbench registration on your OP, a "client ID" and a "client secret" may be presented to you. You need to add a configuration file (`/etc/rstudio/openid-client-secret`) containing the `client-id` and `client-secret`. For example, the configuration file might look like this:
+
+*/etc/rstudio/openid-client-secret*
+
+```ini
+client-id=lllllllllllll-xxxxxxxxxxxxxxxxxxxxxx
+client-secret=BhCC6rK7Sj2ZtPH0ord7lO1w
+```
+
+The `/etc/rstudio/openid-client-secret` file should have user read/write file permissions (i.e., 0600) to protect its contents from other users. You can ensure this as follows:
+
+```bash
+$ sudo chmod 0600 /etc/rstudio/openid-client-secret
+```
+
+> **Important:** The above `client-id` and `client-secret` aren't the actual values you'll use. Rather, you should substitute the values that you obtained from your OP when registering your site for OAuth 2.0 authentication.
+
+##### Client Secret Encryption
+
+An unencrypted value in the `client-secret` option of the `/etc/rstudio/openid-client-secret` file must only be used temporarily for testing purposes. A warning will be present in RStudio log output when an unencrypted secret is being used.
+
+We strongly recommend encrypting the client secret using the command `rstudio-server encrypt-password`. This way, if you have to backup your configuration, save it to a repository or share it with RStudio Support, your OpenID client secret will be protected.
+
+Use the following steps to encrypt the OpenID client secret:
+
+- Run the command `sudo rstudio-server encrypt-password` and enter the client secret.
+- Copy the resulting encrypted secret printed in the terminal.
+- Add or replace the `client-secret` option in the `openid-client-secret` file using the encrypted secret copied above.
+- Restart RStudio. Confirm it operates normally. You should no longer see a warning about unencrypted secret in RStudio logs.
+
+> **Note:** Alternatively, you can also "pipe" your secret to the `rstudio-server encrypt-password` command to skip the prompt. Useful when the secret is already stored elsewhere. For example:
+
+```bash
+cat secretfile | sudo rstudio-server encrypt-password
+```
+
+#### OpenID Issuer and Well-Known configuration
+
+RStudio Workbench also needs to be configured to be able to authenticate the authorization codes returned by the OP. In order to do that, RStudio needs to know the location of the OP with its "issuer" URL. This can be done by adding the option `auth-openid-issuer`. This must be an HTTPS URL and the location of the `/.well-known/openid-configuration` metadata discovery. For example, if your OpenID issuer is `https://op.example.com/` the discovery endpoint should be `https://op.example.com/.well-known/openid-configuration`.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-openid-issuer=https://op.example.com
+```
+
+#### OpenID Claims
+
+Your OP must return at least one claim matching the user's Linux account username (lowercase). By default, RStudio Workbench will look for a claim called `preferred_username` (case-sensitive). If you wish to use a different claim, add the option `auth-openid-username-claim` with the appropriate value.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-openid-username-claim=other
+```
+
+### Advanced Options
+
+Depending on your choice for the username claim your OpenID Provider may require the initial request to contain a certain "scope". RStudio Workbench automatically includes the scopes `openid`, `email` and `profiles` as part of the authentication. If you wish to include additional scopes, use the option `auth-openid-scopes` with a space-separated list of values.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-openid-scopes=scope1 scope2
+```
+
+> **Important:** Quotation marks are not accepted around the scope values.
+
+### Proxy Considerations
+
+If you are running RStudio behind a proxy, you will need to configure your proxy in a way that RStudio can tell the OP to redirect back to the correct location. There are number of options to choose from as described in [Running with a Proxy].
+
+The use of the `X-RStudio-Request` header in your proxy is recommended and the only method which works behind a path-rewriting proxy. In this case, the proxy must set the `X-RStudio-Request` header to the exact complete URL as requested by the browser. For example if your proxy was set up to serve RStudio requests at `https://testdomain.com/rstudio/` and an incoming request for `/home` came in, your proxy should set `X-RStudio-Request: https://testdomain.com/rstudio/home` which would allow RStudio to know about the added path prefix `/rstudio`.
+
+If your proxy does not add path prefixes, RStudio is also compatible with two options using commonly available HTTP proxy headers:
+
+- The headers `X-Forwarded-Host`, `X-Forwarded-Proto`, and `X-Forwarded-Port`.
+- Or the header `Forwarded` with `host`, and `proto` values.
+
+When using path-rewriting proxies, it's also recommended to use either the header `X-RStudio-Root-Path` or the option `www-root-path` to indicate the path defined for RStudio by the proxy. For example, if your URL to RStudio is `www.example.com/rstudio` your proxy should send the header `X-RStudio-Root-Path: /rstudio` or you should use:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+www-root-path=/rstudio
+```
+
+If none of the headers above are set by the proxy, RStudio will attempt to redirect back to the address present in the `Host` header and it will determine the protocol (`http` or `https`) based on its current configuration.
+
+If you are running behind a proxy but cannot set headers for whatever reason, and `www-root-path` is not the right choice, you can use the `auth-openid-base-uri` option in the RStudio configuration file to accomplish the same purpose:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-openid-base-uri=http://testdomain.com/rstudio/
+```
+
+### Outgoing Proxies
+
+Some OpenID authentication features require RStudio to make a call to an external service over HTTP or HTTPS; for example, to retrieve the provider's OpenID configuration from a known endpoint. If your environment requires an HTTP or HTTPS proxy for outbound requests, you must set the appropriate proxy environment variables for RStudio's server process so that it uses the proxy when making the request. 
+
+One way to do this is to add the variables to `env-vars`; for example:
+
+*/etc/rstudio/env-vars*
+
+```ini
+HTTP_PROXY=http://192.168.1.1:8080
+HTTPS_PROXY=http://192.168.1.1:8080
+NO_PROXY=localhost,192.168.1.10
+```
+
+### Troubleshooting
+
+Additional information about the OpenID flow and the received claims may be written to the logs.
+Be sure to configure `rserver` logs to output `info` level messages in `/etc/rstudio/logging.conf` to see these entries.
+
+## Proxied Authentication {.pro-header}
+
+You can configure RStudio Workbench to participate in an existing web-based single-sign-on authentication scheme using proxied authentication. In this configuration all traffic to RStudio Workbench is handled by a proxy server which also handles user authentication. 
+
+In this configuration the proxy server adds a special HTTP header to requests to RStudio Workbench letting it know which authenticated user is making the request. RStudio Workbench trusts this header, launching and directing traffic to an R session owned by the specified user.
+
+The specified user must have a local system account on the server. You should set up local system accounts manually and then map authenticating users to these accounts.
+
+### Enabling Proxied Authentication
+
+To enable proxied authentication you need to specify both the `auth-proxy` and `auth-proxy-sign-in-url` settings (the sign-in URL is the absolute URL to the page that users should be redirected to for sign-in). For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-proxy=1
+auth-proxy-sign-in-url=http://example.com/sign-in
+```
+
+**Once you enable authentication with a proxy, that becomes the exclusive means of authentication (you can't concurrently use both PAM and proxied authentication).**
+
+> **Important:** Proxied authentication still requires [PAM Sessions] and `sssd` to automatically create local system accounts. Without them, local system accounts have to be provisioned manually one-by-one.
+
+### Implementing the Proxy
+
+#### Sign In and Sign Out URLs
+
+The sign in URL should host a page where the user specifies their credentials (this might be for example the main page for an existing web-based authentication system). After collecting and authorizing the credentials the sign in URL should then redirect back to the URL hosting RStudio Workbench.
+
+RStudio will redirect to the sign in URL under the following conditions:
+
+- Whenever an HTTP request that lacks the username header is received by the server; and
+
+- When the user clicks the "Sign out" button in the RStudio IDE user interface and there is no Sign Out URL available.
+
+The sign out URL should host a page responsible for finishing the user session in the authentication proxy. If such a URL is URL available in your proxy, the absolute URL should be configured in RStudio using the setting `auth-proxy-sign-out-url`. When the user clicks the "Sign out" button in the RStudio IDE user interface the browser will be taken to the configured sign out URL.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-proxy-sign-out-url=http://example.com/sign-out
+```
+
+You should be sure in setting up the proxy server that traffic bound for the sign-in and sign-out URLs is excluded from forwarding to RStudio Workbench (otherwise it will end up in an infinite redirect loop).
+
+#### Sign-In Delay
+
+During proxied authentication in RStudio, there is a brief transition page that shows the username and some other information. By default this transition happens almost immediately. If you wish to present this page for a longer period of time, you can use the option `auth-proxy-sign-in-delay` to delay the transition for some seconds.
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-proxy-sign-in-delay=4
+```
+
+#### Forwarding the Username
+
+When proxying pre-authenticated traffic to RStudio Workbench you need to include a special HTTP header (by default `X-RStudio-Username`) with each request indicating which user the request is associated with. For example:
+
+```ini
+X-RStudio-Username: jsmith
+```
+
+It's also possible to specify both a system username and a display username (in the case where system accounts are dynamically provisioned and don't convey actual user identity). For example, if the system user is `ruser24` but the displayed username is `jsmith`, you could use:
+
+```ini
+X-RStudio-Username: rsuser24/jsmith
+```
+
+Note that is highly recommended that you *do not use* the default `X-RStudio-Username` header name. The reasons for this are described in the section on security considerations immediately below.
+
+#### Rewriting Usernames
+
+It may be that the proxy system you are using sends the username in a format that doesn't match that of users on the system, however can be easily transformed to one that does (e.g. it has a standard prefix before the username). If this is the case you can specify the `auth-proxy-user-header-rewrite` option to provide a re-write rule for the inbound header. For example, the following rule strips the prefix "UID-" from a username header:
+
+```markdown
+auth-proxy-user-header-rewrite=^UID-([a-z]+)$ $1
+```
+
+The format of a re-write rule is a regular expression followed by a space and then a replacement string. The replacement string can reference captured parts of the regular expression using `$1`, `$2`, etc. Consult the [Boost Perl Regular Expression Syntax](https://www.boost.org/doc/libs/1_64_0/libs/regex/doc/html/boost_regex/syntax/perl_syntax.html) reference for more syntax documentation.
+
+### Proxy Security Considerations
+
+When using proxied authentication, RStudio trusts that the proxy is the only element in the network capable of sending the special header with the username. Be sure to follow the recommendations below to decrease security risks in your implementation.
+
+
+#### Keeping the Header Name Secret
+
+Using the default header name `X-RStudio-Username` creates a security problem: code running behind the proxy (e.g., code within R sessions) could form requests back to the server which impersonate other users (by simply inserting the header in their request).
+
+To prevent this issue you can specify a custom header name which is kept secret from end users. This is done by creating a special configuration file (`/etc/rstudio/secure-proxy-user-header`) that contains the name of the header, and then setting it's file permissions so that it's not readable by normal users. For example:
+
+```bash
+sudo sh -c "echo 'X-Secret-User-Header' > /etc/rstudio/secure-proxy-user-header"
+sudo chmod 0600 /etc/rstudio/secure-proxy-user-header
+```
+
+#### Preventing Remote Use of the Header
+
+When implementing the proxy it's important to remember that RStudio Workbench will always trust the username header to authenticate users. It's therefore critical from the standpoint of security that all requests originating from the proxy have this header set explicitly by the proxy (as opposed to allowing the header to be specified by a remote client). RStudio will reject requests containing multiple occurrences of the username header.
+
+#### Preventing Internal Access
+
+> **Note:** In previous versions, RStudio offered the option `auth-proxy-require-hmac` to require trust signatures from the proxy, though most proxies have no straightforward means for providing this signature. Therefore, this option has been retired. Following the recommendation below mitigates the same security risks previously covered by the option. If your installation used this option, it should removed from `/etc/rstudio/rserver.conf`. RStudio will refuse to start if this option is still present and enabled.
+
+Your RStudio and proxy configuration should be done in a way where it is impossible for anything other than the proxy to make requests to RStudio. Be sure that:
+
+- RStudio is configured to listen on a network interface not accessible internally by other processes by adjusting the option `www-address`.
+- The network interface where RStudio is running must have firewall settings to prevent any connection to RStudio other than from the proxy.
+
+> **Important:** This should not be considered an exhaustive list. Please consult with your security personnel or IT administrators to determine the exact measures to protect RStudio authentication via a proxy.
+
+### Troubleshooting with Access Logs
+
+If you want to see exactly which requests RStudio is receiving and whether they include the expected username information, you can temporarily enable server access logs using the `server-access-log` setting as follows:
+
+**/etc/rstudio/rserver.conf**
+
+```ini
+server-access-log=1
+```
+
+After restarting RStudio the following file will contain a record of each HTTP request made to the server along with it's HTTP response code:
+
+```bash
+/var/log/rstudio-server/rserver-http-access.log
+```
+
+The log file will contain entries that look like this:
+
+```
+127.0.0.1 - - [29/Jun/2015:06:30:41 -0400] "GET /s/f01ddf8222bea98a/ HTTP/1.1"
+200 91 "http://localhost:8787/s/f01ddf8222bea98a/" "Mozilla/5.0 (X11; Linux x86_64)
+AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.125 Safari/537.36" "jsmith"
+```
+
+Note that the very last item in the log file entry is `"jsmith"`. This is the username that RStudio read from the header passed by the proxy server. If this shows up as blank (`"-"`) then your proxy server isn't forwarding the header or using the correct header name in forwarding.
+
+> **Important**: Once you've concluded troubleshooting it's important that you remove the `server-access-log=1` option from the `/etc/rstudio/rserver.conf` file (since this log file is not rotated it will eventually consume a large amount of disk space if you don't remove the option).
+
+## Google Accounts (deprecated) {.pro-header}
+
+> **Note:** While it is still possible to configure this authentication method, note that in future releases of RStudio, this authentication method will migrate to use OpenID Connect instead; Google itself uses OpenID as an underlying authentication mechanism. Additionally, RStudio Desktop Pro clients will be unable to connect to RStudio Workbench when it is configured to use Google Authentication due to new restrictions from Google - see [Google's Notice](https://developers.googleblog.com/2020/08/guidance-for-our-effort-to-block-less-secure-browser-and-apps.html) for more information.
+
+RStudio Workbench can be configured to authenticate users via Google Accounts. This enables users to log in with their existing Gmail or Google Apps credentials and to be automatically authenticated to RStudio whenever they are already logged into their Google account.
+
+### Registering with Google
+
+In order to use Google Accounts with RStudio Workbench you need to register your server with Google for OAuth 2.0 Authentication. You do this by creating a new "Project" for your server in the *Google Developer Console*:
+
+<https://console.developers.google.com/>
+
+Once you've created a project you go to the *Credentials* area of *APIs and auth* and choose to **Create New Client ID**:
+
+![Create Client Id](images/CreateClientID.png)
+
+
+You'll then be presented with a dialog used to create a new client ID:
+
+![Create Client Id](images/CreateClientIDDialog.png)
+
+You should select "Web application" as the application type and provide two URLs that correspond to the server you are deploying on. The screenshot above uses `https://www.example.com` as the host, you should substitute your own domain and port (if not using a standard one like 80 or 443) in your configuration.
+
+This will result in two values which you'll need to provide as part of the RStudio Workbench configuration: `client-id` and `client-secret` (they'll be displayed in the *Google Developer Console* after you complete the dialog).
+
+### Enabling Google Accounts
+
+To enable authentication with Google Accounts you add the `auth-google-accounts` option to the RStudio configuration file:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-google-accounts=1
+```
+
+**Once you enable authentication with Google Accounts that becomes the exclusive means of authentication (you can't concurrently use both PAM and Google Account authentication).**
+
+In addition, you need to add a configuration file (`/etc/rstudio/google-client-secret`) containing the `client-id` and `client-secret` that you received when registering your site with Google. For example, the configuration file might look like this:
+
+*/etc/rstudio/google-client-secret*
+
+```ini
+client-id=lllllllllllll-xxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+client-secret=BhCC6rK7Sj2ZtPH0ord7lO1w
+```
+
+The `/etc/rstudio/google-client-secret` file should have user read/write file permissions (i.e., 0600) to protect it's contents from other users. You can ensure this as follows:
+
+```bash
+$ sudo chmod 0600 /etc/rstudio/google-client-secret
+```
+
+> **Important:** The above `client-id` and `client-secret` aren't the actual values you'll use. Rather, you should substitute the values that you obtained from Google when registering your site for OAuth authentication.
+
+### Translating to Local Accounts
+
+#### Creating Matching Accounts
+
+Once a user is authenticated via Google Accounts it's necessary to map their Google Accounts identity to a local system account. The default and most straightforward way to do this is to create a local account with a username identical to their Google email address.
+
+If you choose to create local accounts that match Google email addresses, be sure to use only lowercase characters in the account name since Google email addresses are transformed to lower-case prior to matching them to local account names.
+
+One problem with creating local accounts that match Google email addresses is that they often contain characters that are invalid by default within Linux usernames (e.g. @ or .). On Debian/Ubuntu systems it's possible to force the system to create a user with these characters. Here's an example of creating a user with a username that contains typically invalid characters:
+
+```bash
+$ sudo adduser --force-badname <username>
+```
+
+> **Important:** The `--force-badname` option is only available on Debian/Ubuntu systems and is not available on RedHat/CentOS or SLES systems.
+
+If the users you are creating will only be accessing the server via RStudio, you may also want to disable their ability to log in as a normal interactive user and to specify that they have no password. For example:
+
+```bash
+$ sudo adduser --force-badname --disabled-login --disabled-password <username>
+```
+
+#### Using an Account Mappings File
+
+Alternatively, you map create local accounts that do not match Google email addresses and then specify a mapping of Google accounts to local accounts via the `/etc/rstudio/google-accounts` configuration file. For example:
+
+*/etc/rstudio/google-accounts*
+
+```ini
+john.smith@gmail.com=jsmith
+sally.jones@gmail.com=sjones
+```
+
+Note that changes to the `google-accounts` configuration file take effect immediately and do not require a server restart.
+
+
+### Proxy Considerations
+
+If you are running RStudio behind a proxy, you will need to configure your proxy in a way that RStudio can tell the Google Web Services to redirect back to the correct location. There are number of options to choose from as described in [Running with a Proxy].
+
+The use of the `X-RStudio-Request` header in your proxy is recommended and the only method which works behind a path-rewriting proxy. In this case, the proxy must set the `X-RStudio-Request` header to the exact complete URL as requested by the browser. For example if your proxy was set up to serve RStudio requests at `https://testdomain.com/rstudio/` and an incoming request for `/home` came in, your proxy should set `X-RStudio-Request: https://testdomain.com/rstudio/home` which would allow RStudio to know about the added path prefix `/rstudio`.
+
+If your proxy does not add path prefixes, RStudio is also compatible with two options using commonly available HTTP proxy headers:
+
+- The headers `X-Forwarded-Host`, `X-Forwarded-Proto`, and `X-Forwarded-Port`.
+- Or the header `Forwarded` with `host`, and `proto` values.
+
+When using path-rewriting proxies, it's also recommended to use either the header `X-RStudio-Root-Path` or the option `www-root-path` to indicate the path defined for RStudio by the proxy. For example, if your URL to RStudio is `www.example.com/rstudio` your proxy should send the header `X-RStudio-Root-Path: /rstudio` or you should use:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+www-root-path=/rstudio
+```
+
+If none of the headers above are set by the proxy, RStudio will attempt to redirect back to the address present in the `Host` header and it will determine the protocol (`http` or `https`) based on its current configuration.
+
+If you are running behind a proxy but cannot set headers for whatever reason, and `www-root-path` is not the right choice, you can use the `auth-google-accounts-redirect-base-uri` option in the RStudio configuration file to accomplish the same purpose:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-google-accounts-redirect-base-uri=http://testdomain.com/rstudio/
+```
+
+## Customizing the Sign-In Page
+
+You can customize the content and appearance of the RStudio sign-in page by including custom HTML within the page. This is accomplished by either:
+
+- Providing a file at `/etc/rstudio/login.html` that includes additional HTML to include within the login page; or
+
+- Specifying the `auth-login-page-html` option within the `rserver.conf` config file which points to an alternate location for the login HTML file. For example, the following specifies that the file located at `/opt/config/rstudio-login.html` should be included within the login page:
+
+    */etc/rstudio/rserver.conf*
+
+    ```ini
+    auth-login-page-html=/opt/config/rstudio-login.html
+    ```
+
+The contents of the specified HTML file will be included after the standard login header and login username/password form. If you want to modify the appearance of the header and/or add content above the username/password form, you can use CSS and JavaScript within your login.html file to modify the page after it loads.
+
+The same can be done to tweak the display of the sign in page for remote RDP sessions as well, with either the `/etc/rstudio/rdplogin.html` file, or the `auth-rdp-login-page-html` setting within `rserver.conf`.
+
+## Authorization Timeout
+
+### Inactivity Timeout
+
+By default, user authorization will expire after 60 minutes of inactivity, requiring the user to sign in again to continue using their sessions. This is configurable by changing the `auth-timeout-minutes` setting in */etc/rstudio/rserver.conf*. For example, to sign users out after 20 minutes of inactivity instead:
+
+*/etc/rstudio/rserver.conf*
+
+```
+auth-timeout-minutes=20
+```
+
+This setting supersedes the `auth-stay-signed-in-days` setting discussed below in [Stay Signed In], as it provides additional security by ensuring that users that are not actively using the system do not stay signed in. However, if you wish to allow users to stay signed in for many days at a time and disable the authorization timeout completely, set `auth-timeout-minutes` to 0, which will cause the `auth-stay-signed-in-days` setting's behavior to be used instead.
+
+Whenever a user is signed out, the database will be updated to store recently logged out/invalidated cookies, preventing the use of credential replay attacks.
+
+### Stay Signed In
+
+Users have an option to stay signed in across browser sessions when using PAM or Google authentication methods. By default when choosing the stay signed in option users will remain signed in for 30 days. You can modify this behavior using the `auth-stay-signed-in-days` setting. For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-stay-signed-in-days=7
+```
+
+> **Warning:** This setting is deprecated in favor of the `auth-timeout-minutes` setting for additional security. See [Inactivity Timeout] above for more information.
+
+Note that for this setting to take effect, `auth-timeout-minutes` must be set to 0.
+
+If you want to prevent users from being able to stay signed in, you can prevent the "Stay Signed In" option from being shown to them by using the `auth-stay-signed-in` setting. For example:
+
+*/etc/rstudio/rserver.conf*
+
+```ini
+auth-stay-signed-in=0
+```
+
+Setting this option to `0` will result in users being prompted to log in each time they start a new browser session (i.e., logins will only be valid as long as the browser process in which they originated in remains running).

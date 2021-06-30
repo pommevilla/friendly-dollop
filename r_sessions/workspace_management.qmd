@@ -1,0 +1,202 @@
+## Workspace Management
+
+### Default Save Action
+
+When a user exits an R session they need to choose whether to save their R workspace (i.e. `.RData` file). RStudio has global and per-project settings that control what happens when a workspace has unsaved changes. Possible values are:
+
+- `ask` -- Ask whether to save the workspace file
+- `yes` -- Always save the workspace file
+- `no`  -- Never save the workspace file
+
+The default global setting is `ask` and the default project-level setting is derived from the current global setting (these options can be modified by end users via the *Global Options* and *Project Options* dialogs respectively).
+
+The default global setting can also be changed via the `session-save-action-default` configuration parameter in the `rsession.conf` config file. For example, to change the default value to `no` you would use this:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-save-action-default=no
+```
+
+Note that this setting is specified in the `rsession.conf` config file and takes effect the next time a user launches an R session (rather than requiring a full restart of the server).
+
+### Suspend and Resume
+
+When R sessions have been idle (no processing or user interaction) for a specified period of time (2 hours by default) RStudio suspends them to disk to free up server resources. When the user next interacts with their session it is restored from disk and the user resumes right back where they left off. This is all done seamlessly such that users aren't typically aware that a suspend and resume has occurred.
+
+#### Session Timeout
+
+To configure the amount of idle time to wait before suspending sessions you can use the `session-timeout-minutes` setting in the `/etc/rstudio/rsession.conf` file. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-timeout-minutes=360
+```
+
+The default value if none is explicitly specified is 120 minutes.
+
+::: {.callout-important}
+This setting and a few others discussed in this section are specified in the `/etc/rstudio/rsession.conf` file (rather than the `rserver.conf` file previously referenced).
+:::
+
+
+There are some conditions where an R session will not be suspended, these include:
+
+1) When a top-level R computation is running
+2) When the R prompt is not in it's default state (e.g. during a debugging session)
+
+You can also specify that R sessions should never be suspended by setting the `session-timeout-minutes` to zero. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-timeout-minutes=0
+```
+
+You can also set session timeouts on a per-user or per-group basis, see the [User and Group Profiles](user_and_group_profiles.qmd) section for details.
+
+If you simply want the session process to quit (and lose all unsaved work in the process) instead of suspending to disk, you can turn the `session-timeout-suspend` option off, like so:
+
+```ini
+session-timeout-minutes=90
+session-timeout-suspend=0
+```
+
+The above example will quit idle sessions after 90 minutes, discarding any unsaved data.
+
+#### Forcing Suspends
+
+You can force the suspend of individual sessions or even all sessions on the server. You can do this directly from the main page of the [Administrative Dashboard](../server_management/administrative_dashboard.qmd) or from the system shell as follows:
+
+```bash
+$ sudo rstudio-server force-suspend-session <pid>
+$ sudo rstudio-server force-suspend-all
+```
+
+#### Resume and .Rprofile
+
+By default the `Rprofile.site` and `.Rprofile` files are not re-run when a session is resumed (it's presumed that all of their side-effects are accounted for by simply restoring loaded packages, options, environment variables, etc.).
+
+In some configurations it might be desirable to force the re-execution of profile files. There is an end user option that controls this on the *General* options pane which defaults to false. However, server administrators may wish to ensure that this option defaults to true. To do this you use the `session-rprofile-on-resume-default` option. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-rprofile-on-resume-default=1
+```
+
+Note that this setting is specified in the `rsession.conf` config file and takes effect the next time a user launches an R session (rather than requiring a full restart of the server).
+
+#### Child Processes
+
+By default, when sessions are quit or suspended, child processes created in the session will continue to run. You can specify whether or not that should occur by specifying the `session-quit-child-processes-on-exit` setting in `/etc/rstudio/rsession.conf`. The allowed values are `1` or `0` to quit child processes or leave them running, respectively.
+
+For example, to quit child processes when the session exits:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-quit-child-processes-on-exit=1
+```
+
+Note that this setting is specified in the `rsession.conf` config file and takes effect the next time a user launches an R session (rather than requiring a full restart of the server). Also, users can specifically override this setting in their project settings.
+
+#### Session Timeout Kill {.pro-header}
+
+To configure the amount of time to wait before forcefully killing and destroying sessions you can use the `session-timeout-kill-hours` option in the `/etc/rstudio/rsession.conf` file. This allows you to specify how much time should pass before a session is automatically cleaned up. This is the length of time during which a session exists without user input (**regardless of computation status**) allowing you to automatically reclaim temporary disk space used by the session, and to stop its processes and children.
+
+This setting should only be used to ensure that any sessions that users have forgotten about are destroyed, reclaiming valuable disk space.
+
+::: {.callout-important}
+**Sessions can be destroyed while important computations are executing**.
+The user whose session is cleaned will also lose all unsaved code and data.
+:::
+
+This setting can also be used in conjunction with `session-timeout-minutes`, allowing already suspended sessions to be cleaned up.
+
+For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-timeout-kill-hours=48
+```
+
+The default value if none is explicitly specified is 0 hours, meaning sessions will never be killed and destroyed automatically. The supplied value should be an integer representing the amount of hours a session can be idle before being killed.
+
+### Workspace Storage
+
+Storage of workspaces (.RData files) in RStudio does not use compression by default. This differs from the behavior of base R. Compression is disabled because we've observed that for larger workspaces (> 50MB) compression can result in much lower performance for session startup and suspend/resume (on the order of 3 or 4 times slower).
+
+The default workspace save options under RStudio are as follows:
+
+```r
+options(save.defaults=list(ascii=FALSE, compress=FALSE))
+options(save.image.defaults=list(ascii=FALSE, safe=TRUE, compress=FALSE))
+```
+
+If you wish to use different defaults you can define the `save.defaults` and/or `save.image.defaults` options in your `Rprofile.site` or per-user `.Rprofile` and RStudio will respect the settings you specify rather than using it's own defaults.
+
+See <https://stat.ethz.ch/R-manual/R-devel/library/base/html/save.html> for additional details on how R saves objects and the storage and performance implications of using compression.
+
+### User State Storage
+
+By default, RStudio stores each user's state in their home directory, in the following folder:
+
+```bash
+~/.local/share/rstudio
+```
+
+This folder contains information on all of a user's active RStudio sessions, including all of the session data when the session is suspended. It also includes various internal RStudio state. Deleting it will result in a factory-fresh RStudio experience for the user, with the exception of their per-user settings (which are described in [Customizing Session Settings](customizing_session_settings.html)).
+
+Because this folder can include arbitrary amounts of suspended session data, it can become very large. We recommend ensuring that each user has sufficient disk space quota to store suspended sessions along with the data for their R projects, and using other controls to clean up old data (such as `session-timeout-kill-hours`)
+
+::: {.callout-important}
+RStudio 1.3 and earlier stored user state in the folder `~/.rstudio` (non-configurable). If you are upgrading to RStudio 1.4 from an earlier release, RStudio will automatically move user state to the new location when the user starts their first IDE session after the upgrade. If there's a possibility you may downgrade to a prior RStudio release, we recommend configuring RStudio to use the old location temporarily; see below for instructions.
+:::
+
+#### Storage Location Customization
+
+If it is necessary to store user state in another folder to relieve disk quota pressure or comply with other requirements, you can customize it using the `XDG_DATA_HOME` environment variable. `XDG_DATA_HOME` must be set for the entire RStudio process tree, since RStudio needs to write and read user state both inside and outside R sessions (so attempting to set it in session startup scripts like `Rprofile.site` or `rsession-profile` is inadequate and may result in inconsistent behavior).
+
+If your Linux distribution uses the `systemd` init system, run `sudo systemctl edit rstudio-server`. In the editor, add the following section to the file (replacing `/mnt/storage` with your choice of root, of course). Note that the `rstudio` folder is not included in this path; this is a configuration root directory that will be respected by other applications that use the XDG standard.
+
+```ini
+[Service]
+Environment="XDG_DATA_HOME=/mnt/storage/$USER"
+```
+
+If your Linux distribution does not use the `systemd` init system, consult the documentation for your Linux distribution to learn which init system it uses and the appropriate method for setting environment variables for the `rstudio-server` service.
+
+In the example above, the state for the user `bob` would be stored in `/mnt/storage/bob/rstudio`.  The following special variables are expanded in the value:
+
++-------------+-----------------------+
+| Variable    | Expands To            |
++:============+:======================+
+| `$USER`     | User's Unix username  |
+| `$HOME`     | User's home directory |
+| `$HOSTNAME` | Name of current host  |
++-------------+-----------------------+
+
+The `$HOSTNAME` value can be useful to avoid conflicts between hosts running distinct RStudio installations that share a file system, but note that `$HOSTNAME` should only be used in installations wherein the RStudio services and R session are on the same host. It's important that all the machines in an installation agree on the path to the user state.
+
+#### Permissions Considerations
+
+You must ensure that the folder that hosts user state data is writable by all RStudio users, since the R session (running as the user) will create the state folder if it does not exist. In the example above, `bob` would need write access to `/mnt/storage` to create `/mnt/storage/bob/rstudio`.
+
+Note that the user's default *umask* will be used to set permissions on this folder (i.e. RStudio does not attempt to set them). We recommend ensuring that user umasks are configured such that the folder, when created, will not be readable by other users. If you want the folder to be created with permissions other than those it would receive via umask, you can create it via some other means prior to a user's first interaction with RStudio; RStudio will not attempt to re-create the folder or change permissions if it already exists.
+
+#### Compatibility, Sharing, and Exact Locations
+
+`XDG_DATA_HOME` affects many different XDG-compliant applications, and it sets a base (root) directory, to which `/rstudio` is appended to form the final path. If you wish to set the exact path, or want to avoid side effects in other applications, use the environment variable `RSTUDIO_DATA_HOME` instead of `XDG_DATA_HOME`.
+
+For example, RStudio 1.3 and prior stored user state in the folder `~/.rstudio`. If you wish to continue using this folder in RStudio 1.4 and later, you could use the following setting (again, in `sysctl edit rstudio-server`):
+
+```ini
+[Service]
+Environment="RSTUDIO_DATA_HOME=$HOME/.rstudio"
+```
+
+Note however that having two different RStudio installations with different versions of RStudio sharing a user state folder is unsupported and can lead to runtime errors or data corruption, as RStudio's internal state structure changes between versions. If you have multiple RStudio installations with different versions that are run by concurrently by users, we recommend using `RSTUDIO_DATA_HOME` to create distinct user state folders, ensuring that these installations don't corrupt each others' state.
+
+If `RSTUDIO_DATA_HOME` and `XDG_DATA_HOME` are both set, `RSTUDIO_DATA_HOME` takes precedence.
+
+#### Job Launcher Mounts
+
+Finally, if you are using containerized sessions with the Job Launcher, and you mount RStudio's user state data to a folder outside their home directory, you must ensure that directory is mounted into the containers in addition to the home directory itself. See [Launcher Mounts](../job_launcher/configuration.qmd#launcher-mounts) for more information about mounting folders into containerized sessions.
+

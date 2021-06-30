@@ -1,0 +1,148 @@
+## R Executable and Libraries
+
+### Locating R
+
+RStudio uses the version of R pointed to by the output of the following command:
+
+```bash
+$ which R
+```
+
+The `which` command performs a search for the R executable using the system PATH. RStudio will therefore by default bind to the same version that is run when R is executed from a terminal.
+
+For versions of R installed by system package managers this will be `/usr/lib/R`. For versions of R installed from source this will typically (but not always) be `/usr/local/lib/R`.
+
+If you want to override which version of R is used then you can use the `rsession-which-r` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-which-r=/usr/local/bin/R
+```
+
+Note that this change will not take effect until the server is restarted.
+
+#### Using Multiple Versions of R {.pro-header}
+
+The section above describes how RStudio locates the global default version of R. It's also possible to specify alternate versions of R either by user or by group. The [R Versions] section describes this in more detail.
+
+### Locating Shared Libraries
+
+You can add elements to the default `LD_LIBRARY_PATH` for R sessions (as determined by the R `ldpaths` script) by adding an `rsession-ld-library-path` entry to the server config file. This might be useful for ensuring that packages can locate external library dependencies that aren't installed in the system standard library paths. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-ld-library-path=/opt/someapp/lib:/opt/anotherapp/lib
+```
+
+Note that this change will not take effect until the server is restarted.
+
+### Customizing Session Launches {.pro-header}
+
+#### Profile Script Execution
+
+RStudio launches R sessions under a bash login shell. This means that prior to the execution of the R session the bash shell will read and execute commands  from this file if it exists:
+
+```bash
+/etc/profile
+```
+
+After reading that file, it looks for the following files and reads and executes commands from the *first* one that exists and is readable (it's important to note that only one of these files will be read and executed):
+
+```bash
+~/.bash_profile
+~/.bash_login
+~/.profile
+```
+
+If you have further RStudio specific initialization logic (exporting environment variables, etc.) you can optionally create an R session specific profile script at:
+
+```bash
+/etc/rstudio/rsession-profile
+```
+
+If it exists this script will be executed prior to the bash shell that launches the R session. This script must be executable by all RStudio users, so it is recommended that you set its file permissions to `755` via the following command:
+
+```bash
+chmod 755 /etc/rstudio/rsession-profile
+```
+
+In some situations, you will not want to run user shell profile scripts. This is also a good way to troubleshoot the inability for sessions to launch, as it could indicate a conflict is occurring due to environment variables being set in the shell profiles. To disable execution of the shell profiles, set the `rsession-no-profile` option to `1` in `/etc/rstudio/rserver.conf`. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-no-profile=1
+```
+
+#### Environment Variables
+
+R sessions inherit environment variables that are explicitly exported from the  profile scripts described above. It's also possible to append paths to the `LD_LIBRARY_PATH` environment variable using the `rsession-ld-library-path` option (see previous section for details).
+
+Another source of environment variables are PAM sessions. On Debian/Ubuntu systems, the default PAM profile run by RStudio includes the environment variables defined in `/etc/security/pam_env.conf` and `/etc/environment`. To learn more about setting environment variables with PAM you should consult the [PAM Sessions] section as well as the documentation on the `pam_env` module here: [http://linux.die.net/man/8/pam_env](http://linux.die.net/man/8/pam_env).
+
+#### Program Supervisors
+
+You may also wish to run R sessions under a program supervisor that modifies their environment or available resources. You can specify a supervisor (and the arguments which control it's behavior) using the `rsession-exec-command` setting. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-exec-command=nice -n 10
+```
+
+This example uses the `nice` command to run all R sessions with a lower scheduling priority. See [http://linux.die.net/man/1/nice](http://linux.die.net/man/1/nice) for more details on `nice`. Note that for `nice` in particular it's possible to accomplish the same thing using user and group profiles (and even specify a custom priority level per user or group). See the [User and Group Profiles] section for more details.
+
+### Diagnosing Session Launch Failures {.pro-header}
+
+RStudio Workbench allows you to launch sessions in a diagnostics mode to capture extended session launch information in the event that you run into problems when starting sessions. This mode captures the environment variables that are set by all of the profile scripts, loading of any modules, arguments passed to the session, and the exit code of the session and any stack trace information if the session crashes. To enable collection of this diagnostic data, set the `rsession-diagnostics-enabled` flag in `/etc/rstudio/rserver.conf` like below:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-diagnostics-enabled=1
+```
+
+When this setting is enabled, all sessions that are started will create a diagnostics file that contains extended launch diagnostics under the `/tmp` directory by default. To change the location, use the `rsession-diagnostics-dir` to point to the desired directory, like so:
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-diagnostics-dir=/tmp/diagnostics
+```
+
+Be aware that this directory should be accessible by all users of the system. If it does not exist, RStudio will attempt to create it and set its permissions to Read/Write/Execute for everyone (file permissions of 777).
+
+To diagnose containerized sessions (e.g. Kubernetes) launched via the Job Launcher, set `rsession-diagnostics-dir` to a shared folder mounted in the container via `/etc/rstudio/launcher-mounts`. Otherwise sessions may fail to launch due to the default location under `/tmp` not being available in the containers.
+
+Strace information can be included in the diagnostics file by adding the `rsession-diagnostics-strace-enabled` flag as shown below. Before using this setting, ensure that strace is installed and is available on your users' path.
+
+```ini
+# /etc/rstudio/rserver.conf
+rsession-diagnostics-enabled=1
+rsession-diagnostics-strace-enabled=1
+```
+
+We recommend that you send these files to RStudio support to aid in troubleshooting any session launch issues should they arise.
+
+#### Safe Mode
+
+Two of the most common session startup problems are (1) oversized global R environments, which take a long time to load into memory when the session is resumed, and (2) problematic code in `.Rprofile` which takes too long to run or throws errors during startup.
+
+In order to help eliminate these variables as the cause of session startup issues, RStudio can start sessions in Safe Mode. This mode starts the session without running `.Rprofile` or restoring the global environment. If a session takes too long to start, the user will be given the option to restart a session in Safe Mode.
+
+It is also possible to control these features independently, which can be helpful when troubleshooting issues.
+
+##### Skipping Workspace Restoration
+
+To skip workspace restoration (i.e. reloading the contents of the global environment), append `?restore_workspace=0` to the R session's full URL. For example:
+
+    https://yourcorp/rstudio/s/4cc57da229b59e81c306b/?restore_workspace=0
+
+Note that this will work *only if the session is not already running*. If you are currently waiting for the session to start, it is too late to try to skip workspace restoration, since it is already in progress. Kill or force-kill the session before restarting the attempt with the `restore_workspace` flag.
+
+##### Omitting .Rprofile
+
+To skip executing `.Rprofile`, append `run_rprofile=0` to the R session's full URL. For example:
+
+    https://yourcorp/rstudio/s/4cc57da229b59e81c306b/?run_rprofile=0
+
+Just like `restore_workspace`, this can only be used prior to the session starting.
+
+Note that Safe Mode is only available when RStudio itself is starting sessions, so it is not a useful troubleshooting technique when sessions are being run using the Job Launcher.
+

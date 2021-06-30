@@ -1,0 +1,39 @@
+## Installing R
+
+We recommend installing multiple versions of R because an environment with multiple
+versions of R helps provide a stable, reproducible environment for your R
+developers.
+
+Install R using the directions at <https://docs.rstudio.com/resources/install-r/>.
+
+### Recommended Installation Directories
+
+RStudio Workbench automatically scans for versions of R at the following locations:
+
+```bash
+/usr/lib/R
+/usr/lib64/R
+/usr/local/lib/R
+/usr/local/lib64/R
+/opt/local/lib/R
+/opt/local/lib64/R
+```
+
+In addition, RStudio Workbench scans all subdirectories of the following directories within `/opt`:
+
+```bash
+/opt/R
+/opt/local/R
+```
+
+For example, any of the following installed versions of R will be automatically detected by RStudio Workbench:
+
+```bash
+/opt/R/3.1.0
+/opt/R/3.2.0
+/opt/local/R/3.1.0
+/opt/local/R/3.2.0
+```
+
+If you have versions of R located at other places in the file system, RStudio Workbench can still utilize them.  However, you'll need to explicitly specify their location in a configuration file (this is covered in more detail in the [Using Multiple Versions](using_multiple_versions_of_r.qmd) section).
+

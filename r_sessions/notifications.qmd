@@ -1,0 +1,133 @@
+## Notifications {.pro-header}
+
+Administrators can broadcast notifications to user sessions in real-time using the `notifications.conf` file located at `/etc/rstudio/notifications.conf`. This file comes by default with commented out entries that you can uncomment and use, and helps show you the available time and message formats.
+
+Each session monitors for changes in the `notifications.conf` file, and if a new notification is detected, it will be shown to the user at the appropriate time (as defined in the next section). All open sessions for a user will receive the notification, and they will continue to see the notification in any new sessions they open until the notification is acknowledged.
+
+Modifying a notification will cause it to count as a new notification, so make sure to only save changes to the file when you've confirmed what you want the message to be and what time it should be displayed. Otherwise, the same message could be shown multiple times.
+
+
+### notifications.conf format
+
+The `notifications.conf` file is a file consisting of multiple notification entries separated by a blank line. The following table lists the fields that are available for each notification entry in the file.
+
+|                      |                                                    |
+| -------------------- | -------------------------------------------------- |
+| StartTime            | The start time at which the notification can start to be delivered. This must be a time-formatted field. This field is not required. |
+| EndTime              | The end time at which the notification will no longer be delivered. This must be a time-formatted field. This field is required. |
+| Message              | The message content to show to the users. The message cannot have empty lines in it. This field is required. |
+
+An example `notifications.conf` file is shown below. For more information on the formatting of each field, see the subsequent sections.
+
+```ini
+# /etc/rstudio/notifications.conf
+StartTime: 2017-08-30 09:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Please remember to shut down your computers at the end of the day.
+
+StartTime: 2017-05-30 05:55
+EndTime: 2017-06-13
+Message: This is a test notification. Notifications can span
+   multiple lines by indenting the next line's message text.
+   Empty lines are not supported!
+```
+
+It is important that each entry consists of 2-3 fields as specified above (StartTime, EndTime, and Message). Each field must go on its own line. There should be no empty lines between field definitions.
+
+For example, this is okay:
+
+```ini
+# /etc/rstudio/notifications.conf
+StartTime: 2017-08-30 12:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Please remember to shut down your computers at the end of the day.
+```
+
+But this is not:
+
+```ini
+# /etc/rstudio/notifications.conf
+StartTime: 2017-08-30 12:00:00 -5:00
+
+EndTime: 2017-08-30 20:00:00 -05:00
+
+Message: Please remember to shut down your computers at the end of the day.
+```
+
+
+There must be **one** empty line (2 new line characters) in between separate notification entries.
+
+For example, this is okay:
+
+```ini
+# /etc/rstudio/notifications.conf
+StartTime: 2017-08-30 08:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Please remember to shut down your computers at the end of the day.
+
+StartTime: 2017-08-30 08:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Remember to drop off any borrowed equipment at Grace's office today only.
+```
+
+But this is not:
+
+```ini
+#  /etc/rstudio/notifications.con
+StartTime: 2017-08-30 12:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Please remember to shut down your computers at the end of the day.
+
+
+StartTime: 2017-08-30 12:00:00 -5:00
+EndTime: 2017-08-30 20:00:00 -05:00
+Message: Remember to drop off any borrowed equipment at Grace's office today only.
+```
+
+
+#### Time format
+
+The time format fields, `StartTime` and `EndTime`, must be in one of the following formats:
+
+`YYYY`-`MM`-`DD`
+
+`YYYY`-`MM`-`DD` `hh`:`mm`
+
+`YYYY`-`MM`-`DD` `hh`:`mm`:`ss` `zh`:`zm`
+
+The following table shows the meaning of the format sections.
+
+|                                             |                                                    |
+| ------------------------------------------- | -------------------------------------------------- |
+| YYYY                                        | 4 digit year (example: 2017)
+| MM                                          | 2 digit month (example: 06) |
+| DD                                          | 2 digit day (example: 28) |
+| hh                                          | 2 digit hours (24 hour clock. example: 19) |
+| mm                                          | 2 digit minutes (example: 15) |
+| ss                                          | 2 digit seconds (example: 59) |
+| zh                                          | Time zone hours offset (example: -06 for CST or -08 for PST) |
+| zm                                          | Time zone minutes offset (usually just 00, different for only a few timezones) |
+
+
+If no time is specified, the time will be set to 00:00:00 in the current server time zone for start times and 23:59:59 in the current server time zone for end times.
+
+If no seconds are specified, they will be set to 00 and the time is interpreted in the current server time zone.
+
+Note that if you have sessions spanning multiple servers in different time zones and you want your notifications to display at a uniform time, you MUST manually set the timezone to what is appropriate. Otherwise, sessions in different time zones will see notifications in their local time.
+
+
+The following table shows some example dates and how they would be formatted.
+
+|                                                                                           |                                                    |
+| ----------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| January 1st, 2020 at 6:00 PM in the server's time zone                                    | 2020-01-01 18:00 |
+| July 31st, 2018 at midnight in the server's time zone (for a start time)                  | 2018-07-31 |
+| September 23rd, 2019 at 23:59:59 in the server's time zone (for an end time)              | 2019-09-23 |
+| November 30th, 2020 at 9:14:12 in Pacific Standard Time                                   | 2020-11-30 09:14:12 -08:00 |
+
+
+
+#### Message format
+
+The message to deliver must be plain text and cannot have any empty lines. To start text on another line, simply indent the line as in the multiline example in the previous section.
+

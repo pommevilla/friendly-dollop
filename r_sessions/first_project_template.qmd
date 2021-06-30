@@ -1,0 +1,40 @@
+## First Project Template
+
+### Overview
+
+RStudio allows you to specify a first project to automatically open for first time users of the system. To do this, set the `session-first-project-template-path` parameter in `rsession.conf` to an RStudio project directory. This directory will be copied into the user's home directory upon first running the IDE, and will automatically open the project contained within. For example:
+
+```ini
+# /etc/rstudio/rsession.conf
+session-first-project-template-path=/etc/rstudio/welcome-project
+```
+
+In the example above, the project located within /etc/rstudio/welcome-project would be copied to users' home directories when first starting RStudio, and the project file `welcome-project.Rproj` would be run.
+
+The project file must be named the same as the directory it is contained in. For the above example, the project file must be named `welcome-project.Rproj`. In addition, you must ensure that the project directory is fully readable and executable by your users, as they will be copying the contents of the directory into their home directory.
+
+If you copy an existing project to be used as a project template, ensure that you delete the RStudio metadata folders and files contained within the project directory. You will want to ensure you delete the following:
+
+- `.Rproj.user`
+- `.Rhistory`
+- `.RData`
+
+If you are creating the project template for the first time, the project (.Rproj) file must contain the version specifier at a minimum. For example:
+
+```ini
+# welcome-project.Rproj
+Version: 1.0
+```
+
+### Project DefaultOpenDocs
+
+Project files allow you to specify default documents that should be opened when a project is opened for the very first time. For example, you could have your welcome project bring up explanatory documents to help guide your users. To do this, add the `DefaultOpenDocs` line to the .Rproj file. For example:
+
+```ini
+# welcome-project.Rproj
+Version: 1.0
+DefaultOpenDocs: welcome.txt:firstMarkdown.Rmd
+```
+
+The `DefaultOpenDocs` parameters specifies a list of files to automatically be opened when the project is opened for the first time, separated by a `:` character. These files are relative paths to the project directory. Only files contained within the project directory can be opened.
+

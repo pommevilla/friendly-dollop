@@ -1,0 +1,33 @@
+
+.sidebar-logo {
+  width: 60%;
+}
+
+.pro-header > h1:after,
+.pro-header > h2:after,
+.pro-header > h3:after,
+.pro-header > h4:after {
+    content: 'PRO';
+    margin-left: 1em;
+    position: relative;
+    top: -0.5em;
+}
+
+.pro-header > h1:after,
+.pro-header > h2:after,
+.pro-header > h3:after,
+.pro-header > h4:after,
+div span.pro-feature {
+    display: inline-block;
+    color: #909090;
+    border: 1px solid #E0E0E0;
+    font-weight: 400;
+    font-size: 9pt !important;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+div span.pro-feature {
+    margin-left: 1em;
+    text-transform: uppercase;
+}

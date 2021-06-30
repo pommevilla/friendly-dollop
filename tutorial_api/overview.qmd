@@ -1,0 +1,24 @@
+## Overview
+The Tutorial API provides an interface for driving automated interactions with the RStudio IDE. The Tutorial API assumes that RStudio is hosted within an `<iframe>` with the hosting page content surrounding it (e.g. in a sidebar).
+
+The hosting `<iframe>` must be connected to the DOM and have non-zero dimensions (including not having the `display: none` style) when the IDE is loaded into it.
+
+The API supports a variety of interactions with the IDE including typing console input, opening source files, opening projects, creating projects, showing help topics, and executing arbitrary R code.
+
+This document describes the basic workings of the Tutorial API, and related settings. A simple example page is provided to demonstrate invoking the APIs.
+
+The Tutorial API files are installed with RStudio Workbench in `/usr/lib/rstudio-server/extras/tutorial`.
+
+- `demo.htm` is an example host page
+- `rstudio.js` is used by a hosting page to interact with the Tutorial API; always use the version of rstudio.js that came with the installed version of RStudio Workbench and ensure it is cache-busted to prevent web browsers from using an older cached version (one option would be to rename it and reference it via that new name, e.g. rstudio001.js)
+
+::: {.callout-important}
+These instructions, and the example page itself, assume the following regarding the domains utilized:
+
+  - The demo host page is served from domain <http://localhost:8080>
+  - The RStudio IDE is served from domain <http://localhost:8787>
+
+If the IDE is being served from a different domain than <http://localhost:8787> edit the **demo.htm** file and change all instances of <http://localhost:8787> to the actual domain where the IDE is available.
+:::
+
+

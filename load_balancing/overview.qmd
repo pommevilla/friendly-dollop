@@ -1,0 +1,23 @@
+## Overview
+
+RStudio Workbench can be configured to load balance R sessions across two or more nodes within a cluster. This provides both increased capacity as well as higher availability.
+
+Load balancing with RStudio Workbench **always** operates in an active-active fashion where all nodes are equally equipped to serve users. All nodes have a primary role.
+
+Note that load balancing for RStudio Workbench has some particular "stickiness" requirements stemming from the fact that users must always return to the same R session where their work resides (i.e. their traffic can't be handled by more than one node). As a result, it's not enough to simply place multiple RStudio Workbench servers behind a conventional hardware or software load balancer---additional intelligence and routing is required.
+
+Key characteristics of the RStudio Workbench load balancer include:
+
+1. Multiple primary nodes for high availability - all nodes can balance traffic to all other nodes.
+
+2. Support for several load balancing strategies including least busy server (by active sessions or system load), even distribution by user, or a custom strategy based on an external script.
+
+3. The ability to add and remove nodes while the cluster is running.
+
+4. Works standalone or can be integrated with other front-end load balancing environments.
+
+::: {.callout-note}
+The standalone load balance and higher availability characteristics of RStudio Workbench are an exception among RStudio products. RStudio Connect and Shiny Server will require a front-end load balancing under the same scenarios. The use of an external load balancer can still be beneficial in a failover setup. See [External Load Balancers] below for details.
+:::
+
+

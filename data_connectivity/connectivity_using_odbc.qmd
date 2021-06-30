@@ -1,0 +1,8 @@
+## Connectivity using ODBC
+
+RStudio makes ODBC connections available in the Connections Pane. ODBC connections are obtained from the `odbcinst.ini` file and can be further customized using Snippet Files.
+
+### Professional Drivers {.pro-header}
+
+RStudio Workbench provides connectivity to data sources through RStudio Professional Drivers. See [Getting Started with RStudio Professional Drivers](https://rstudio.org/links/professional_drivers) and [Databases using R](http://db.rstudio.com/) for more information. 
+

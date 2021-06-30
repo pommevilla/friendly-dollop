@@ -1,0 +1,141 @@
+---
+knit: bookdown::preview_chapter
+---
+
+# (APPENDIX) Appendix {-}
+
+# Session User Settings
+
+The following table enumerates the settings supported in the user (or system) `rstudio-prefs.json` file, along with their type, allowable values, and defaults. 
+```{r, echo = FALSE}
+# Read the schema from the repo
+json <- jsonlite::read_json("../../src/cpp/session/resources/schema/user-prefs-schema.json")
+
+# Loop over each property to form a data frame
+props <- data.frame(
+  Property = names(json$properties),
+  Description = vapply(json$properties, function(x) { x$description }, ""),
+  Type = vapply(json$properties, function(x) { 
+    if (is.null(x$enum))
+       x$type 
+    else
+       paste0(x$type, " (", paste(x$enum, collapse = ", "), ")")
+    }, ""),
+  Default = vapply(json$properties, function(x) {
+    if (is.null(x$default))
+      ""
+    else if (identical(x$type, "object"))
+      ""
+    else if (identical(x$type, "array")) {
+      if (length(x$default) > 0) {
+        paste(x$default, collapse = ", ")
+      } else {
+        "Empty"
+      }
+    }
+    else if (identical(x$type, "boolean")) {
+       # R uses "TRUE"/"FALSE" for booleans but JSON wants "true"/"false"
+       tolower(x$default)
+    } else
+      as.character(x$default)
+  }, ""),
+  stringsAsFactors = FALSE
+)
+
+# Sort, clear row names, and display
+props <- props[order(props$Property),] 
+row.names(props) <- NULL
+knitr::kable(props)
+```
+
+# RStudio IDE Commands
+
+The following table enumerates all of the commands currently supported by RStudio. These command IDs can be used in RStudio API calls such as `rstudioapi::executeCommand`. 
+
+```{r, echo = FALSE}
+contents <- xml2::as_list(xml2::read_xml("../../src/gwt/src/org/rstudio/studio/client/workbench/commands/Commands.cmd.xml"))
+
+allcommands <- contents$commands[names(contents$commands) == "cmd"]
+
+commands <- data.frame(
+  Id = vapply(allcommands, function(x) { attr(x, "id") }, ""),
+  Description = vapply(allcommands, function(x) {
+    if (!is.null(attr(x, "desc"))) {
+      # Actual description
+      attr(x, "desc")
+    } else if (!is.null(attr(x, "menuLabel"))) {
+      # Menu label (remove accelerators)
+      gsub("_", "", attr(x, "menuLabel"))
+    } else if (!is.null(attr(x, "buttonLabel"))) {
+      # Button label
+      attr(x, "buttonLabel")
+    } else {
+      # No description for command (will not be listed)
+      ""
+    }
+  }, "")
+)
+
+# Filter out commands for which we don't have a description 
+# (these are typically internal commands such as MRU invokers)
+commands <- commands[commands["Description"] != "",]
+
+# Sort and display
+commands <- commands[order(commands$Id),] 
+row.names(commands) <- NULL
+knitr::kable(commands)
+```
+
+
+# R Package Dependencies
+
+The following is a list of all of the R packages RStudio depends on in some way. None of these packages are necessary for the basic operation of RStudio; they all enable additional IDE functionality as noted in in *Features*.
+
+This information is also available in the IDE itself using the **rstudioapi** package as follows:
+
+    rstudioapi::getRStudioPackageDependencies()
+
+Note that some of these packages may require a higher version of R than RStudio itself requires; consult the individual package's documentation for more details.
+
+```{r, echo = FALSE}
+json <- jsonlite::read_json("../../src/cpp/session/resources/dependencies/r-packages.json")
+
+# extract a list of all the short names of the features
+features <- names(json$features)
+
+# begin building a table of information for each R package
+packages <- lapply(names(json$packages), function(name) {
+  
+  # find a list of all features which use this package
+  included <- vapply(features, function(feature) {
+     name %in% json$features[[feature]]$packages
+  }, TRUE)
+  
+  # find the pretty names of those features
+  featureNames <- vapply(json$features[included], function(feature) {
+    feature$description
+  }, "")
+  
+  # combine name, version, and features into a list
+  list(Name = name, 
+       Version = json$packages[[name]]$version,
+       Features = paste(featureNames, collapse = ", "))  
+})
+
+# format as a data table and print
+deps <- do.call(rbind.data.frame, packages)
+deps <- deps[order(deps$Name),]
+row.names(deps) <- NULL
+knitr::kable(deps)
+```
+
+
+# RStudio Configuration
+
+The following sections detail user-configurable options for RStudio Server and RStudio Workbench.
+
+```{r child='rserver-config.Rmd.in'}
+```
+
+```{r child='rsession-config.Rmd.in'}
+```

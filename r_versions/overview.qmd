@@ -1,0 +1,12 @@
+## Overview
+
+RStudio Workbench enables users and administrators to have very fine-grained control over which versions of R are used in various contexts. Capabilities include:
+
+-  Administrators can install several versions of R and specify a global default version as well as per-user or per-group default versions.
+
+-  Users can switch between any of the available versions of R as they like.
+
+- Users can specify that individual R projects remember their last version of R and always use that version until explicitly migrated to a new version.
+
+Flexible control over R versions makes it much easier to provide upgraded versions of R for users (or individual projects) that require them; while at the same time not disrupting work that requires continued use of older versions.
+

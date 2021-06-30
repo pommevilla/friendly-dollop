@@ -1,0 +1,6 @@
+## Multiple Sessions
+
+Multiple VS Code windows with distinct processes and projects can be opened within the same VS Code session in separate browser windows. Closing a VS Code session window causes the processes associated with that window to exit, while other processes associated with the same session will remain running.
+
+After a user closes all windows associated with a session, restarting the session from the RStudio Workbench homepage will open the last project that the user opened in this session. The order in which the windows are closed does not impact this. Reopening the VS Code Workspace or folder the user was previously working in will return the window to the state that it was left in.
+

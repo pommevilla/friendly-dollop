@@ -1,0 +1,526 @@
+## rsession.conf
+
+The following is a list of available options that can be specified in the `rsession.conf` configuration file, which controls behavior of the `rsession` process, allowing you to tune various R session parameters.
+
+
+### *verify* Settings
+
+#### **verify-installation**   
+Verifies that the session installation is working correctly and exits.  
+  
+Type: bool  
+Default: `0  `
+  
+
+### *version* Settings
+
+#### **version**   
+Prints the version number and exits.  
+  
+Type: bool  
+Default: `0  `
+  
+
+### *docs* Settings
+
+#### **docs-url**   
+If specified, overrides the URL to navigate to when a user clicks on the RStudio help link.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+
+### *session* Settings
+
+#### **session-timeout-minutes**   
+The amount of minutes before a session times out, at which point the session will either suspend or exit.  
+  
+Type: int  
+Default: `120  `
+  
+#### **session-timeout-suspend**   
+Indicates whether or not to suspend the session after the timeout has elapsed. Setting this to `false` will cause the session to quit instead of suspending to disk when the session times out.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **session-disconnected-timeout-minutes**   
+If set, causes the session to time out after not receiving any new connections within the specified minutes. This behavior is generally not needed, and you should instead use session-timeout-minutes  
+  
+Type: int  
+Default: `0  `
+  
+#### **session-preflight-script**   
+Sets a script to be run on startup before any R initialization has occurred.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **session-create-public-folder**   
+Indicates whether or not to create a `Public` folder for the user whenever the session starts. This folder will have global read permissions, and can be used as a simple means for users to share files. It is recommended you do not use this feature, and instead use the more advanced Project Sharing features.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-create-profile**   
+Indicates whether or not to create a default empty .Rprofile script within the user's home directory, which can be altered to perform any desired common startup tasks.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-rprofile-on-resume-default**   
+Specifies the default user setting for running the Rprofile when sessions are resumed.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-save-action-default**   
+Specifies the default save action (yes, no, or ask).  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **session-default-working-dir**   
+Specifies the default working directory to use for new sessions.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **session-default-new-project-dir**   
+Specifies the default directory to use for new projects.  
+**This option is deprecated and should not be used.**  
+  
+Type: string  
+Default: `~  `
+  
+#### **show-help-home**   
+Indicates whether or not to show the help home page on startup.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-default-console-term**   
+Specifies the default TERM setting for the R console.  
+  
+Type: string  
+Default: `xterm-256color  `
+  
+#### **session-default-clicolor-force**   
+Specifies the default CLICOLOR_FORCE setting for the R console.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **session-quit-child-processes-on-exit**   
+Indicates whether or not to quit child processes of the session on exit. If unset, child processes created by forking or parallel processing may continue to run in the background after the session is terminated.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-first-project-template-path**   
+Specifies the path to a first project template which will be copied into new users' home directories and opened the first time they run a session. The template can optionally be configured with `DefaultOpenDocs` to cause documents to automatically be opened for the first project.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **default-rsconnect-server**   
+Specifies the default RStudio Connect server URL.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **websocket-ping-seconds**   
+Specifies the WebSocket keep-alive ping interval for session terminals.  
+  
+Type: int  
+Default: `10  `
+  
+#### **websocket-connect-timeout**   
+Specifies the WebSocket initial connection timeout in seconds for session terminals.  
+  
+Type: int  
+Default: `3  `
+  
+#### **websocket-log-level**   
+Specifies the WebSocket log level for session terminals ((0=none, 1=errors, 2=activity, 3=all).  
+  
+Type: int  
+Default: `0  `
+  
+#### **websocket-handshake-timeout**   
+Specifies the WebSocket protocol handshake timeout for session terminals in milliseconds.  
+  
+Type: int  
+Default: `5000  `
+  
+#### **package-output-to-package-folder**   
+Specifies whether or not package builds output to the package project folder.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **restrict-directory-view**   
+Indicates whether or not to restrict the directories that can be viewed within the IDE.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **directory-view-whitelist**   
+Specifies a list of directories exempt from directory view restrictions, separated by a colon character (:).  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **session-env-var-save-blacklist**   
+Specifies a list of environment variables that will not be saved when sessions suspend, separated by a colon character (:).  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **session-suspend-on-incomplete-statement**   
+Specifies whether the session should be allowed to suspend when a user has entered a partial R statement.  
+  
+Type: bool  
+Default: `0  `
+  
+
+### *allow* Settings
+
+#### **allow-vcs-executable-edit**   
+Indicates whether or not to allow editing of VCS (Version Control Systems) executables.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-r-cran-repos-edit**   
+Indicates whether or not to allow editing of CRAN repositories.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-vcs**   
+Indicates whether or not to allow the use of version control features.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-package-installation**   
+Indicates whether or not to allow installation of packages from the packages pane.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-shell**   
+Indicates whether or not to allow access to the shell dialog.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-terminal-websockets**   
+Indicates whether or not to allow connections to terminal sessions with websockets.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-file-downloads**   
+Indicates whether or not to allow file downloads from the files pane.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-file-uploads**   
+Indicates whether or not to allow file uploads from the files pane.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-remove-public-folder**   
+Indicates whether or not to allow removal of the user public folder.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-rpubs-publish**   
+Indicates whether or not to allow publishing of content to external services.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-external-publish**   
+Indicates whether or not to allow publishing of content to external services.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-publish**   
+Indicates whether or not to allow publishing of content.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-presentation-commands**   
+Indicates whether or not to allow presentation commands.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **allow-full-ui**   
+Indicates whether or not to allow full standalone UI mode.  
+  
+Type: bool  
+Default: `1  `
+  
+#### **allow-launcher-jobs**   
+Indicates whether or not to allow running jobs via the Launcher.  
+  
+Type: bool  
+Default: `1  `
+  
+
+### *r* Settings
+
+#### **r-core-source**   
+Specifies the Core R source path.  
+  
+Type: string  
+Default: `R  `
+  
+#### **r-modules-source**   
+Specifies the Modules R source path.  
+  
+Type: string  
+Default: `R/modules  `
+  
+#### **r-session-package-archives**   
+Specifies the R package archives path.  
+  
+Type: string  
+Default: `R/packages  `
+  
+#### **r-libs-user**   
+Specifies the R user library path.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **r-cran-repos**   
+Specifies the default CRAN repository.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **r-cran-repos-file**   
+Specifies the path to a configuration file which contains default CRAN repositories.  
+  
+Type: string  
+Default: `The first repos.conf file that is found within the XDG_CONFIG_DIRS environment, or /etc/rstudio/repos.conf if not XDG_CONFIG_DIRS are specified.  `
+  
+#### **r-cran-repos-url**   
+Specifies the URL to a configuration file which contains optional CRAN repositories.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **r-auto-reload-source**   
+Indicates whether or not to automatically reload R source if it changes during the session.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **r-compatible-graphics-engine-version**   
+Specifies the maximum graphics engine version that this version of RStudio is compatible with.  
+  
+Type: int  
+Default: `14  `
+  
+#### **r-resources-path**   
+Specifies the directory containing external resources.  
+  
+Type: string  
+Default: `resources  `
+  
+#### **r-doc-dir-override**   
+Specifies the override for R_DOC_DIR (used for debug configurations).  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **r-restore-workspace**   
+If set, overrides the user/project restore workspace setting. Can be 0 (No), 1 (Yes), or 2 (Default).  
+  
+Type: int  
+Default: `2 (Default).  `
+  
+#### **r-run-rprofile**   
+If set, overrides the user/project .Rprofile run setting. Can be 0 (No), 1 (Yes), or 2 (Default).  
+  
+Type: int  
+Default: `2 (Default).  `
+  
+
+### *limits* Settings
+
+#### **limit-file-upload-size-mb**   
+Sets a size limit in megabytes on files that are uploaded via the files pane.  
+  
+Type: int  
+Default: `0  `
+  
+#### **limit-cpu-time-minutes**   
+Sets a limit in minutes for the amount of time top level R computations may run before being interrupted.  
+  
+Type: int  
+Default: `0  `
+  
+#### **limit-xfs-disk-quota**   
+Indicates whether or not XFS quotas should be enforced when performing file operations via the files pane.  
+  
+Type: bool  
+Default: `0  `
+  
+
+### *external* Settings
+
+#### **external-consoleio-path**   
+Specifies the path to the consoleio executable (Windows-only).  
+  
+Type: string  
+Default: `bin/consoleio.exe  `
+  
+#### **external-gnudiff-path**   
+Specifies the path to gnudiff utilities (Windows-only).  
+  
+Type: string  
+Default: `bin/gnudiff  `
+  
+#### **external-gnugrep-path**   
+Specifies the path to gnugrep utilities (Windows-only).  
+  
+Type: string  
+Default: `bin/gnugrep  `
+  
+#### **external-msysssh-path**   
+Specifies the path to msys_ssh utilities (Windows-only).  
+  
+Type: string  
+Default: `bin/msys-ssh-1000-18  `
+  
+#### **external-sumatra-path**   
+Specifies the path to SumatraPDF (Windows-only).  
+  
+Type: string  
+Default: `bin/sumatra  `
+  
+#### **external-winutils-path**   
+Specifies the path to Hadoop Winutils (Windows-only).  
+  
+Type: string  
+Default: `bin/winutils  `
+  
+#### **external-hunspell-dictionaries-path**   
+Specifies the path to hunspell dictionaries.  
+  
+Type: string  
+Default: `resources/dictionaries  `
+  
+#### **external-mathjax-path**   
+Specifies the path to the mathjax library.  
+  
+Type: string  
+Default: `resources/mathjax-27  `
+  
+#### **external-pandoc-path**   
+Specifies the path to pandoc binaries.  
+  
+Type: string  
+Default: `bin/pandoc  `
+  
+#### **external-libclang-path**   
+Specifies the path to the libclang shared library  
+  
+Type: string  
+Default: `bin/rsclang  `
+  
+#### **external-libclang-headers-path**   
+Specifies the path to the libclang builtin headers.  
+  
+Type: string  
+Default: `resources/libclang/builtin-headers  `
+  
+#### **external-winpty-path**   
+Specifies the path to winpty binaries.  
+  
+Type: string  
+Default: `bin  `
+  
+
+### *git* Settings
+
+#### **git-commit-large-file-size**   
+Warns when attempting to commit files larger than this size (in bytes; set 0 to disable).  
+  
+Type: int  
+Default: `5242880  `
+  
+
+### *user* Settings
+
+#### **show-user-identity**   
+Indicates whether or not to show the user identity in the session UI.  
+  
+Type: bool  
+Default: `1  `
+  
+
+### *misc* Settings
+
+#### **tutorial-api-enabled** {.pro-header}  
+Enables/disables the tutorial API.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **tutorial-api-parent-notify-enabled** {.pro-header}  
+Enables/disables tutorial API parent notification.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **tutorial-api-client-origin** {.pro-header}  
+Specifies the tutorial API client origin.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **nfs-acl-version** {.pro-header}  
+Specifies the protocol version for the NFS Access Control List to use with Project Sharing (nfsv3 or nfsv4).  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **nfs4-principal-type** {.pro-header}  
+Specifies the type of security principal to use with NFSv4 Access Control Lists ('username' or 'uid').  
+  
+Type: string  
+Default: `username  `
+  
+#### **nfs4-domain** {.pro-header}  
+Specifies the domain for NFSv4 Access Control Lists. Needed when using Project Sharing on an NFSv4 share with username-style security principals.  
+  
+Type: string  
+Default: `<empty string>  `
+  
+#### **project-sharing-enumerate-server-users** {.pro-header}  
+Indicates whether or not to enumerate the server's user groups when determining the users available for Project Sharing. If disabled, enumerates the users that are present in the RStudio user database instead.  
+  
+Type: bool  
+Default: `0  `
+  
+#### **session-timeout-kill-hours** {.pro-header}  
+Specifies the amount of hours to wait before forcefully killing a running session after it has been idle.  
+  
+Type: int  
+Default: `0  `
+  
+
+

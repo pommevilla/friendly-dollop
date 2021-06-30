@@ -1,0 +1,4 @@
+## Connectivity using R Packages
+
+For R Packages that provide data connectivity through the [Connections Contract](https://rstudio.github.io/rstudio-extensions/connections-contract.html), RStudio makes these connections also available in the Connections Pane and can be further customized using Snippet Files. Currently, the [odbc](https://github.com/rstats-db/odbc) and [sparklyr](https://github.com/rstudio/sparklyr) packages provide this connectivity.
+

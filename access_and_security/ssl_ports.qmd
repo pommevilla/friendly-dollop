@@ -1,0 +1,41 @@
+---
+aliases:
+  - access-and-security.html#ssl-ports
+---
+
+## SSL Ports {.pro-header}
+
+When RStudio Workbench is configured to use SSL the default behavior with respect to ports is:
+
+1) SSL is bound to port 443 (enabling access using the standard https protocol within the browser)
+2) The server also listens on port 80 and redirects all requests to port 443 (allowing users to specify the domain without the https protocol and be automatically redirected to the secure port)
+
+However, if SSL is bound to another port (using the `www-port` option) then the automatic redirect behavior is not enabled. It's also possible to disable automatic SSL redirects entirely using the `ssl-redirect-http` option as follows:
+
+```ini
+# /etc/rstudio/rserver.conf
+ssl-redirect-http=0
+```
+
+Note that changes to the configuration will not take effect until the server is restarted. 
+
+### Strict Transport Security
+
+When SSL is enabled, RStudio Workbench sends an HTTP Strict Transport Security (HSTS) header, `Strict-Transport-Security`, by default on outbound responses. This header tells the browser to forbid all HTTP connections to the domain for a period of time.
+
+RStudio Workbench sets this period of time to 1 day (84600 seconds) by default, because if HTTPS issues arise it can be difficult to address them when the browser is locked to HTTPS because of HSTS. Once you are confident that your HTTPS setup is correct, you can increase the period by specifying the desired number of seconds in the `ssl-hsts-max-age` option. For example, to lock browsers to HTTPS for one year:
+
+```ini
+# /etc/rstudio/rserver.conf
+ssl-hsts-max-age=31536000
+```
+
+If all subdomains of the server on which RStudio Workbench is hosted support HSTS, you can extend HSTS protection to them as well with the `ssl-hsts-include-subdomains` option. This doesn't happen by default since RStudio Workbench does not know what other services it's sharing a domain with, but it's a recommended security best practice, so you should turn it on if you can.
+
+```ini
+# /etc/rstudio/rserver.conf
+ssl-hsts-include-subdomains=1
+```
+
+Finally, we do not recommend disabling HSTS, but if you need to, you can do so by setting `ssl-hsts=0`. 
+

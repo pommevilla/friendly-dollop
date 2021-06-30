@@ -1,0 +1,82 @@
+## Access and Availability
+
+Once you've defined a cluster and brought it online you'll need to decide how the cluster should be addressed by end users. There are two distinct approaches to this:
+
+1. **Single Node Routing**. Provide users with the address of one of the nodes. This node will automatically route traffic and sessions as required to the other nodes. This has the benefit of simplicity (no additional software or hardware required) but also results in a single point of failure.
+
+2. **Multiple Node Routing**. Put the nodes behind some type of system that routes traffic to them (e.g. dynamic DNS or a software or hardware load balancer). While this requires additional configuration it also enables all of nodes to serve as points of failover for each other.
+
+Both of these options are described in detail below. 
+
+### Single Node Routing
+
+In a Single Node Routing configuration, you designate one of the nodes in the cluster as the main one and provide end users with the address of this node as their point of access. For example:
+
+```bash
+[nodes]
+rstudio.example.com
+rstudio2.example.com
+rstudio3.example.com
+```
+
+Users would access the cluster using **http://rstudio.example.com**. This node would in turn route traffic and sessions both to itself and the other nodes in the cluster in accordance with the active load balancing strategy.
+
+Note that in this configuration the **rstudio2.example.com** and **rstudio3.example.com** nodes can either fail or be removed from the cluster at any time and service will continue to users. However, if the main node fails or is removed then the cluster is effectively down.
+
+
+### Multiple Node Routing
+
+In a Multiple Node Routing configuration all of the nodes in the cluster are peers and provide failover for each other. This requires that some external system (dynamic DNS or a load balancer) route traffic to the nodes; see below for examples and caveats. In this scenario any of the nodes can fail and service will continue, so long as the external router can respond intelligently to a node being unreachable. 
+
+For example, here's an [Nginx](http://wiki.nginx.org/Main) reverse-proxy configuration that you could use with the cluster defined above:
+
+```bash
+http {
+  upstream rstudio-server {
+    server rstudio1.example.com;
+    server rstudio2.example.com backup;
+    server rstudio3.example.com backup;
+  }
+  server {
+    listen 80;
+    location / {
+      proxy_pass http://rstudio-server;
+      proxy_redirect http://rstudio-server/ $scheme://$host/;
+    }
+  }
+}
+```
+
+In this scenario the Nginx software load balancer would be running on **rstudio.example.com** and reverse proxy traffic to **rstudio1.example.com**, **rstudio2.example.com**, etc. Note that one node is designated by convention as the main one so traffic is routed there by default. However, if that node fails then Nginx automatically makes use of the backup nodes.
+
+This is merely one example as there are many ways to route traffic to multiple servers---RStudio Workbench load balancing is designed to be compatible with all of them.
+
+### External Load Balancers
+
+When using an external load balancer with a Multiple Node Routing configuration, the external load balancer may be configured as active/active or active/passive.
+
+RStudio Workbench load balances all requests internally in an active/active way, deciding where new sessions will be started, and routing requests to existing sessions, regardless which RStudio node received the initial request from the external load balancer. The RStudio node that receives the request will re-route the request appropriately. Therefore, the external load balancer does not determine which RStudio node will respond to the request.
+
+- External load balancer configured as active/passive: All requests are routed by the external load balancer to a single RStudio node. If that node becomes unavailable or unresponsive, the external load balancer will select a different RStudio node. The RStudio node may route the request to another node to handle the request. The external load balancer provides failover / high availability, while RStudio Workbench’s load balancer provides scalability across nodes.
+
+- External load balancer configured as active/active: Per above, RStudio Workbench’s internal load balancer may re-route the request to another node. Consequently, having the external load balancer select different nodes per request will not actually help balance the session load. Again, the external load balancer provides high availability, while scalability is still provided by the internal load balancer.
+
+
+### Using SSL
+
+If you are running RStudio Workbench on a public facing network then using SSL encryption is strongly recommended. Without this all user session data is sent in the clear and can be intercepted by malicious parties.
+
+The recommended SSL configuration depends on which access topology you've deployed.
+
+#### Single Node Routing
+
+For a Single Node Routing deployment, you would configure each node of the cluster to use SSL as described in the [Secure Sockets (SSL)](../access_and_security/secure_sockets.qmd) section. The nodes will then use SSL for both external and intra-machine communication.
+
+::: {.callout-note}
+In this configuration, you must ensure that your `load-balancer` file lists the hostname in the same format listed on host's SSL certificate in the Common Name (CN) or Subject Alternative Name (SAN) field, so that the nodes are able to validate each others' certificates when connecting.
+:::
+
+#### Multiple Node Routing
+
+For a Multiple Node Routing deployment, you would configure SSL within the external routing layer (e.g. the Nginx server in the example above) and use standard unencrypted HTTP for the individual nodes. You can optionally configure the RStudio nodes to use SSL as well, but this is not strictly required if all communication with outside networks is done via the external routing layer.
+

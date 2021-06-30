@@ -1,0 +1,29 @@
+## Interface
+
+You can access the Tutorial API by including `rstudio.js` within your host page. This will enable you to instantiate an **RStudio** object that has a connection to the RStudio IDE within an IFrame. For example, if the IDE were hosted in an IFrame as follows:
+
+```html
+<iframe id="rstudio" src="http://localhost:8787"></iframe>
+```
+
+Then you would instantiate an RStudio object as follows:
+
+```js
+var RStudio = new RStudio(document.getElementById("rstudio"), 
+                          "http://localhost:8787",
+                          function() { // onReady callback
+                             console.log("API is ready!");
+                          },
+                          function(responseJSON) { // parent-notify callback
+                             console.log(responseJSON);
+                          });
+```
+
+The third argument is a callback that will be invoked once the RStudio API is ready to be called (i.e. once the IDE has loaded). Note that you should be sure to instantiate this object before the IFrame containing the IDE is fully loaded (if you don't then you might miss the onReady callback). The best way to do this is to either:
+
+1. Create the object immediately after defining the IFrame within the host page; or
+
+2. More conservatively, create the IFrame, then create the object, then provide the src to the IFrame (this is however almost certainly not necessary and #1 should suffice). 
+
+The fourth argument is a callback that will be invoked when certain events described below in [Tutorial API Callbacks](tutorial_api_callbacks.qmd) are emitted by the IDE. These are only emitted if `tutorial-api-parent-notify-enabled=1` was set as described earlier. The response will be a text string in JSON format, as described below in [Tutorial API Callbacks](tutorial_api_callbacks.qmd).
+

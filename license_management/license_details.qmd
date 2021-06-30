@@ -1,0 +1,14 @@
+## License Details
+
+RStudio Workbench licenses include some details that you'll see when you run the `status` command. These are part of the license and can't be changed without purchasing a different license. They are as follows: 
+
+| Value                | Meaning                                            |
+| -------------------- | -------------------------------------------------- |
+| `enable-launcher`    | Whether the Job Launcher is enabled.               |
+| `sessions`           | The maximum number of concurrent R sessions that can be run; 0 if unlimited. |
+| `users`              | The maximum number of users that can connect to the server; 0 if unlimited. |
+
+Typically, RStudio Workbench licenses either disable the Launcher but allow for unlimited local users and sessions, or enable the Launcher and provide limits on users and/or sessions. If you have questions about the best kind of license for your use case, contact <sales@rstudio.com> for help.
+
+Note that when named user licenses are in effect (`users` is greater than 0), [R Session Auditing](../auditing_and_monitoring/auditing_configuration.qmd#r-session-auditing) is enabled by default to help you keep track of which users are using the product.
+

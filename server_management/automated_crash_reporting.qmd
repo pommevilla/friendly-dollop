@@ -1,0 +1,30 @@
+## Automated Crash Reporting
+
+RStudio allows you to automatically capture crash dumps for all RStudio processes and upload them to our crash database for easy reporting, allowing us to more easily determine the exact cause of crashes without adding administrative overhead to your team by requiring you to manually collect crash dumps. As user privacy is of utmost concern, these crash dumps **only** contain stack information, such as the names of the functions that were on the callstack at the time of the crash. **No** heap information is stored within the dumps, so no sensitive user data is captured in the crash dumps. The IP address of the machine uploading the reports is captured and used **only** to determine the unique amount of users experiencing a crash.
+
+### Crash Handler Configuration
+
+A separate RStudio process is responsible for handling crashes, and may be configured similar to other RStudio processes by modifying the config file `/etc/rstudio/crash-handler.conf`. Automated crash handling is disabled by default, though we recommend that you enable it. The following shows a table of available configuration options for `/etc/rstudio/crash-handler.conf`:
+
+Config Option | Description | Required (Y/N) | Default Value
+------------------------ | -------------------------------------------------------------------------------------------------- | ------------ | -------------------------
+crash-handling-enabled | Enables/disables automatic capturing of crash dumps for all RStudio processes. | **N** | 0 (disabled)
+crash-db-path | Location of the path where crash dumps should be stored on disk. This path must be readable and writeable by all RStudio users. | **N** | /tmp/crashpad_database
+uploads-enabled | Enables/disables automatic uploading of crash dumps to our crash reporting service. If this is disabled, you will have to manually upload crash dumps. | **N** | 1 (enabled)
+upload-url | Web URL where crash reports are uploaded. You should likely not change this setting unless RStudio Support instructs you to do so. | **N** |
+upload-proxy | Proxy server to connect to when submitting the minidump. Only applicable on Linux - uses the default system-wide setting on OSX. If left blank, any system-wide setting specified will be used. This should be in the form of [scheme]://[host]:[port], where scheme may be one of the following: `http` `https` `socks4` `socks4a` `socks5` or `socks5h`. For more information, see https://curl.haxx.se/libcurl/c/CURLOPT_PROXY.html | **N** | 
+
+For most RStudio installations, it is sufficient to merely set `crash-handling-enabled=1` in the config file , like so:
+
+```ini
+# /etc/rstudio/crash-handler.conf
+crash-handling-enabled=1
+```
+
+### Manually Uploading Crash Dumps
+
+In some cases, you may be unable to automatically upload crash dumps to the crash reporting service because of lack of internet connectivity or simply because you want to manually upload crash dumps. RStudio allows you to manually upload crash dumps at any time by invoking the following command:
+
+```ini
+rstudio-server upload-minidump /path/to/minidump
+```

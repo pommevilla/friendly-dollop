@@ -1,0 +1,54 @@
+## Evaluations
+
+### Extending Evaluations
+
+If you are unable to complete your evaluation of RStudio Connect during the
+initial evaluation period, contact your Customer Success Representative or
+RStudio Sales (<sales@rstudio.com>) to speak about your evaluation process and how we may be able to help with the remaining items you need to test.
+
+Once you have the key, supply it to RStudio Workbench using the `extend-evaluation` command.
+
+```bash
+$ sudo rstudio-server license-manager extend-evaluation <key>
+```
+
+If you are performing the evaluation on a physical machine (not on virtualized hardware or containers) without a network connection, you may also request an offline evaluation extension key, which does not require an internet connection. This key may be supplied to RStudio Workbench as follows:
+
+```bash
+$ sudo rstudio-server license-manager extend-evaluation-offline <key>
+```
+
+Note that offline evaluation extension keys are valid *only* on machines which do not have Internet access and are not virtualized. For most offline evaluation extensions, you will need to generate an offline evaluation request (see below for details).
+
+### Connectivity Requirements
+
+#### Beginning Evaluations 
+
+Generally speaking, there are no network requirements during the evaluation period. Inside virtual machines or sandboxes (such as Docker), however, Internet access is required to begin the evaluation period.
+
+If you have a proxy, you can supply it using the `--proxy` argument as described above. If however you have no means of connecting to the Internet from inside the virtual environment, you can begin the evaluation as follows:
+
+```bash
+$ sudo rstudio-server license-manager begin-evaluation-request
+```
+
+Executing this command will print an offline activation request to the terminal which you should copy and paste and then send to RStudio customer support (<support@rstudio.com>). You will receive a reply with a file attachment that can be used to begin the evaluation offline as follows:
+
+```bash
+$ sudo rstudio-server license-manager begin-evaluation-offline <evaluation-file>
+```
+
+#### Extending Evaluations
+
+You may extend evaluations offline using the same pattern described above (just use `extend-evaluation-request` and `extend-evaluation-offline`):
+
+```bash
+$ sudo rstudio-server license-manager extend-evaluation-request
+```
+
+Then, when you've received the evaluation file:
+
+```bash
+$ sudo rstudio-server license-manager extend-evaluation-offline <evaluation-file>
+```
+

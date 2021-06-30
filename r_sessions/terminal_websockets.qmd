@@ -1,0 +1,63 @@
+## Terminal WebSockets
+
+The RStudio terminal pane uses WebSockets to communicate between the web browser and the session. If the attempt to connect with WebSockets fails, the terminal switches to a less responsive but generally more forgiving HTTP-based protocol.
+
+Slow typing response in the terminal is a symptom of this slower protocol. You can check by starting a terminal, then going to Tools / Terminal / Terminal Diagnostics. Scroll down to *Connection Information* and look for "WebSocket connect error, switching to RPC". This indicates that the terminal was unable to use WebSockets and has fallen back on the slower protocol.
+
+Several settings are available for tuning the terminal's use of WebSockets.
+
+### IDE Settings
+
+In the IDE under Tools / Global Options / Terminal, there is a checkbox "Connect with WebSockets". Unchecking this will cause terminals to always connect with the HTTP-based protocol.
+
+### Feature Limit {.pro-header}
+
+As mentioned earlier, the feature limit `allow-terminal-websockets` completely disables the use of WebSockets.
+
+### Advanced Settings
+
+The following settings may be modified by adding them to the `/etc/rstudio/rsession.conf` file.
+
++-----------------------------+--------------+---------------------------------------------+
+| Setting                     | Default      | Purpose                                     |
++:============================+:=============+:============================================+
+| websocket-ping-seconds      | 10           | How often a keep-alive is sent over         |
+|                             |              | the WebSocket, in seconds. Set to 0         |
+|                             |              | to disable keep-alives. Many proxies        |
+|                             |              | will close inactive WebSockets so keeping   |
+|                             |              | enabled is recommended.                     |
++-----------------------------+--------------+---------------------------------------------+
+| websocket-connect-timeout   | 3            | How long terminal waits (in seconds)        |
+|                             |              | for WebSocket to connect before             |
+|                             |              | switching to the HTTP protocol. If set to   |
+|                             |              | 0 then the timeout of the web browser's     |
+|                             |              | WebSocket implementation will be used;      |
+|                             |              | this is often quite lengthy (minutes).      |
++-----------------------------+--------------+---------------------------------------------+
+| websocket-log-level         | 0            | Controls logging of WebSocket diagnostics.  |
+|                             |              | These are for troubleshooting only, and     |
+|                             |              | will appear in the RStudio R Console pane   |
+|                             |              | while enabled.                              |
+|                             |              |                                             |
+|                             |              | - 0 = no WebSocket logging                  |
+|                             |              | - 1 = log WebSocket errors                  |
+|                             |              | - 2 = log WebSocket activity                |
+|                             |              | - 3 = log WebSocket errors and activity     |
++-----------------------------+--------------+---------------------------------------------+
+| websocket-handshake-timeout | 5000         | How long the server waits (in milliseconds) |
+|                             |              | for WebSocket handshake to complete when    |
+|                             |              | connecting and disconnecting. Set to 0 to   |
+|                             |              | disable.                                    |
++-----------------------------+--------------+---------------------------------------------+
+
+For example, this would double the number of keep-alive packets sent, wait longer before switching to HTTP, log information on WebSocket errors, and increase the handshake timeout to 15 seconds.
+
+```
+websocket-ping-seconds=5
+websocket-connect-timeout=10
+websocket-log-level=1
+websocket-handshake-timeout=15000
+```
+
+For more background on the terminal feature, see this [support article](https://support.rstudio.com/hc/en-us/articles/115010737148-Using-the-RStudio-Terminal).
+

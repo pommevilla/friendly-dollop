@@ -1,0 +1,23 @@
+## Managing Upgrades of R
+
+There are various ways to handle upgrades to new versions of R ranging from allowing each user to control exactly when they upgrade all the way to forcing everyone to upgrade all at once. 
+
+By combining the various options described above you can create a highly customized upgrade policy that reflects both your internal policies and the preferences of your users.
+
+### User Controlled Migration
+
+The most conservative approach is to start with a default version of R and preserve that default for the lifetime of the server. In this configuration you can continue to install new versions of R as they are released however users won't ever run those new versions unless they make an explicit gesture to do so. See the [User Configurable Default Version](configuring_default.qmd#user-configurable-default-version) and [Switching Between Versions](using_multiple_versions_of_r.qmd#switching-between-versions) sections for details on how users can explicitly switch versions.
+
+### Partial Migration
+
+If your posture towards new R versions is that you'd like users to migrate to the new version(s) as quickly as is convenient you can be more aggressive in how you introduce them. In this scenario you might use the [Default Version Per User or Group](configuring_default.qmd#default-version-per-user-or-group) feature to migrate a portion of new users immediately but preserve older versions for those who request it.
+
+Note that in this scenario R projects will still preserve their previous R version so long as users have enabled the option described in [Preserving Versions for Projects](using_multiple_versions_of_r.qmd#preserving-versions-for-projects).
+
+### Full Migration
+
+The most aggressive approach is to force all users to upgrade to the new R version immediately (this is essentially what happens in the open-source version of RStudio Server). To implement this you'd set a [Single Default Version of R](configuring_default.qmd#single-default-version-of-r) as well as disabling the use multiple versions as described in [Disabling Use of Multiple Versions](using_multiple_versions_of_r.qmd#disabling-use-of-multiple-versions).
+
+Note that via [User and Group Profiles](../r_sessions/user_and_group_profiles.html#user-and-group-profiles) you could also have a subset of R users that are always fully migrated to new versions while preserving user controlled migration or partial migration for others.  
+
+

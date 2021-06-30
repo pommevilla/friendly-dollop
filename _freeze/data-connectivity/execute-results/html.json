@@ -1,0 +1,16 @@
+{
+  "hash": "42b70f6d7cf7087cd818e926e27e8277",
+  "result": {
+    "markdown": "---\nknit: quarto render\n---\n\n# Data Connectivity\n\n## Connectivity using ODBC\n\nRStudio makes ODBC connections available in the Connections Pane. ODBC connections are obtained from the `odbcinst.ini` file and can be further customized using Snippet Files.\n\n### Professional Drivers {.pro-header}\n\nRStudio Workbench provides connectivity to data sources through RStudio Professional Drivers. See [Getting Started with RStudio Professional Drivers](https://rstudio.org/links/professional_drivers) and [Databases using R](http://db.rstudio.com/) for more information. \n\n## Connectivity using R Packages\n\nFor R Packages that provide data connectivity through the [Connections Contract](https://rstudio.github.io/rstudio-extensions/connections-contract.html), RStudio makes these connections also available in the Connections Pane and can be further customized using Snippet Files. Currently, the [odbc](https://github.com/rstats-db/odbc) and [sparklyr](https://github.com/rstudio/sparklyr) packages provide this connectivity.\n\n## Snippet Files\n\nA Connection Snippet File is an R code snippet with additional metadata which is intended to initialize a connection. This file can be as simple as:\n\n```r\nlibrary(readr)\ndata <- read_csv(readr_example(\"mtcars.csv\"))\n```\n\nOnce this file is saved under `/etc/rstudio/connections/` as `Motor Trend Cars.R`, RStudio will make this connection as available under the Connection Pane.\n\nThe path is configurable through the `connections-path` environment variable and multiple connection files can be specified.\n\nIn order to parameterize this connection, one can create fields using using the `${Position:Label=Default}` syntax:\n\n- **Position:** The row position starting at zero.\n- **Label:** The label assigned to this field.\n- **Default:** An optional default value.\n\nFor example, we can filter out this dataframe to produce the following connection interface:\n\n```r\nlibrary(readr)\ndata <- read_csv(readr_example(\"mtcars.csv\"))\ndata[data$mpg == ${0:Miles per Gallon=21.4} | data$cyl == ${1:Cylinders=6}, ]\n```\n\nIn order to create a `;` separated list of values, one can use the syntax `${Position:Label=Default:Key}`. Semicolon-separated list are common in database connections and therefore, natively supported in snippet files, for instance:\n\n```r\n\"${2:Letters=ABC:LettersKey}${3:Numbers=123:NumbersKey}\"\n```\n\nThere are a couple of escape characters supported: `$colon$` to escape `:` and `$equal` to escape `=`.\n\nAdditional resources are available under [RStudio Extensions - Connections](https://rstudio.github.io/rstudio-extensions/rstudio-connections.html ).",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "dependencies": {
+      "type": "includes",
+      "data": []
+    },
+    "preserve": {},
+    "postProcess": null
+  }
+}

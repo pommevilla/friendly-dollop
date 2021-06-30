@@ -1,0 +1,10 @@
+
+# Overview
+
+## Jupyter Sessions {.pro-header}
+
+RStudio Workbench allows you to launch Jupyter sessions from the home page via the Job Launcher, if configured. Users have the option of starting either JupyterLab or Jupyter Notebook sessions that allow them to work with Jupyter while still working within the administrative framework provided by RStudio, such as authentication, PAM session management, etc. 
+
+::: {.callout-note}
+Before Jupyter sessions can be launched, the Job Launcher must be setup correctly. For more information, see the [Job Launcher](../job_launcher/job_launcher.qmd) section.
+:::

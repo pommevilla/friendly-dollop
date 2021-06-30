@@ -1,0 +1,50 @@
+## Authentication Migration
+
+It is possible to migrate between the supported authentication mechanisms.
+
+### Migrating from PAM
+
+Your local system accounts currently used with PAM can be used for Single Sing-On (SSO) authentication with SAML or OpenID. Ensure that:
+
+- The existing PAM configuration is configured for [PAM & Provisioning](pam_basics.qmd#pam-provisioning), as suggested above.
+- RStudio is configured with [PAM Sessions](../r_sessions/pam_sessions.qmd) if your local system accounts are maintained by `sssd`.
+- RStudio is configured with the appropriate SSO authentication mechanism.
+- The configured SAML attribute or OpenID claim for username from your Identity Management system matches the names of your **existing** local system accounts.
+
+::: {.callout-important}
+ If PAM was used with Kerberos, please note that the credential forwarding functionality offered by Kerberos is only possible with PAM and it cannot be leveraged directly by RStudio when using SSO.
+:::
+
+
+### Migrating to PAM
+
+Since all other authentication methods already leverage PAM in some degree, there's no actual migration to PAM. You should only make sure PAM is configured for authenticating the existing users and configure RStudio to use PAM.
+
+### Migrating from Proxied authentication
+
+Your local system accounts currently used with Proxied authentication can be used for Single Sing-On (SSO) authentication with SAML or OpenID. Ensure that:
+
+- If RStudio is placed under a different path by the proxy (e.g., `example.com/rstudio`), be sure to check the "Proxy Considerations" sections under [SAML Single Sign-On Authentication](saml_sso.qmd) or [OpenID Connect Authentication](openid_connect_authentication.qmd) for additional options your proxy or RStudio configuration may need.
+- RStudio is configured with the appropriate SSO authentication mechanism.
+- The configured SAML attribute or OpenID claim for username match the names of your **existing** local system accounts as they were sent by the proxy in the HTTP header for username.
+
+### Migrating to Proxied authentication
+
+::: {.callout-note}
+This migration is not recommended unless none of the other existing authentication mechanisms are sufficient for your organization's needs.
+:::
+
+If [Migrating from PAM], you can follow the same recommendations listed above for SSO, noting that the HTTP header for username must match existing accounts. If migrating from SAML or OpenID, the same observation on the HTTP header for username applies.
+
+### Migrating from Google accounts
+
+Migrating from Google accounts is similar to [Migrating from PAM] to SSO, or [Migrating to PAM].
+
+::: {.callout-important}
+**Google accounts have been deprecated** and we strongly recommend against migrating to this authentication.
+:::
+
+::: {.callout-note}
+If you are currently using Google accounts for authentication, the migration from Google accounts to OpenID using Google itself as the OpenID provider is not yet supported. We recommend to keep using Google accounts or migrating to some other **non-Google** SSO authentication.
+:::
+

@@ -1,0 +1,103 @@
+## Kerberos {.pro-header}
+
+You can use PAM sessions to arrange for [Kerberos](https://en.wikipedia.org/wiki/Kerberos_\(protocol\)) tickets to be made available for use by R sessions. This is accomplished using the [pam_sss](https://linux.die.net/man/8/pam_sss) PAM module. Note that you may need to install this module separately depending on which Linux distribution/version you are running.
+
+### Configuration
+
+::: {.callout-note}
+You should be sure to understand the previous section on [PAM Sessions](pam_sessions.qmd) before attempting to modify your configuration to support Kerberos.
+:::
+
+The following are simple examples of the `pam_sss` and `sssd.conf` configuration directives you would need to add to use Kerberos with RStudio. Note that the sssd Kerberos backend supports a large number of options, some of which may be required to get Kerberos working correctly in your environment. You should consult the [documentation](https://linux.die.net/man/5/sssd-krb5) before proceeding to ensure you've specified all options correctly.
+
+::: {.callout-important}
+If you are migrating your Kerberos settings from the now deprecated `pam_krb5` to `pam_sss`, consult the [pam_krb5 migration documentation](https://sssd.io/docs/users/pam_krb5_migration.html) for additional information.
+:::
+
+
+The main PAM profile for RStudio should be modified to include the following `pam_sss` directives:
+
+```ini
+# /etc/pam.d/rstudio
+auth       sufficient     pam_sss.so
+account    required       pam_sss.so
+session    requisite      pam_sss.so
+```
+
+In addition to modifying the main PAM profile, you will also need to create a custom PAM session profile for RStudio (as described in [Creating a Custom Profile](pam_sessions.qmd#creating-a-custom-profile)). This needs to include the appropriate `pam_sss` directives. For example:
+
+```ini
+# /etc/pam.d/rstudio-session
+auth        required      pam_sss.so
+account     [default=bad success=ok user_unknown=ignore] pam_sss.so
+password    sufficient    pam_sss.so use_authtok
+session     requisite     pam_sss.so
+```
+
+Note that typically when you create a custom PAM session profile you include the `auth sufficient pam_rootok.so` directive. However, in the case of configuring for Kerberos authentication you do not want this directive, rather you need to specify that authentication is done by Kerberos using an explicit password as illustrated in the above example.
+
+To ensure that the custom PAM session profile is used by RStudio Workbench and that PAM passwords are correctly forwarded to `pam_sss` you'll also need to add the following entries to the `rserver.conf` config file:
+
+```ini
+# /etc/rstudio/rserver.conf
+auth-pam-sessions-profile=rstudio-session
+auth-pam-sessions-use-password=1
+```
+
+Finally, you will need to specify Kerberos settings in `sssd.conf` (usually located at `/etc/sssd/sssd.conf`). For more information on SSSD configuration, see the [sssd.conf documentation](https://linux.die.net/man/5/sssd.conf) and the [sssd-krb5 documentation](https://linux.die.net/man/5/sssd-krb5).
+
+```ini
+# /etc/sssd/sssd.conf
+[sssd]
+services = nss, pam
+
+# replace this with a comma-separated list of your configured SSSD domains
+domains = TEST.EXAMPLE.COM
+
+[domain/TEST.EXAMPLE.COM]
+# can also be set to ad or local depending on your authentication setup
+id_provider = ldap
+
+auth_provider = krb5
+
+# replace with the name of your Kerberos realm
+krb5_realm = TEST.EXAMPLE.COM
+
+# we recommend setting the debug level high to make troubleshooting easier
+debug_level = 5
+
+krb5_validate = true
+
+# note that RHEL-7 default to KERNEL ccaches, which are preferred in most cases to FILE
+krb5_ccachedir = /var/tmp
+
+krb5_keytab = /etc/krb5.keytab
+```
+
+Some additional notes regarding configuration:
+
+- The `debug` setting in `sssd.conf` is not required however we recommend adding it as it makes troubleshooting much more straightforward.
+
+- The examples above are not *complete* examples but rather illustrations of the `pam_sss` and `sssd.conf` entries that need to be present. Your local environment may have many additional entries which you should ensure are also included as necessary.
+
+You should be sure to suspend active R sessions and to restart RStudio after making configuration changes to ensure that the new settings are being used. You can do this as follows:
+
+```bash
+sudo rstudio-server force-suspend-all
+sudo rstudio-server restart
+```
+
+### Testing and Troubleshooting
+
+After making the required configuration changes you should test your updated PAM configuration in isolation from RStudio using the `pamtester` utility as described in [Diagnosing PAM Authentication Problems](../authenticating_users/pam_authentication.qmd#diagnosing-pam-authentication-problems). The following command will test both authentication as well as issuing of Kerberos tickets:
+
+```bash
+sudo /usr/lib/rstudio-server/bin/pamtester --verbose \
+  rstudio-session <user> authenticate setcred open_session
+```
+
+Note that you should substitute an actual local username for the `<user>` part of the command line.
+
+The specifics of both PAM configuration and Kerberos configuration can vary substantially by environment. As a result correct configuration likely requires additional entries and options which this guide isn't able to cover. Please refer to the documentation linked to in [More Resources] as well as the [pam_krb5](http://www.eyrie.org/~eagle/software/pam-krb5/pam-krb5.html) for additional details.
+
+

@@ -1,0 +1,18 @@
+# Overview
+
+## VS Code Sessions {.pro-header}
+
+RStudio Workbench allows you to launch VS Code sessions from the home page via the Job Launcher, if configured. Users can start VS Code sessions that allow them to work with VS Code while still working within the administrative framework provided by RStudio, such as authentication, PAM session management, etc.
+
+::: {.callout-note}
+Before VS Code sessions can be launched, the Job Launcher must be setup correctly. For more information, see the [Job Launcher](../job_launcher/job_launcher.qmd) section.
+:::
+
+::: {.callout-note}
+RStudio is not affiliated with Microsoft. Your usage of the open source code-server and VS Code are subject to their respective licenses: see [here](https://github.com/cdr/code-server/blob/master/LICENSE.txt) and [here](https://github.com/microsoft/vscode/blob/master/LICENSE.txt).
+:::
+
+### RStudio Workbench Extension
+
+VS Code sessions are intended to be used with the RStudio Workbench VS Code extension installed. The extension provides users with a button to open the RStudio Workbench homepage in a new tab. Because VS Code sessions are running remotely, any web server a user may be developing, such as Shiny, Dash, or Streamlit, will also be running remotely. The RStudio Workbench VS Code extension allows users to access these remote web servers through their browser. If the extension is not installed, VS Code sessions will launch but without the additional features; users working on these types of apps will not be able to access the servers they are running on.
+

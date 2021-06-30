@@ -1,0 +1,346 @@
+## Configuration {#launcher-configuration}
+
+### Job Launcher Configuration
+
+Before the Job Launcher can be run, it must be properly configured via the config file `/etc/rstudio/launcher.conf`; see the [Job Launcher documentation](https://docs.rstudio.com/job-launcher/1.4.1717-3/index.html) for supported configuration options. If the Launcher was installed with RStudio Workbench, a default working configuration that uses the Local plugin is installed for your convenience.
+
+The Launcher configuration parameter `admin-group` should be configured to the group value of the RStudio Workbench server user, specified in the `server-user` configuration parameter in `rserver.conf` (which defaults to  rstudio-server). This makes the server user a Job Launcher admin, which is necessary to properly launch sessions on behalf of other users.
+
+### RStudio Workbench Integration
+
+RStudio Workbench must be configured in order to integrate with the Job Launcher. There are several files which house the configuration, and they are described within subsequent sections.
+
+#### Server Configuration
+
+The RStudio Workbench process `rserver` must be configured to communicate with the Job Launcher in order to enable session launching. The following table lists the various configuration options that are available to be specified in the `rserver.conf` configuration file:
+
+**/etc/rstudio/rserver.conf**
+
+Config Option | Description | Required (Y/N) | Default Value
+------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------------------
+launcher-sessions-enabled | Enables launching of rsession processes via the Job Launcher. This must be enabled to use the Job Launcher. | **N** | 0
+launcher-address | TCP host/IP of the launcher host, or unix domain socket path (must match `/etc/rstudio/launcher.conf` configuration value). If using the default launcher configuration that ships with RStudio, this should be `localhost` (assuming you run the launcher side-by-side with RStudio Workbench). | **Y** |
+launcher-port | Port that the launcher is listening on. Only required if not using unix domain sockets. If using the default launcher configuration that ships with RStudio, this should be `5559`. | **Y** |
+launcher-default-cluster | Name of the cluster to use when launching sessions. Can be overridden by the launching user. | **N** |
+launcher-sessions-callback-address | Address (HTTP or HTTPS) of RStudio Workbench that will be used by launcher sessions to communicate back for project sharing and launcher features. The address must be the reachable address of the `rserver` process from the host that will be running `rsession`, which in the case of launcher sessions can be on a different network segment entirely. If RStudio is configured to use SSL, you must also ensure that the callback address hostname matches the FQDN of the Common Name or one of the Subject Alternate Names on the HTTPS certificate. See the example configuration below for more details. | **Y** |
+launcher-sessions-callback-verify-ssl-certs | Whether or not to verify SSL certificates when Launcher sessions are connecting to RStudio. Only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes. | **N** | 1 |
+launcher-use-ssl | Whether or not to connect to the launcher over HTTPS. Only supported for connections that do not use unix domain sockets. | **N** | 0
+launcher-verify-ssl-certs  | Whether or not to verify SSL certificates when connecting to the launcher. Only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes. | **N** | 1 |
+launcher-sessions-clusters | Whitelist of clusters to allow for submitting interactive session jobs to. The default allows all job launcher clusters to run interactive sessions. | **N** |
+launcher-adhoc-clusters | Whitelist of clusters to allow for submitting adhoc jobs from the Launcher pane. The default allows all job launcher clusters to run adhoc jobs. | **N** |
+launcher-sessions-container-image | The default container image to use when creating sessions. Only required if using a plugin that requires containerization. If none is specified, the Job launcher-specified default will be used, if the plugin supports it. | **N** |
+launcher-sessions-container-images | Comma-separated list of images which may be used for launching sessions. Used to filter out incompatible entries from the UI when a user is selecting an image to use for running the session. Leave blank to allow all images to be used. | **N** |
+launcher-adhoc-container-images | Comma-separated list of images which may be used for launching adhoc jobs. Used to filter out incompatible entries from the UI when a user is selecting an image to use for running an adhoc job. Leave blank to allow all images to be used. | **N** |
+launcher-sessions-container-run-as-root | Whether or not to run as root within the session container. We recommend you do not use this in most cases. | **N** | 0
+launcher-sessions-create-container-user | Whether or not to create the session user within the container. Only applicable if using container sessions and not running containers as root. The created user will have the same UID, GID, home directory, and login shell as the user that launched the session. It is recommended that this option be used, unless your containers connect to an LDAP service to manage users and groups. The container starts as root so it can create the correct user and group ids, then drops privilege to use the created user account. If it cannot drop privilege the container will fail to start. | **N** | 1
+launcher-sessions-forward-container-environment | Whether or not to forward any container environment variables to the session. This is useful for example, propogating Kubernetes secrets to the sesion. However, the variables `USER`, `HOME`, and `LOGNAME` are not forwarded, and are loaded from the user's passwd entry. | **N** | 1
+launcher-sessions-connection-timeout-seconds | Number of seconds to allow for making the initial connection to a launcher session. Connection failures are retried automatically - this is simply to prevent unreachable hosts from hanging the retry process as the default connection timeout on most systems is very high. Only change this if you are having trouble connecting to sessions. A value of 0 indicates that there should be no timeout (system default). | **N** | 3
+launcher-sessions-container-forward-groups | Whether or not to forward the user's supplemental groups to the created containers. This will only be done when not creating the container user, and when running the container as a non-root user, such as if integrating with LDAP. This is enabled by default, but if group lookups are very expensive in your environment and supplemental groups are not necessary, this can be disabled. | **N** | 1
+
+For example, your `rserver.conf` file might look like the following:
+
+```ini
+# /etc/rstudio/rserver.conf
+launcher-address=localhost
+launcher-port=5559
+launcher-sessions-enabled=1
+launcher-default-cluster=Kubernetes
+
+# the callback address that launcher sessions will reconnect to rserver on
+# since our Kubernetes jobs run on a different network segment, this needs
+# to be the routable IP address of the web server servicing RStudio traffic
+# (routable from the point of view of any Kubernetes nodes)
+launcher-sessions-callback-address=http://10.15.44.30:8787
+
+launcher-use-ssl=1
+launcher-sessions-container-image=rstudio:R-3.5
+launcher-sessions-container-run-as-root=0
+launcher-sessions-create-container-user=1
+```
+
+#### SSL Considerations
+
+Both RStudio Workbench and the Job Launcher can be configured to use SSL. When the Launcher is configured to use SSL, the RStudio Workbench node(s) that are connecting to the Launcher must ensure that the hostname configured in the `launcher-address` field matches the FQDN of the Common Name or Subject Alternate Name of the certificate that is presented by the Launcher. If the hostnames do not match exactly, SSL verification will fail, and RStudio will be unable to connect to the Job Launcher.
+
+Similarly, if RStudio Workbench is configured to use SSL, the hostname configured in the `launcher-sessions-callback-address` field must match the FQDN of the Common Name or Subject Alternate Name of the certificate that is presented by RStudio. Failure to do so will cause certificate verification to fail when sessions attempt to connect to RStudio, preventing you from using Job Launcher functionality such as starting Launcher jobs.
+
+Additionally, both the RStudio Workbench and Job Launcher root certificates need to be imported into the trusted root certificate store on the systems that are accessing those addresses. For example, the Workbench server nodes need to have the Job Launcher root certificate installed in their trusted certificate store to ensure that certificate verification works correctly. The exact steps for importing a certificate into the trusted root store are operating system specific and outside of the scope of this document.
+
+#### Job Launcher and PAM Sessions
+
+PAM Sessions work slightly differently when used with Launcher sessions. See [PAM Sessions with the Job Launcher](../r_sessions/pam_sessions.qmd#pam-sessions-with-the-job-launcher) for more information.
+
+#### Authentication
+
+RStudio Workbench authenticates with the Job Launcher via the `secure-cookie-key` file, a secret key that is read on startup of both the launcher and RStudio which is only readable by the root account. The file is present at `/etc/rstudio/secure-cookie-key`. If the Job Launcher is running on a different machine than RStudio Workbench, you will need to make sure that the exact same `secure-cookie-key` file is present on both machines.
+
+To do this, create a secure cookie key file on one of the nodes like so:
+
+```bash
+# generate secure-cookie-key as a simple UUID
+sudo sh -c "echo `uuid` > /etc/rstudio/secure-cookie-key"
+
+# ensure that the cookie is only readable by root
+sudo chmod 0600 /etc/rstudio/secure-cookie-key
+```
+
+Once this file has been created, copy it to the other node to the same location so that both services use the same key. Alternatively, you could accomplish this via a symlink to a location on a file share.
+
+The path to the `secure-cookie-key` file can be changed, but it is not recommended in most cases. If you need to change it, it can be done by adding the following line to the `/etc/rstudio/rserver.conf` and `/etc/rstudio/launcher.conf` configuration files:
+
+```bash
+secure-cookie-key-file=/path/to/secure-cookie-key
+```
+
+When running Launcher sessions in a load balanced RStudio deployment, sessions do additional authorization verification to ensure that they are only used by the user that created them. This is accomplished by an RSA key pair, located at `/etc/rstudio/launcher.pem` and `/etc/rstudio/launcher.pub`. These files must be the same on every RStudio node, or users will be unable to use their sessions on multiple nodes.
+
+In order to create the RSA files, run the following commands:
+
+```bash
+sudo openssl genpkey -algorithm RSA -out /etc/rstudio/launcher.pem -pkeyopt rsa_keygen_bits:2048
+sudo openssl rsa -in /etc/rstudio/launcher.pem -pubout > /etc/rstudio/launcher.pub
+sudo chmod 0600 /etc/rstudio/launcher.pem"
+```
+
+You must ensure that the above private key (.pem) file is owned by root and has `600` permissions, as it *must* remain secret to your users.
+
+Once the files are created, simply copy them to each RStudio node in your cluster.
+
+#### Launcher Sessions
+
+It is recommended that you configure the Shared Storage path (see [Shared Storage](../r_sessions/project_sharing.qmd#shared-storage) for configuration) in a location that will be reachable both by the RStudio Workbench instance and each Launcher Session in order to support various RStudio features. Failure to do so could cause subtle, unintended issues.
+
+See the [Launcher Mounts] section for more details about how to configure this correctly with [Containerized Sessions].
+
+#### Containerized Sessions
+
+In order to run your R sessions in containers, you will need a Docker image that contains the necessary `rsession` binaries installed. RStudio provides an official image for this purpose, which you can get from [Docker Hub](https://hub.docker.com/r/rstudio/r-session-complete).
+
+For example, to get the RHEL6 image, you would run:
+
+```bash
+docker pull rstudio/r-session-complete:centos7
+```
+
+After pulling the desired image, you will need to create your own Dockerfile that extends from the r-session-complete image and adds whatever versions of R you want to be available to your users, as well as adding any R packages that they will need. For example, your Dockerfile should look similar to the following:
+
+```bash
+FROM rstudio/r-session-complete:centos7
+
+# install desired versions of R
+RUN yum install -y R
+
+# install R packages
+...
+```
+
+See [Docker Hub](https://hub.docker.com/r/rstudio/r-session-complete) for more information.
+
+##### Launcher Mounts
+
+When creating containerized sessions via the Job Launcher, you will need to specify mount points as appropriate to mount the users' home drives and any other desired paths. In order for sessions to run properly within containers, it is **required** to mount the home directories into the containers, as well as any directories containing per-user state (e.g., a customized `XDG_DATA_HOME`). The home mount path within the container must be the same as the user's home path as seen by the RStudio Workbench instance itself (generally, `/home/{USER}`).
+
+To specify mount points, modify the `/etc/rstudio/launcher-mounts` file to consist of multiple mount entries separated by a blank line. The following table lists the fields that are available for each mount entry in the file.
+
+Field | Description | Required (Y/N) | Default Value
+---------------- | -------------------------------------------------- | --- | --------
+MountType | The type of mount. Can be `Host`, `NFS`, `CephFs`, `GlusterFs`, `AzureFile`, `KubernetesPersistentVolumeClaim`, or `Passthrough` | **Y**
+MountPath | The path within the container that the directory will be mounted to. | **Y** |
+ReadOnly | Whether or not the mount is read only. Can be true or false. | **N** | false
+JobType | What type of jobs the mount is applied to. Can be `session`, `adhoc`, or `any`. | **N** | any
+Workbench | What type of workbench the mount is applied to. Can be `rstudio`, `jupyterlab`, `jupyter notebook`, `vs code`, or `any`. | **N** | any
+Cluster | The specific cluster that this mount applies to. Applies to all clusters if not specified. | **N** |
+
+Depending on the `MountType` specified above, different settings may be used to control the mount.
+
+**MountType: Host**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+Path | The source directory of the mount, i.e. where the mount data comes from. | **Y**
+
+**MountType: NFS**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+Path | The source directory of the mount, i.e. where the mount data comes from. | **Y**
+Host | The NFS host name for the NFS mount. | **N**
+
+**MountType: CephFs**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+Monitors | A comma-separated list of Ceph monitor addresses. For example: `192.168.1.200:8765,192.168.1.200:8766` | **Y**
+Path | The path within the Ceph filesystem to mount | **N**
+User | The Ceph username to use | **N**
+SecretFile | The file which contains the Ceph keyring for authentication | **N**
+SecretRef | Reference to Ceph authentication secrets, which overrides `SecretFile` if specified | **N**
+
+**MountType: GlusterFs**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+Endpoints | The name of the endpoints object that represents a Gluster cluster configuration | **Y**
+Path | The name of the GlusterFs volume | **Y**
+
+**MountType: AzureFile**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+SecretName | The name of the secret that contains both the Azure storage account name and the key | **Y**
+ShareName | The share name to be used
+
+**MountType: KubernetesPersistentVolumeClaim**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+ClaimName | The name of the Kubernetes Persistent Volume Claim to use | **Y**
+
+**MountType: Passthrough**
+
+Field | Description | Required (Y/N)
+------ | ---------------------------------------------- | ----
+FilePath | Path to a file that contains the raw JSON object representing the mount, which is sent directly to the back-end without transformation | **Y**
+
+Note that for many mount types, paths may contain the special variable `{USER}` to indicate that the user's name be substituted, enabling you to mount user-specific paths.
+
+An example `/etc/rstudio/launcher-mounts` file is shown below.
+
+```ini
+# /etc/rstudio/launcher-mounts
+# User home mount - This is REQUIRED for the session to run
+MountType: NFS
+Host: nfs01
+Path: /home/{USER}
+MountPath: /home/{USER}
+ReadOnly: false
+
+# Shared code mount
+Cluster: Kubernetes
+MountType: NFS
+Host: nfs01
+Path: /dev64
+MountPath: /code
+ReadOnly: false
+
+# Only mount the following directory when the user is launching a JupyterLab session
+Cluster: Kubernetes
+Workbench: JupyterLab
+MountType: CephFs
+Monitors: 127.0.0.1:8080,127.0.0.1:8081
+SecretFile: /etc/secrets/ceph
+ReadOnly: true
+```
+
+It is important that each entry consists of the fields as specified above. Each field must go on its own line. There should be no empty lines between field definitions. Each entry must be separated by one full blank line (two new-line `\n` characters).
+
+If you choose to run your containers as root, the user home drive **must** be mapped to `/root`. For example:
+
+```ini
+# /etc/rstudio/launcher-mounts
+MountType: NFS
+Host: nfs01
+Path: /home/{USER}
+MountPath: /root
+ReadOnly: false
+```
+
+As noted in the [Launcher Sessions] section, it is recommended that you also mount the Shared Storage path (see [Shared Storage] for configuration) into the session container to support various RStudio features. When mounting the shared storage path, ensure that the folder is mounted to the same path within the container to ensure that the `rsession` executable will correctly find it. For example:
+
+```ini
+# /etc/rstudio/launcher-mounts
+MountType: NFS
+Host: nfs01
+Path: /rstudio/shared-storage
+MountPath: /rstudio/shared-storage
+ReadOnly: false
+```
+
+##### Launcher Environment
+
+You may optionally specify environment variables to set when creating launcher sessions.
+
+To specify environment overrides, modify the `/etc/rstudio/launcher-env` file to consist of multiple environment entries separated by a blank line. The following table lists the fields that are available for each environment entry in the file.
+
+Field | Description | Required (Y/N) | Default Value
+---------------- | -------------------------------------------------- | --- | --------
+JobType | What type of jobs the environment value(s) is applied to. Can be `session`, `adhoc`, or `any`. | **N** | any
+Workbench | What type of workbench the mount is applied to. Can be `rstudio`, `jupyterlab`, `jupyter notebook`, `vs code`, or `any`. | **N** | any
+Cluster | The specific cluster that the environment applies to. Applies to all clusters if not specified. | **N** |
+Environment | The environment variables to set, one per line (each subsequent line must be indented with an arbitrary amount of spaces or tabs), in the form of `KEY=VALUE` pairs. | **N** |
+
+Additionally, you can use the special `{USER}` variable to specify the value of the launching user's username, similar to the mounts file above.
+
+An example `/etc/rstudio/launcher-env` file is shown below.
+
+```ini
+# /etc/rstudio/launcher-env
+JobType: session
+Environment: IS_LAUNCHER_SESSION=1
+ IS_ADHOC_JOB=0
+ USER_HOME=/home/{USER}
+
+JobType: adhoc
+Environment: IS_LAUNCHER_SESSION=0
+ IS_ADHOC_JOB=1
+ USER_HOME=/home/{USER}
+
+JobType: any
+Cluster: Kubernetes
+ENVIRONMENT: IS_KUBERNETES=1
+```
+
+If you do not need to set different environment variables for different job types or different clusters, you may simply specify `KEY=VALUE` pairs, one per line, which will be applied to all launcher ad-hoc jobs and sessions. For example:
+
+```ini
+IS_LAUNCHER_JOB=1
+USER_HOME=/home/{USER}
+```
+
+##### Launcher Ports
+
+You may optionally specify ports that should be exposed when creating containerized jobs. This will allow the ports to be exposed within the host running the container, allowing the ports to be reachable from external services. For example, for Shiny applications to be usable, you must expose the desired Shiny port, otherwise the browser window will not be able to connect to the Shiny application running within the container.
+
+To specify exposed ports, modify the `/etc/rstudio/launcher-ports` file to consist of multiple port entries separated by a blank line. The following table lists the fields that are available for each port entry in the file.
+
+Field | Description | Required (Y/N) | Default Value
+---------------- | -------------------------------------------------- | --- | --------
+JobType | What type of jobs the port(s) is applied to. Can be `session`, `adhoc`, or `any`. | **N** | any
+Workbench | What type of workbench the mount is applied to. Can be `rstudio`, `jupyterlab`, `jupyter notebook`, `vs code`, or `any`. | **N** | any
+Cluster | The specific cluster that this set of ports applies to. Applies to all clusters if not specified. | **N** |
+Ports | The ports to expose, one per line (each subsequent line must be indented with an arbitrary amount of spaces or tabs). | **N** |
+
+An example `/etc/rstudio/launcher-ports` file is shown below.
+
+```ini
+# /etc/rstudio/launcher-ports
+JobType: adhoc
+Ports: 6210
+ 6143
+ 6244
+ 6676
+
+# additional Kubernetes ports to expose
+JobType: adhoc
+Cluster: Kubernetes
+Ports: 4434
+```
+
+If you do not need to set different exposed ports for different job types or different clusters, you may simply specify port values, one per line, which will be applied to all launcher ad-hoc jobs and sessions. For example:
+
+```ini
+# /etc/rstudio/launcher-ports
+5873
+5874
+64234
+64235
+```
+
+#### Containerized Adhoc Jobs
+
+To run adhoc jobs in containers from the Launcher pane, you need a Docker image containing the bash shell and the desired version of R on the path.
+
+The adhoc job container will run using the same userId and groupId value as the RStudio user. In order for scripts under the home directory to be found in the container, the home directory must be mounted with the same absolute path inside the container.
+
+Jobs started from the RStudio console via `rstudioapi::launcherSubmitJob()` have no specific container requirements.
+

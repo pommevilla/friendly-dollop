@@ -1,0 +1,18 @@
+{
+  "hash": "6f9d2045ed7317759abf62454d1ee095",
+  "result": {
+    "markdown": "--- \ntitle: \"RStudio Workbench {{< var version >}}\"\nsubtitle: \"Administration Guide\"\ndate: \"2021-06-28\"\n---\n\nRStudio Server enables you to provide a browser based interface (the RStudio IDE) to a version of R running on a remote Linux server. Deploying R and RStudio on a server has a number of benefits, including:\n\n- The ability to access R sessions from any computer in any location;\n- Easy sharing of code, data, and other files with colleagues;\n- Allowing multiple users to share access to the more powerful compute resources (memory, processors, etc.) available on a well equipped server; and\n- Centralized installation and configuration of R, R packages, TeX, and other supporting libraries.\n\nThis manual describes *RStudio Workbench*, which adds many enhancements to the open-source version of RStudio Server, including:\n\n- The ability to run multiple concurrent RStudio IDE sessions per-user.\n- Flexible use of multiple versions of R on the same server.\n- The ability to run sessions on external cluster nodes, such as Kubernetes or Slurm.\n- Support for Jupyter, JupyterLab, and VS Code editor sessions.\n- Project sharing for easy collaboration within workgroups.\n- Load balancing for increased capacity and higher availability.\n- An administrative dashboard that provides insight into active sessions, server health, and monitoring of system-wide and per-user performance and resource metrics;\n- Authentication using system accounts, ActiveDirectory, LDAP, SAML, OpenID, or Google Accounts;\n- Full support for PAM (including PAM sessions for dynamically provisioning user resources);\n- Ability to establish per-user or per-group CPU priorities and memory limits;\n- HTTP enhancements including support for SSL and keep-alive for improved performance;\n- Ability to restrict access to the server by IP;\n- Customizable server health checks; and\n- Suspend, terminate, or assume control of user sessions; Impersonate users for assistance and troubleshooting.\n\nThe documentation applies to both RStudio Server (Open Source) and RStudio Workbench (Pro), unless the section is specifically marked `Pro`, in which case it only applies to RStudio Workbench.",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "dependencies": {
+      "type": "includes",
+      "data": []
+    },
+    "preserve": {},
+    "postProcess": null
+  }
+}

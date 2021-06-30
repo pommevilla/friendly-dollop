@@ -1,0 +1,26 @@
+---
+aliases:
+  - access-and-security.html#additional-security-considerations
+---
+
+## Additional Security Considerations
+
+To help mitigate against CSRF attacks, RStudio can automatically reject any request originating from an `Origin` or `Referer` that does not match the `Host`, `X-Forwarded-Host`, `Forwarded: host` or `X-RStudio-Request` headers. To enable this check, add the following configuration:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-enable-origin-check=1
+```
+
+In some cases, such as if running behind a proxy that you cannot modify, this check may be too strict, and can prevent access to RStudio, causing requests to return a 400 status. In such cases, it is recommended that you disable the check. Origin checking is currently disabled by default, but will likely be enabled by default in a future version of RStudio. 
+
+You may wish to consider some origins to be safe in all cases, causing RStudio to consider such `Origin` or `Referer` values to be allowed instead of being rejected, even if they do not match a Host header. To specify such origins, add each of them as a `www-allow-origin` setting in `rserver.conf`. For example:
+
+```ini
+# /etc/rstudio/rserver.conf
+www-allow-origin=mysubdomain.mydomain.com
+www-allow-origin=*.mydomain2.com
+``` 
+
+Note that wildcards (`*`) are accepted and will match any character, including hostname separators. For instance, the previous example of `*.mydomain2.com` will match both `foo.bar.mydomain2.com` and `foo.mydomain2.com`.
+

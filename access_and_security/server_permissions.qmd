@@ -1,0 +1,50 @@
+---
+aliases:
+  - access-and-security.html#server-permissions
+---
+
+## Server Permissions 
+
+### Server Account
+
+RStudio runs as the system root user during startup and then drops this privilege and runs as a more restricted user. RStudio then re-assumes root privilege for a brief instant when creating R sessions on behalf of users (the server needs to call `setresuid` when creating the R session, and this call requires root privilege). 
+
+The user account that RStudio runs under in the normal course of operations is `rstudio-server`. This account is automatically added to the system during installation and is created as a system rather than end user account (i.e. the `--system` flag is passed to `useradd`).
+
+#### Alternate Server Account
+
+You can configure RStudio so that it will run from an alternate account with the following steps:
+
+1. Create a new system user (if the one you want to use doesn't already exist)
+2. Assign this user to the `server-user` option in the `/etc/rstudio/rserver.conf` configuration file (see example below)
+3. Restart RStudio
+
+For example, to shutdown the server and create a new system user named `rs-user` you'd use the following commands:
+
+```bash
+sudo rstudio-server stop
+sudo useradd --system rs-user
+```
+
+Then edit the `/etc/rstudio/rserver.conf` configuration file as follows:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-user=rs-user
+```
+
+Finally, restart RStudio to begin running under the new user:
+
+```bash
+sudo rstudio-server start
+```
+
+### umask 
+
+By default, RStudio sets its umask to `022` on startup. If you don't want this behavior, for instance because you'd prefer the server process to use the default umask set in init, it can be disabled as follows:
+
+```ini
+# /etc/rstudio/rserver.conf
+server-set-umask=0
+```
+

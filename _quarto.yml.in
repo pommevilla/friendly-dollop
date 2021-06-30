@@ -6,7 +6,7 @@ execute:
 
 site:
   title: "RStudio Workbench Administration"
-  subtitle: "Version 23.12.5-17"
+  subtitle: "Version ${CPACK_PACKAGE_VERSION}"
   downloads: [docx, pdf, epub]
   sharing: [twitter, facebook, linkedin]
   page-navigation: true

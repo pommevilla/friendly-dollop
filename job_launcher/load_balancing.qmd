@@ -1,0 +1,12 @@
+## Load Balancing
+
+Both RStudio Workbench and the Job Launcher services can be load balanced, providing maximum scalability and redundancy. When using the RStudio Workbench load balancer with the Launcher, it is generally sufficient to simply have each Workbench node point to its own node-local Launcher service via `rserver.conf` configuration - no external load balancer needs to control access to the Launcher itself.
+
+::: {.callout-note}
+In this mode, when using the local Launcher, sessions will be balanced according to the setting you have defined under `balancer` in */etc/rstudio/load-balancer*.
+:::
+
+However, in some cases, you may want to scale the Job Launcher separately from RStudio Workbench. For example, if your Launcher cluster needs to exist in a different network for security reasons, such as to limit node connectivity to backend services (e.g., Kubernetes). In such cases, you will need to scale the Job Launcher separately via an external load balancer, and Workbench should be configured to point to this load balanced instance of the Job Launcher. In most cases, the external load balancer should be configured for sticky sessions, which will ensure that each instance of Workbench connects to just one Job Launcher node, providing the most consistent view of the current job state. For more information on configuring the Job Launcher for load balancing, see the [Job Launcher documentation](https://docs.rstudio.com/job-launcher/1.4.1717-3/index.html).
+
+It should be noted that in most cases, load balancing is not needed for performance reasons, and is generally used for redundancy purposes.
+

@@ -1,0 +1,156 @@
+## Configuration
+
+### Jupyter configuration
+
+Configuration of the Jupyter feature is handled via the config file `/etc/rstudio/jupyter.conf`. Note that this file is not automatically created by RStudio, and must be created before being configured, and the Jupyter feature is disabled by default. The following table lists the various configuration options that are available to be specified in the `jupyter.conf` configuration file:
+
+**/etc/rstudio/jupyter.conf**
+
+Config Option | Description | Default Value
+------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------------------
+labs-enabled | Enables launching of JupyterLab sessions. | 0 (disabled)
+notebooks-enabled | Enabled launching of Jupyter Notebook sessions. | 0 (disabled)
+jupyter-exe | Path to the Jupyter executable. | /usr/local/bin/jupyter
+lab-command | The Jupyter command to run when starting a Lab session. | lab
+lab-version | The version of Jupyter Lab being used. If set to `auto`, the version is automatically detected by running the Jupyter Lab version command. If Jupyter is being launched via the Launcher and is not installed locally, you are strongly encouraged to set this to the version in use. Running against multiple different Jupyter versions simultaneously in different Launcher clusters is not supported - they must all be running the same version, or proxying issues will occur. | auto
+lab-args | Arguments to be passed to the Jupyter Lab command. Note that this does not override the default value - if you wish to use some of the default arguments, you must contain the default arguments in the configuration value. It is strongly recommended that you do not change this unless you know what you're doing! | \--no-browser \--allow-root \--ip=0.0.0.0 
+notebook-command | The Jupyter comman to run when starting a Notebook session. | notebook
+notebook-version | The version of Jupyter Notebook being used. If set to `auto`, the version is automatically detected by running the Jupyter Notebook version command. If Jupyter is being launched via the Launcher and is not installed locally, you are strongly encouraged to set this to the version in use. Running against multiple different Jupyter versions simultaneously in different Launcher clusters is not supported - they must all be running the same version, or proxying issues will occur. | auto
+notebook-args | Arguments to be passed to the Jupyter Notebook command. Note that this does not override the default value - if you wish to use some of the default arguments, you must contain the default arguments in the configuration value. It is strongly recommended that you do not change this unless you know what you're doing! | \--no-browser \--allow-root \--ip=0.0.0.0
+session-clusters | List of available Job Launcher clusters for launching Jupyter sessions. Leave blank to specify all clusters. |
+default-session-cluster | The default Job Launcher cluster to use when launching a Jupyter session. |
+default-session-container-image | The default container image to use when launching a containerized Jupyter session. |
+session-container-images | Comma-delimited list of images that may be used for running Jupyter sessions. |
+jupyter-session-path | Path to the Jupyter Session launcher executable/script. It is recommended that you do not change this unless you know what you're doing, and you need to point to a different script. | /usr/lib/rstudio-server/bin/jupyter-session-run
+session-no-profile | Enables/disables running of bash profile scripts when starting Jupyter sessions. | 0 (run profile scripts)
+session-cull-minutes | The amount of idle time to wait in minutes before a Jupyter session's kernels and terminals is automatically "culled" (shut down). To disable culling, set the value to `0`. Enabling this sets the following Jupyter arguments: `--MappingKernelManager.cull_interval=60 --MappingKernelManager.cull_idle_timeout=<60 * session-cull-minutes value>` | 120
+session-shutdown-minutes | The amount of idle time to wait in minutes before a Jupyter session is shut down after its kernels and terminals have been culled. To disable automatic shutdown, set the value to `0`. This setting sets the the following Jupyter arguments: `--NotebookApp.shutdown_no_activity_timeout=<60 * session-shutdown-minutes value> --LapApp.shutdown_no_activity_timeout=<60 * session-shutdown-minutes value>` | 5
+session-cull-connected | Whether or not to cull sessions that have a browser connected. Regardless of this setting, only idle (unused) sessions are culled. Sets the `--MappingKernelManager.cull_connected` Jupyter setting. | 1 (true)
+
+For example, your `jupyter.conf` file might look like the following:
+
+```ini
+# /etc/rstudio/jupyter.conf
+jupyter-exe=/usr/bin/jupyter
+labs-enabled=1
+notebooks-enabled=1
+session-cull-minutes=240
+default-session-cluster=Kubernetes
+default-session-container-image=rstudio:jupyter-session
+```
+
+### Jupyter Versions
+
+Currently, RStudio Workbench supports JupyterLab 2.x and 3.x, as well as Jupyter Notebooks 6.x. Due to differences between Jupyter versions, RStudio Workbench needs to know the versions of Jupyter Notebook and Jupyter Lab that are in use. They can be automatically detected by RStudio Workbench on start up by running the Jupyter command, or can be specified by using the `lab-version` and `notebook-version` settings in */etc/rstudio/jupyter.conf*. Automatic version detection is done if the default value of `auto` is used.
+
+If you are running Jupyter in a remote cluster like Kubernetes, you will need to manually specify the version of Jupyter if it is not locally installed or is not running the same version as the remote cluster. Due to differences in routing, running against multiple different versions of Jupyter in different Launcher clusters simultaneously is not supported - the versions must match in all clusters.
+
+You should specify a full Jupyter 3-part version number like so:
+
+```ini
+# /etc/rstudio/jupyter.conf
+lab-version=3.0.6
+notebook-version=6.2.0
+```
+
+### Launcher Configuration
+
+When creating containerized Jupyter sessions via the Job Launcher, you will need to specify mount points as appropriate to mount the users' home drives and any other desired paths. In order for sessions to run properly within containers, it is **required** to mount the home directories into the containers.
+
+For more information, see [Launcher Mounts](../job_launcher/configuration.qmd#launcher-mounts). Note that you can specify the `Workbench` with either `JupyterLab` or `Jupyter Notebook` to configure mount entries that should only be mounted for JupyterLab and Jupyter Notebook sessions, respectively.
+
+::: {.callout-note}
+If you are using NFSv3 for the shared storage for user home directories, you will need to set the `local_lock=all` NFS setting in /etc/fstab in order for Jupyter sessions to work properly. Failure to do this will cause Jupyter sessions to hang. For this reason, we strongly recommend the use of NFSv4 for Jupyter sessions. See the [NFS documentation](https://linux.die.net/man/5/nfs) for information on NFS settings.
+:::
+
+::: {.callout-note}
+Only a user's home folder is visible within Jupyter sessions. To access other folders, create symbolic links to them within the home folder. 
+:::
+
+
+### Container Configuration
+
+When running Jupyter sessions in containers, such as by using the Kubernetes Job Launcher plugin, you will need to ensure that the image(s) used to launch Jupyter sessions contain, at minimum, the following:
+
+1) Python 2.7 or Python 3.x
+2) JupyterLab and/or Jupyter Notebook installation
+3) RStudio session binaries
+4) If creating container users (see [Server Configuration](../job_launcher/configuration.qmd#server-configuration)), you must have the `libuser1-dev` or `libuser-devel` packages, depending on your platform to install the libuser library and development tools. 
+
+For ease of use, it is recommended that you use the `r-session-complete` Docker image as a base for any Jupyter session images you intend to create. This will allow you to use that one base image to provide Jupyter itself and a default version of Python, which you can extend if necessary to add/modify Jupyter versions or add additional versions of Python if desired. See [Docker Hub](https://hub.docker.com/r/rstudio/r-session-complete) for more information.
+
+### Installing the Jupyter Notebook Plugin
+
+RStudio Workbench can further integrate with Jupyter Notebooks by utilizing the `rsp-jupyter` Jupyter Notebook plugin. This plugin will automatically track and write recently opened notebooks to the Workbench homepage under the *Recent Projects* section, and also provides an easy way for users to leave their notebooks and return to the homepage.
+
+If running Workbench in containers via the `r-session-complete` Docker image, you do not need to install the Notebook plugin, as it comes with the container. Otherwise, to install and enable the plugin, run the following commands:
+
+```bash
+pip install rsp_jupyter
+jupyter-nbextension install --sys-prefix --py rsp_jupyter
+jupyter-nbextension enable --sys-prefix --py rsp_jupyter
+```
+
+If you need to uninstall the plugin for whatever reason, run the following command:
+
+```bash
+jupyter-nbextension uninstall --sys-prefix --py rsp_jupyter
+```
+
+To upgrade the plugin, you must first uninstall and then reinstall it.
+
+### Adding Python Environments to Jupyter
+
+You can add new Python virtual environments or conda environments to Jupyter as Python Kernels that users can select, allowing them to have flexibility in the Python versions they can use.
+
+The following steps show how to add a new Python virtualenv as a Kernel to Jupyter:
+
+1. Create the virtualenv or conda environment
+2. Add the environment as an iPython kernel
+3. Verify the kernel is available in Jupyter
+
+```bash
+# first, create the virtual env in a directory accessible by all users
+cd /opt/python-kernels
+
+# then make the virtualenv
+virtualenv myenv
+
+# alternatively, you can make a conda environment
+# conda create -n myenv
+
+# then, add the virtualenv to the Kernels list globally for all users
+sudo ipython kernel install --name "myenv" --display-name "My Python Environment"
+
+# finally, verify that the kernel is registered with Jupyter
+sudo jupyter kernelspec list
+```
+
+Once the Kernel is listed in the output of the `jupyter kernelspec list` command, it will be available for use in both JupyterLab and Jupyter Notebooks.
+
+To remove the kernel, simply run the following command:
+
+```bash
+sudo jupyter kernelspec remove "myenv"
+```
+
+For more information, see the [IPython docs](https://ipython.readthedocs.io/en/stable/install/kernel_install.html).
+
+### Installing JupyterLab Extensions
+
+With the release of JupyterLab 3, it is now easier for system administrator to add extensions to Jupyter by using `pip`. Simply `pip install` the extension you want, and it will show up in JupyterLab sessions launched from RStudio Workbench.
+
+For example, to install the `jupyterlab-kernelspy` extension using pip:
+
+```bash
+pip install jupyterlab-kernelspy
+```
+
+::: {.callout-note} 
+You will need to install the desired extensions on all Launcher nodes that are running JupyterLab sessions. For containerized sessions, the extension must be installed in the container image(s) that are used.
+:::
+
+There is no need to explicitly enable or disable the extension. Once installed, active sessions can see the extension after refreshing the browser. Other extensions can be found on the [Pypi.org site](https://pypi.org).
+
+In previous versions of JupyterLab, you needed to install packages from source and build them with `nodejs`. This flow is still supported, but installing prebuilt extensions via `pip` is much simpler. For more information, see the [JupyterLab extension docs](https://jupyterlab.readthedocs.io/en/stable/user/extensions.html).
+

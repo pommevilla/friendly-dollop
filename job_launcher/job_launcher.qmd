@@ -1,0 +1,10 @@
+# Overview
+
+## Job Launcher {.pro-header}
+
+The RStudio Job Launcher provides the ability for RStudio Workbench to start processes within various batch processing systems (e.g., Slurm) and container orchestration platforms (e.g., Kubernetes). RStudio Workbench integrates with the Job Launcher to allow you to run your R Sessions within your compute cluster software of choice, and allows you to containerize your sessions for maximum process isolation and operations efficiency. Furthermore, users can submit standalone adhoc jobs to your compute cluster(s) to run computationally expensive R scripts.
+
+::: {.callout-note}
+Integration with the Job Launcher is not enabled in all editions of RStudio Workbench. You can run `rstudio-server license-manager status` to see if the Launcher is enabled. If it isn't, contact <sales@rstudio.com> to purchase a license with the Job Launcher enabled.
+:::
+

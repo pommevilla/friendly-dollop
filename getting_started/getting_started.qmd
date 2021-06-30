@@ -1,0 +1,12 @@
+--- 
+title: "RStudio Workbench `r params$version`"
+subtitle: "Administration Guide"
+date: "`r Sys.Date()`"
+geometry: margin=1in
+fontsize: 11pt
+params:
+  version: 99.9.9-9
+---
+
+# Getting Started
+

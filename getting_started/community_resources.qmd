@@ -1,0 +1,3 @@
+## Community Resources
+
+RStudio provides a community website where open-source RStudio users can go to get help with issues related to RStudio Server, R, R code, and the various R packages available in the R ecosystem. If you have such an issue, please visit <https://community.rstudio.com> and post a message on the community forum, where other users and RStudio employees can help you.

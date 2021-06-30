@@ -1,0 +1,203 @@
+## Floating Licensing
+
+If you stop and start RStudio Workbench instances frequently, for instance because you're running them inside virtual machines or containers, you may wish to use floating licensing instead of traditional licensing.
+
+To use floating licensing, you run a small, lightweight server, which holds a license that grants you the right to run a certain number of concurrent RStudio Workbench instances.
+
+When RStudio Workbench starts, it will connect to the license server and obtain a temporary lease, releasing it when RStudio Workbench is stopped. Using this method, you can have any number of RStudio Workbench instances, so long as you do not run more instances at once than specified in your license.
+
+### Floating License Keys
+
+A license key which distributes floating license leases is not the same as a traditional license key, and the two cannot be used interchangeably. If you have purchased traditional license keys and wish to exchange them for a floating license key, or vice versa, please get in touch with RStudio customer support (<support@rstudio.com>).
+
+### The RStudio Workbench License Server
+
+The RStudio Workbench License server supplies licenses to RStudio Workbench. It is available for Linux, Mac, and Windows. A license server can supply licenses to any platform; for instance, you can run your license server on Windows and distribute licenses to RStudio Workbench instances running Linux.
+
+#### Linux 
+
+The [RStudio License Server site](https://www.rstudio.com/floating-license-servers/) contains Linux license server downloads for all RStudio products. Download and install the license server for RStudio Workbench. You then activate your license key with the command:
+
+```bash
+$ sudo dpkg -i rsp-license-server-1.1.2-x86_64.deb
+$ sudo rsp-license-server activate <product-key>
+$ sudo rsp-license-server start
+```
+
+The file `/etc/rsp-license-server.conf` contains configuration settings for the RStudio Workbench License server, including the network port to listen on and any proxy settings required for connecting to the Internet.
+
+#### Mac and Windows
+
+The [RStudio License Server site](https://www.rstudio.com/floating-license-servers/) contains downloads for the Mac and Windows license servers. These require a few additional configuration steps. They can be set up as follows (order is important):
+
+1. Download the license server (`TurboFloatServer`) appropriate to your platform, and place it in the directory where you wish it to run.
+2. Copy the file `/usr/lib/rstudio-server/bin/license-manager.conf` to the same directory as `TurboFloatServer`, and change its name to `TurboActivate.dat`.
+3. If activating online, run the command `TurboFloatServer.exe -a="ABCD-EFGH-IJKL-MNOP-QRST-UVWX"`.
+4. If activating offline, follow the [offline activation steps](https://wyday.com/limelm/help/turbofloat-server/#activate-offline). Note that it is necessary to supply the *fully qualified path* to file arguments to `TurboFloatServer`, even if they are in the same directory as the executable.
+5. After successful activation, `TurboFloatServer.exe -i` with administrator permissions. This will install the license server as a service that will start automatically and run in the background.
+
+For additional help with Mac and Windows license server installation and configuration, refer to the official [TurboFloat Server documentation](https://wyday.com/limelm/help/turbofloat-server/).
+
+### License Server Hardware Requirements
+
+While the license server is designed to distribute licenses to ephemeral virtual machines or containers, which may move freely between hosts, the license server *itself* must stay on the same physical host on which it was activated. 
+
+It is acceptable to run the license server inside a container or a virtual machine, as long as the container or the VM always runs on the same hardware. Stopping the license server, moving it to a different physical host, and starting it again will cause it to become deactivated. Because it's often impractical to try to ensure that the server only runs on a particular host, we recommend running the license server outside containers and virtualization software.  
+
+Note that the system requirements for the license server are very low, so it can be run on almost any server. If your environment will not allow for ensuring that the server stays on a single physical host, please contact <support@rstudio.com> to discuss alternate licensing options.
+
+### License Server Offline Activation
+
+The `rsp-license-server activate` command requires an internet connection. If your license server has no connection to the Internet it's also possible to perform an offline activation. The process for doing this on the license server is identical to the process used to activate RStudio Workbench offline. Generate an offline activation request as follows:
+
+```bash
+$ sudo rsp-license-server activate-offline-request <product-key>
+```
+
+Executing this command will print an offline activation request to the terminal which you should copy and paste and then send to RStudio customer support (<support@rstudio.com>). You will receive a reply with a file attachment that can be used to activate offline as follows:
+
+```bash
+$ sudo rsp-license-server activate-offline <activation-file>
+$ sudo rsp-license-server restart
+```
+
+### License Server Deactivation
+
+If you are permanently decommissioning your license server, or need to transfer its license to a different license server, you should deactivate (remove) its license as follows:
+
+```bash
+sudo rsp-license-server deactivate
+```
+
+### Using Floating Licensing
+
+Once your license server is up and running, you need to tell RStudio Workbench to use floating licensing instead of traditional licensing.
+
+```bash
+# /etc/rstudio/rserver.conf
+server-license-type=remote
+```
+
+The value `remote` indicates that RStudio Workbench should connect to a remote licensing server to obtain a license; the value `local` can be used to explicitly specify traditional (local) activation.
+
+Then, tell RStudio Workbench which licensing server to connect to:
+
+```bash
+$ sudo rstudio-server license-manager license-server <server-hostname-or-ip>
+$ sudo rstudio-server restart
+```
+
+You only need to run the `license-server` command once; RStudio Workbench saves the server name and will use it on each subsequent startup.
+
+Depending on your system configuration, it is possible that the RStudio Workbench service will be started before the service which allows hostname resolution (this is known to be the case for example on some Amazon EC2 systems). If this is the case, you'll want to specify the license server using a private IP address rather than a hostname, so that RStudio Workbench can acquire a license immediately when starting up.
+
+>**Note:** If you are renewing your floating license offline or if you want to move your floating license for RStudio Workbench to another system, then you should first perform license deactivation offline.
+
+To renew your floating license offline or to move your floating license, run the following to perform license deactivation offline:
+    
+```bash
+$ sudo rstudio-server deactivate-offline-request <product-key>
+```
+
+### Specifying a License Server 
+
+RStudio supports three methods for connecting to a license server. You can select the method by specifying the license server as follows:
+
+#### Connecting Over TCP
+
+*Example*
+
+```bash
+$ sudo rstudio-server license-manager license-server mylicensehost:9403
+```
+
+By default, the RStudio Workbench License Server listens via raw TCP on port 8989. If you specify the only the hostname or IP address of the license server, this the kind of connection you'll get.
+
+If you wish to use a different port, you will need to specify the port in `/etc/rsp-license-server.conf`, and specify `license-server` to RStudio Workbench as `<server-hostname-or-ip:port>`.
+
+#### Connecting Over HTTPS
+
+*Example*
+
+```bash
+$ sudo rstudio-server license-manager license-server https://mylicensehost/
+```
+
+You can also connect to the license server via HTTPS rather than raw TCP. This can be useful when using proxies or load balancers in front of the license server. Note that the license server does not use HTTPS by default, so you can only use this connectivity method if you have configured your license server to use HTTPS.
+
+Configuring the license server for HTTPS support is outside the scope of this guide. You can read instructions here:
+
+[Configuring TurboFloat Server for HTTPS Communication](https://wyday.com/limelm/help/turbofloat-server/#config-https)
+
+#### Connecting to a Hosted Server
+
+*Example*
+
+```bash
+$ sudo rstudio-server license-manager license-server 871A2BFA-87C5-11E9-BD16-4749DB7B7927
+```
+
+Finally, if you are connecting to a hosted license server, specify the UUID of the server rather than its hostname. Hosted license servers are run by our licensing vendor, WyDay, and do not require you to run anything in your own network. Read more about setting up a hosted license server and getting a UUID here:
+
+[Creating a LicenseChest Server](https://wyday.com/licensechest/help/create-tfs-instance)
+
+### Configuring License Leases
+
+When using floating licenses, you can optionally determine how long the license leases last by setting the `lease length` value on the licensing server. This value is in seconds, so for instance to make license leases last 30 minutes you would use the following syntax:
+
+```xml
+<!--/etc/rsp-license-server.conf-->
+<lease length="1800"/>
+```
+
+The lease length controls how frequently the RStudio Workbench instances need to contact the licensing server to renew their license leases in order for the lease to remain valid.
+
+A **shorter** lease length will increase tolerance to failures on RStudio Workbench instances by making leases available for reuse more quickly. RStudio Workbench will release its lease immediately if shut down normally, but if abnormally terminated, the lease will not be released until it expires.
+
+A **longer** lease length will increase tolerance to transient failures on the network and the RStudio Workbench License Server. Any such issues that can be resolved before the lease is due for renewal won't interrupt use of RStudio Workbench.
+
+We generally recommend using a longer lease length. Use a short lease length only if your environment routinely encounters abnormal terminations of the server or the container/instance on which it runs.
+
+### License Server Downtime Tolerance
+
+RStudio Workbench does not wait until its lease has fully expired before it renews it. It renews its lease when it is *halfway to expiry*. For instance, if you use 30 minute leases, RStudio Workbench will actually renew its lease every 15 minutes.
+
+This means that it is possible to take down the license server for a short period of time without affecting any running RStudio Workbench instances. Because of the aforementioned behavior, no existing lease will be more than halfway to expiry if the server goes down.You have a grace period of N/2 (where N is the length of the lease) during which the server can be offline without consequences. For instance, if you use 30 minute leases, your license server can be offline for 15 minutes.
+
+### Lease Expiration and Renewal
+
+Under normal conditions RStudio Workbench will automatically renew its license lease in a configurable interval as described above. However, there are situations in which it will be unable to do so, such as a network problem, or an issue on the host running the license server.
+
+When RStudio Workbench cannot obtain a license lease, either because there are no leases currently available or because it can't reach the licensing server, it will begin automatically attempting to acquire a lease every 10 seconds. This interval is configurable; for instance, to retry every 30 seconds instead you would set the following value:
+
+```bash
+# /etc/rstudio/rserver.conf
+license-retry-seconds=30
+```
+
+If you don't want RStudio Workbench to attempt to reestablish a license lease automatically, set the value to `0` to disable retries. In this case you will need to manually restart RStudio Workbench in order to reestablish the lease. This can be useful if you often run more instances than you have keys for, and wish to have more control over which RStudio Workbench instances receive license leases from the limited pool on the license server.
+
+### Troubleshooting Floating Licensing
+
+To validate that the license server has been successfully activated, run the `activation-status` command. This will report the version of the server as well as the license key and the number of available slots.
+
+```bash
+$ sudo rsp-license-server activation-status
+```
+
+If your server is activated but you're still having trouble with floating licensing, you can tell the RStudio Workbench License Server to emit more detailed logs. Change the log level to `notification`:
+
+```xml
+<!--/etc/rsp-license-server.conf-->
+<log file="/var/log/rstudio-licensing.log" level="notification"/>
+```
+
+Then, restart the license server, tail the licensing log, and start your RStudio Workbench instances.
+
+```bash
+$ sudo rsp-license-server restart
+$ tail -f /var/log/rstudio-licensing.log
+```
+
+At the `notification` level, the licensing log will tell you the total number of licenses associated with your key, and how many are currently in use. It will also notify you when RStudio Workbench instances acquire leases, and when those leases are released, renewed, or expired. No rotation is done for this log, so it's recommended to use the `warning` level in production.
+
