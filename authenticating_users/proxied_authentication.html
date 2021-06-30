@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – proxied_authentication</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007ba5; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #007ba5; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #007ba5; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../authenticating_users/google_accounts.html" rel="next">
+  <link href="../authenticating_users/openid_connect_authentication.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="active">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#proxied-authentication" class="nav-link active" data-scroll-target="#proxied-authentication">Proxied Authentication</a>
+<ul class="collapse">
+<li><a href="#enabling-proxied-authentication" class="nav-link" data-scroll-target="#enabling-proxied-authentication">Enabling Proxied Authentication</a></li>
+<li><a href="#implementing-the-proxy" class="nav-link" data-scroll-target="#implementing-the-proxy">Implementing the Proxy</a></li>
+<li><a href="#proxy-security-considerations" class="nav-link" data-scroll-target="#proxy-security-considerations">Proxy Security Considerations</a></li>
+<li><a href="#troubleshooting-with-access-logs" class="nav-link" data-scroll-target="#troubleshooting-with-access-logs">Troubleshooting with Access Logs</a></li>
+</ul></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/authenticating_users/proxied_authentication.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="proxied-authentication" class="level2 pro-header">
+<h2 class="pro-header anchored" data-anchor-id="proxied-authentication">Proxied Authentication</h2>
+<p>You can configure RStudio Workbench to participate in an existing web-based single-sign-on authentication scheme using proxied authentication. In this configuration all traffic to RStudio Workbench is handled by a proxy server which also handles user authentication.</p>
+<p>In this configuration the proxy server adds a special HTTP header to requests to RStudio Workbench letting it know which authenticated user is making the request. RStudio Workbench trusts this header, launching and directing traffic to an R session owned by the specified user.</p>
+<p>The specified user must have a local system account on the server. You should set up local system accounts manually and then map authenticating users to these accounts.</p>
+<section id="enabling-proxied-authentication" class="level3">
+<h3 class="anchored" data-anchor-id="enabling-proxied-authentication">Enabling Proxied Authentication</h3>
+<p>To enable proxied authentication you need to specify both the <code>auth-proxy</code> and <code>auth-proxy-sign-in-url</code> settings (the sign-in URL is the absolute URL to the page that users should be redirected to for sign-in). For example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">auth-proxy</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">auth-proxy-sign-in-url</span><span class="ot">=</span><span class="st">http://example.com/sign-in</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Once you enable authentication with a proxy, that becomes the exclusive means of authentication</strong> - you can’t concurrently use both PAM and proxied authentication.</p>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Proxied authentication still requires <a href="../r_sessions/pam_sessions.html">PAM Sessions</a> and <code>sssd</code> to automatically create local system accounts. Without them, local system accounts have to be provisioned manually one-by-one.</p>
+</div>
+</div>
+</section>
+<section id="implementing-the-proxy" class="level3">
+<h3 class="anchored" data-anchor-id="implementing-the-proxy">Implementing the Proxy</h3>
+<section id="sign-in-and-sign-out-urls" class="level4">
+<h4 class="anchored" data-anchor-id="sign-in-and-sign-out-urls">Sign In and Sign Out URLs</h4>
+<p>The sign in URL should host a page where the user specifies their credentials (this might be for example the main page for an existing web-based authentication system). After collecting and authorizing the credentials the sign in URL should then redirect back to the URL hosting RStudio Workbench.</p>
+<p>RStudio will redirect to the sign in URL under the following conditions:</p>
+<ul>
+<li><p>Whenever an HTTP request that lacks the username header is received by the server; and</p></li>
+<li><p>When the user clicks the “Sign out” button in the RStudio IDE user interface and there is no Sign Out URL available.</p></li>
+</ul>
+<p>The sign out URL should host a page responsible for finishing the user session in the authentication proxy. If such a URL is URL available in your proxy, the absolute URL should be configured in RStudio using the setting <code>auth-proxy-sign-out-url</code>. When the user clicks the “Sign out” button in the RStudio IDE user interface the browser will be taken to the configured sign out URL.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">auth-proxy-sign-out-url</span><span class="ot">=</span><span class="st">http://example.com/sign-out</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should be sure in setting up the proxy server that traffic bound for the sign-in and sign-out URLs is excluded from forwarding to RStudio Workbench (otherwise it will end up in an infinite redirect loop).</p>
+</section>
+<section id="sign-in-delay" class="level4">
+<h4 class="anchored" data-anchor-id="sign-in-delay">Sign-In Delay</h4>
+<p>During proxied authentication in RStudio, there is a brief transition page that shows the username and some other information. By default this transition happens almost immediately. If you wish to present this page for a longer period of time, you can use the option <code>auth-proxy-sign-in-delay</code> to delay the transition for some seconds.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">auth-proxy-sign-in-delay</span><span class="ot">=</span><span class="dv">4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="forwarding-the-username" class="level4">
+<h4 class="anchored" data-anchor-id="forwarding-the-username">Forwarding the Username</h4>
+<p>When proxying pre-authenticated traffic to RStudio Workbench you need to include a special HTTP header (by default <code>X-RStudio-Username</code>) with each request indicating which user the request is associated with. For example:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">X-RStudio-Username: jsmith</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It’s also possible to specify both a system username and a display username (in the case where system accounts are dynamically provisioned and don’t convey actual user identity). For example, if the system user is <code>ruser24</code> but the displayed username is <code>jsmith</code>, you could use:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">X-RStudio-Username: rsuser24/jsmith</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is highly recommended that you <em>do not use</em> the default <code>X-RStudio-Username</code> header name. The reasons for this are described in the section on <a href="#proxy-security-considerations">security considerations</a> below.</p>
+</div>
+</div>
+</section>
+<section id="rewriting-usernames" class="level4">
+<h4 class="anchored" data-anchor-id="rewriting-usernames">Rewriting Usernames</h4>
+<p>It may be that the proxy system you are using sends the username in a format that doesn’t match that of users on the system, however can be easily transformed to one that does (e.g.&nbsp;it has a standard prefix before the username). If this is the case you can specify the <code>auth-proxy-user-header-rewrite</code> option to provide a re-write rule for the inbound header. For example, the following rule strips the prefix “UID-” from a username header:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>auth-proxy-user-header-rewrite=^UID-(<span class="co">[</span><span class="ot">a-z</span><span class="co">]</span>+)$ $1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The format of a re-write rule is a regular expression followed by a space and then a replacement string. The replacement string can reference captured parts of the regular expression using <code>$1</code>, <code>$2</code>, etc. Consult the <a href="https://www.boost.org/doc/libs/1_64_0/libs/regex/doc/html/boost_regex/syntax/perl_syntax.html">Boost Perl Regular Expression Syntax</a> reference for more syntax documentation.</p>
+</section>
+</section>
+<section id="proxy-security-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="proxy-security-considerations">Proxy Security Considerations</h3>
+<p>When using proxied authentication, RStudio trusts that the proxy is the only element in the network capable of sending the special header with the username. Be sure to follow the recommendations below to decrease security risks in your implementation.</p>
+<section id="keeping-the-header-name-secret" class="level4">
+<h4 class="anchored" data-anchor-id="keeping-the-header-name-secret">Keeping the Header Name Secret</h4>
+<p>Using the default header name <code>X-RStudio-Username</code> creates a security problem: code running behind the proxy (e.g., code within R sessions) could form requests back to the server which impersonate other users (by simply inserting the header in their request).</p>
+<p>To prevent this issue you can specify a custom header name which is kept secret from end users. This is done by creating a special configuration file (<code>/etc/rstudio/secure-proxy-user-header</code>) that contains the name of the header, and then setting it’s file permissions so that it’s not readable by normal users. For example:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> sh <span class="at">-c</span> <span class="st">"echo 'X-Secret-User-Header' &gt; /etc/rstudio/secure-proxy-user-header"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 0600 /etc/rstudio/secure-proxy-user-header</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="preventing-remote-use-of-the-header" class="level4">
+<h4 class="anchored" data-anchor-id="preventing-remote-use-of-the-header">Preventing Remote Use of the Header</h4>
+<p>When implementing the proxy it’s important to remember that RStudio Workbench will always trust the username header to authenticate users. It’s therefore critical from the standpoint of security that all requests originating from the proxy have this header set explicitly by the proxy (as opposed to allowing the header to be specified by a remote client). RStudio will reject requests containing multiple occurrences of the username header.</p>
+</section>
+<section id="preventing-internal-access" class="level4">
+<h4 class="anchored" data-anchor-id="preventing-internal-access">Preventing Internal Access</h4>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In previous versions, RStudio offered the option <code>auth-proxy-require-hmac</code> to require trust signatures from the proxy, though most proxies have no straightforward means for providing this signature. Therefore, this option has been retired. Following the recommendation below mitigates the same security risks previously covered by the option. If your installation used this option, it should removed from <code>/etc/rstudio/rserver.conf</code>. RStudio will refuse to start if this option is still present and enabled.</p>
+</div>
+</div>
+<p>Your RStudio and proxy configuration should be done in a way where it is impossible for anything other than the proxy to make requests to RStudio. Be sure that:</p>
+<ul>
+<li>RStudio is configured to listen on a network interface not accessible internally by other processes by adjusting the option <code>www-address</code>.</li>
+<li>The network interface where RStudio is running must have firewall settings to prevent any connection to RStudio other than from the proxy.</li>
+</ul>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This should not be considered an exhaustive list. Please consult with your security personnel or IT administrators to determine the exact measures to protect RStudio authentication via a proxy.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="troubleshooting-with-access-logs" class="level3">
+<h3 class="anchored" data-anchor-id="troubleshooting-with-access-logs">Troubleshooting with Access Logs</h3>
+<p>If you want to see exactly which requests RStudio is receiving and whether they include the expected username information, you can temporarily enable server access logs using the <code>server-access-log</code> setting as follows:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">server-access-log</span><span class="ot">=</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After restarting RStudio the following file will contain a record of each HTTP request made to the server along with it’s HTTP response code:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/var/log/rstudio-server/rserver-http-access.log</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The log file will contain entries that look like this:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">127.0.0.1</span> <span class="at">-</span> <span class="at">-</span> [29/Jun/2015:06:30:41 <span class="at">-0400]</span> <span class="st">"GET /s/f01ddf8222bea98a/ HTTP/1.1"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">200</span> 91 <span class="st">"http://localhost:8787/s/f01ddf8222bea98a/"</span> <span class="st">"Mozilla/5.0 (X11; Linux x86_64)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.125 Safari/537.36"</span> <span class="st">"jsmith"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that the very last item in the log file entry is <code>"jsmith"</code>. This is the username that RStudio read from the header passed by the proxy server. If this shows up as blank (<code>"-"</code>) then your proxy server isn’t forwarding the header or using the correct header name in forwarding.</p>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Once you’ve concluded troubleshooting it’s important that you remove the <code>server-access-log=1</code> option from the <code>/etc/rstudio/rserver.conf</code> file (since this log file is not rotated it will eventually consume a large amount of disk space if you don’t remove the option).</p>
+</div>
+</div>
+<!-- -->
+</section>
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+      <a href="../authenticating_users/openid_connect_authentication.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">OpenID Connect Authentication</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../authenticating_users/google_accounts.html">
+        <span class="nav-page-text">Google Accounts (deprecated)</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>

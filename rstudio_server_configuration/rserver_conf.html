@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – rserver_conf</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../rstudio_server_configuration/rsession_conf.html" rel="next">
+  <link href="../rstudio_server_configuration/rstudio_server_configuration.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="active">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#rserver.conf" class="nav-link active" data-scroll-target="#rserver.conf">rserver.conf</a>
+<ul class="collapse">
+<li><a href="#verify-settings" class="nav-link" data-scroll-target="#verify-settings"><em>verify</em> Settings</a></li>
+<li><a href="#server-settings" class="nav-link" data-scroll-target="#server-settings"><em>server</em> Settings</a></li>
+<li><a href="#www-settings" class="nav-link" data-scroll-target="#www-settings"><em>www</em> Settings</a></li>
+<li><a href="#rsession-settings" class="nav-link" data-scroll-target="#rsession-settings"><em>rsession</em> Settings</a></li>
+<li><a href="#database-settings" class="nav-link" data-scroll-target="#database-settings"><em>database</em> Settings</a></li>
+<li><a href="#auth-settings" class="nav-link" data-scroll-target="#auth-settings"><em>auth</em> Settings</a></li>
+<li><a href="#monitor-settings" class="nav-link" data-scroll-target="#monitor-settings"><em>monitor</em> Settings</a></li>
+</ul></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/rstudio_server_configuration/rserver_conf.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="rserver.conf" class="level2">
+<h2 class="anchored" data-anchor-id="rserver.conf">rserver.conf</h2>
+<p>The following is a list of available options that can be specified in the <code>rserver.conf</code> configuration file, which controls behavior of the <code>rserver</code> process, allowing you to tune HTTP, authorization options, and other settings that broadly affect RStudio Server.</p>
+<section id="verify-settings" class="level3">
+<h3 class="anchored" data-anchor-id="verify-settings"><em>verify</em> Settings</h3>
+<section id="verify-installation" class="level4">
+<h4 class="anchored" data-anchor-id="verify-installation"><strong>verify-installation</strong></h4>
+<p>Runs verification mode to verify the current installation.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="verify-user" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="verify-user"><strong>verify-user</strong></h4>
+<p>Specifies the run-as user for additional Job Launcher verification.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="verify-test" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="verify-test"><strong>verify-test</strong></h4>
+<p>Specifies the verify-installation test to run. Leave empty to run all tests.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+</section>
+<section id="server-settings" class="level3">
+<h3 class="anchored" data-anchor-id="server-settings"><em>server</em> Settings</h3>
+<section id="server-working-dir" class="level4">
+<h4 class="anchored" data-anchor-id="server-working-dir"><strong>server-working-dir</strong></h4>
+<p>The default working directory of the rserver process.</p>
+<p>Type: string<br>
+Default: <code>/</code></p>
+</section>
+<section id="server-user" class="level4">
+<h4 class="anchored" data-anchor-id="server-user"><strong>server-user</strong></h4>
+<p>The user account of the rserver process.</p>
+<p>Type: string<br>
+Default: <code>rstudio-server</code></p>
+</section>
+<section id="server-daemonize" class="level4">
+<h4 class="anchored" data-anchor-id="server-daemonize"><strong>server-daemonize</strong></h4>
+<p>Indicates whether or not the rserver process should run as a daemon.</p>
+<p>Type: bool<br>
+Default: <code>1 (true) if rserver was run with root privilege, otherwise 0 (false).</code></p>
+</section>
+<section id="server-pid-file" class="level4">
+<h4 class="anchored" data-anchor-id="server-pid-file"><strong>server-pid-file</strong></h4>
+<p>The path to a file where the rserver daemon’s pid is written.</p>
+<p>Type: string<br>
+Default: <code>/var/run/rstudio-server.pid</code></p>
+</section>
+<section id="server-set-umask" class="level4">
+<h4 class="anchored" data-anchor-id="server-set-umask"><strong>server-set-umask</strong></h4>
+<p>If enabled, sets the rserver process umask to 022 on startup, which causes new files to have rw-r-r permissions.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="secure-cookie-key-file" class="level4">
+<h4 class="anchored" data-anchor-id="secure-cookie-key-file"><strong>secure-cookie-key-file</strong></h4>
+<p>If set, overrides the default path of the secure-cookie-key file used for encrypting cookies.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="server-data-dir" class="level4">
+<h4 class="anchored" data-anchor-id="server-data-dir"><strong>server-data-dir</strong></h4>
+<p>Path to the data directory where RStudio Server will write run-time state.</p>
+<p>Type: string<br>
+Default: <code>/var/run/rstudio-server</code></p>
+</section>
+<section id="server-add-header" class="level4">
+<h4 class="anchored" data-anchor-id="server-add-header"><strong>server-add-header</strong></h4>
+<p>Adds a header to all responses from RStudio Server. This option can be specified multiple times to add multiple headers.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="server-nginx-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-path"><strong>server-nginx-path</strong></h4>
+<p>The relative path from the RStudio installation directory, or absolute path where the nginx binary is located.</p>
+<p>Type: string<br>
+Default: <code>bin/rserver-http</code></p>
+</section>
+<section id="server-nginx-conf-template-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-conf-template-path"><strong>server-nginx-conf-template-path</strong></h4>
+<p>The relative path from the RStudio installation directory, or absolute path where the nginx config file templates are located.</p>
+<p>Type: string<br>
+Default: <code>conf</code></p>
+</section>
+<section id="server-nginx-conf-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-conf-path"><strong>server-nginx-conf-path</strong></h4>
+<p>Specifies the path to the nginx config files.</p>
+<p>Type: string<br>
+Default: <code>/var/lib/rstudio-server/conf</code></p>
+</section>
+<section id="server-nginx-ld-library-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-ld-library-path"><strong>server-nginx-ld-library-path</strong></h4>
+<p>Specifies the LD_LIBRARY_PATH for the nginx executable.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="server-access-log" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-access-log"><strong>server-access-log</strong></h4>
+<p>Indicates whether or not to write HTTP access logs to /var/log/rstudio-server.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="server-nginx-http-directives-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-http-directives-path"><strong>server-nginx-http-directives-path</strong></h4>
+<p>Specifies the path to custom nginx http directives.</p>
+<p>Type: string<br>
+Default: <code>The first nginx.http.conf file that is found on the XDG_CONFIG_DIRS environment, or /etc/rstudio/nginx.http.conf if no XDG_CONFIG_DIRS are specified.</code></p>
+</section>
+<section id="server-nginx-server-directives-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-server-directives-path"><strong>server-nginx-server-directives-path</strong></h4>
+<p>Specifies the path to custom nginx server directives.</p>
+<p>Type: string<br>
+Default: <code>The first nginx.server.conf file that is found on the XDG_CONFIG_DIRS environment, or /etc/rstudio/nginx.server.conf if no XDG_CONFIG_DIRS are specified.</code></p>
+</section>
+<section id="server-nginx-site-directives-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-nginx-site-directives-path"><strong>server-nginx-site-directives-path</strong></h4>
+<p>Specifies the path to custom nginx site directives.</p>
+<p>Type: string<br>
+Default: <code>The first nginx.site.conf file that is found on the XDG_CONFIG_DIRS environment, or /etc/rstudio/nginx.site.conf if no XDG_CONFIG_DIRS are specified.</code></p>
+</section>
+<section id="server-health-check-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-health-check-enabled"><strong>server-health-check-enabled</strong></h4>
+<p>Indicates whether or not to allow access to the server health check URL.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="server-license-type" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-license-type"><strong>server-license-type</strong></h4>
+<p>Specifies whether to use remote (floating) or local (activation) licensing.</p>
+<p>Type: string<br>
+Default: <code>local</code></p>
+</section>
+<section id="license-retry-seconds" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="license-retry-seconds"><strong>license-retry-seconds</strong></h4>
+<p>Specifies the number of seconds to wait between floating license retries.</p>
+<p>Type: int<br>
+Default: <code></code></p>
+</section>
+<section id="resolve-load-balancer-nodes" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="resolve-load-balancer-nodes"><strong>resolve-load-balancer-nodes</strong></h4>
+<p>Indicates whether or not to resolve IP addresses associated with load balancer nodes; not compatible with SSL unless the the IP address is in the CN/SAN.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="server-balancer-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-balancer-path"><strong>server-balancer-path</strong></h4>
+<p>The relative path from the RStudio installation directory, or absolute path where the custom load balancing script is located.</p>
+<p>Type: string<br>
+Default: <code>bin/rserver-balancer</code></p>
+</section>
+<section id="server-multiple-sessions" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-multiple-sessions"><strong>server-multiple-sessions</strong></h4>
+<p>Indicates whether or not to allow multiple sessions per user.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="r-versions-multiple" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="r-versions-multiple"><strong>r-versions-multiple</strong></h4>
+<p>Indicates whether or not to allow the use of multiple R versions.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="server-project-sharing" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-project-sharing"><strong>server-project-sharing</strong></h4>
+<p>Indicates whether or not to allow project sharing.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="server-project-sharing-root-dir" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-project-sharing-root-dir"><strong>server-project-sharing-root-dir</strong></h4>
+<p>Specifies the root directory for shared projects in addition to users’ own home directories.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="server-user-home-page" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-user-home-page"><strong>server-user-home-page</strong></h4>
+<p>Indicates whether or not to show the user home page upon login.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="r-versions-scan" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="r-versions-scan"><strong>r-versions-scan</strong></h4>
+<p>Indicates whether or not to scan for available R versions on the system.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="modules-bin-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="modules-bin-path"><strong>modules-bin-path</strong></h4>
+<p>Specifies the path to modules sh init binary. This is necessary if you intend to load R versions via modules.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="admin-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="admin-enabled"><strong>admin-enabled</strong></h4>
+<p>Indicates whether or not to allow access to the administration dashboard.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="admin-group" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="admin-group"><strong>admin-group</strong></h4>
+<p>Limits admin dashboard access to users belonging to the specified group.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="admin-superuser-group" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="admin-superuser-group"><strong>admin-superuser-group</strong></h4>
+<p>Limits admin superusers to those belonging to the specified group.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="admin-monitor-log-use-server-time-zone" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="admin-monitor-log-use-server-time-zone"><strong>admin-monitor-log-use-server-time-zone</strong></h4>
+<p>Indicates whether or not to use the server time zone when displaying the monitor log. If disabled, uses UTC.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="r-versions-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="r-versions-path"><strong>r-versions-path</strong></h4>
+<p>Specifies the path to the file containing the list of available R Versions in JSON format. This file will be automatically generated by the rserver process after discovering the R versions available on the system. It is strongly recommended not to modify this setting in most cases.</p>
+<p>Type: string<br>
+Default: <code>/var/lib/rstudio-server/r-versions</code></p>
+</section>
+<section id="launcher-address" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-address"><strong>launcher-address</strong></h4>
+<p>Specifies the address of the Launcher service (local unix domain socket file or IP address).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-port" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-port"><strong>launcher-port</strong></h4>
+<p>Specifies the port of the Launcher to connect to (if not using a unix domain socket).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-use-ssl" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-use-ssl"><strong>launcher-use-ssl</strong></h4>
+<p>Indicates whether or not to use SSL connections when connecting to the Launcher (if not using a unix domain socket).</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="launcher-verify-ssl-certs" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-verify-ssl-certs"><strong>launcher-verify-ssl-certs</strong></h4>
+<p>Indicates whether or not to verify the Launcher certificate(s) when using an SSL connection.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="launcher-sessions-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-enabled"><strong>launcher-sessions-enabled</strong></h4>
+<p>Indicates whether or not to use the Launcher for creating sessions.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="launcher-default-cluster" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-default-cluster"><strong>launcher-default-cluster</strong></h4>
+<p>Specifies the default cluster to launch jobs on when using the Launcher.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-sessions-callback-address" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-callback-address"><strong>launcher-sessions-callback-address</strong></h4>
+<p>The callback address (hostname, IP address, or HTTP URL) of rserver for Launcher sessions to communicate back.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-sessions-callback-verify-ssl-certs" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-callback-verify-ssl-certs"><strong>launcher-sessions-callback-verify-ssl-certs</strong></h4>
+<p>Indicates whether or not to enforce SSL certificate verification of the server when Launcher sessions communicate back via the callback address.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="launcher-sessions-container-image" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-container-image"><strong>launcher-sessions-container-image</strong></h4>
+<p>Specifies the default container image to use for Launcher sessions. Only applicable for container-based job systems (e.g.&nbsp;Kubernetes).</p>
+<p>Type: strng<br>
+Default: <code></code></p>
+</section>
+<section id="launcher-sessions-container-run-as-root" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-container-run-as-root"><strong>launcher-sessions-container-run-as-root</strong></h4>
+<p>Indicates whether or not to run the Launcher session containers as root. If not, uses the requesting user’s UID. Only applicable for container-based job systems.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="launcher-sessions-create-container-user" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-create-container-user"><strong>launcher-sessions-create-container-user</strong></h4>
+<p>Indicates whether or not to create a user for the container’s owner when running Launcher session containers. Only applicable for container-based job systems.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="launcher-sessions-connection-timeout-seconds" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-connection-timeout-seconds"><strong>launcher-sessions-connection-timeout-seconds</strong></h4>
+<p>Specifies the connection timeout in seconds to use when establishing a connection to a Launcher session.</p>
+<p>Type: int<br>
+Default: <code>3</code></p>
+</section>
+<section id="launcher-sessions-clusters" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-clusters"><strong>launcher-sessions-clusters</strong></h4>
+<p>Specifies a comma-separated list of available clusters for launching interactive sessions (or all Launcher clusters if empty).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-adhoc-clusters" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-adhoc-clusters"><strong>launcher-adhoc-clusters</strong></h4>
+<p>Specifies a comma-separated list of available clusters for launching adhoc jobs (or all Launcher clusters if empty).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-sessions-container-images" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-container-images"><strong>launcher-sessions-container-images</strong></h4>
+<p>Specifies a comma-separated list of available container images for launching interactive sessions (or all cluster images if empty). Only applicable for container-based job systems.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-adhoc-container-images" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-adhoc-container-images"><strong>launcher-adhoc-container-images</strong></h4>
+<p>Specifies a comma-separated list of available container images for launching ad-hoc jobs (or all cluster images if empty). Only applicable for container-based job systems.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="launcher-sessions-forward-container-environment" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-forward-container-environment"><strong>launcher-sessions-forward-container-environment</strong></h4>
+<p>Indicates whether or not to forward the existing container environment variables to the session. Only applicable for container-based job systems.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="launcher-sessions-container-forward-groups" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="launcher-sessions-container-forward-groups"><strong>launcher-sessions-container-forward-groups</strong></h4>
+<p>Indicates whether or not to forward the user’s supplemental groups to the container. Only applicable for container-based job systems.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+</section>
+<section id="www-settings" class="level3">
+<h3 class="anchored" data-anchor-id="www-settings"><em>www</em> Settings</h3>
+<section id="www-address" class="level4">
+<h4 class="anchored" data-anchor-id="www-address"><strong>www-address</strong></h4>
+<p>The network address that RStudio Server will listen on for incoming connections.</p>
+<p>Type: string<br>
+Default: <code>0.0.0.0</code></p>
+</section>
+<section id="www-port" class="level4">
+<h4 class="anchored" data-anchor-id="www-port"><strong>www-port</strong></h4>
+<p>The port that RStudio Server will bind to while listening for incoming connections. If left empty, the port will be automatically determined based on your SSL settings (443 for SSL, 80 for no SSL).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="www-root-path" class="level4">
+<h4 class="anchored" data-anchor-id="www-root-path"><strong>www-root-path</strong></h4>
+<p>The path prefix added by a proxy to the incoming RStudio URL. This setting is used so RStudio Server knows what path it is being served from. If running RStudio Server behind a path-modifying proxy, this should be changed to match the base RStudio Server URL.</p>
+<p>Type: string<br>
+Default: <code>Assume the root path '/' if not defined.</code></p>
+</section>
+<section id="www-thread-pool-size" class="level4">
+<h4 class="anchored" data-anchor-id="www-thread-pool-size"><strong>www-thread-pool-size</strong></h4>
+<p>The size of the threadpool from which requests will be serviced. This may be increased to enable more concurrency, but should only be done if the underlying hardware has more than 2 cores. It is recommended to use a value that is &lt;= to the number of hardware cores, or &lt;= to two times the number of hardware cores if the hardware utilizes hyperthreading.</p>
+<p>Type: int<br>
+Default: <code>2</code></p>
+</section>
+<section id="www-proxy-localhost" class="level4">
+<h4 class="anchored" data-anchor-id="www-proxy-localhost"><strong>www-proxy-localhost</strong></h4>
+<p>Indicates whether or not to proxy requests to localhost ports over the main server port. This should generally be enabled, and is used to proxy HTTP traffic within a session that belongs to code running within the session (e.g.&nbsp;Shiny or Plumber APIs)</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="www-verify-user-agent" class="level4">
+<h4 class="anchored" data-anchor-id="www-verify-user-agent"><strong>www-verify-user-agent</strong></h4>
+<p>Indicates whether or not to verify connecting browser user agents to ensure they are compatible with RStudio Server.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="www-same-site" class="level4">
+<h4 class="anchored" data-anchor-id="www-same-site"><strong>www-same-site</strong></h4>
+<p>The value of the ‘SameSite’ attribute on the cookies issued by RStudio Server. Accepted values are ‘none’ or ‘lax’. The value ‘none’ should be used only when RStudio is hosted into an iFrame. For compatibility with some browsers (i.e.&nbsp;Safari 12), duplicate cookies will be issued by RStudio Server when ‘none’ is used.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="www-frame-origin" class="level4">
+<h4 class="anchored" data-anchor-id="www-frame-origin"><strong>www-frame-origin</strong></h4>
+<p>Specifies the allowed origin for the iFrame hosting RStudio if iFrame embedding is enabled.</p>
+<p>Type: string<br>
+Default: <code>none</code></p>
+</section>
+<section id="www-enable-origin-check" class="level4">
+<h4 class="anchored" data-anchor-id="www-enable-origin-check"><strong>www-enable-origin-check</strong></h4>
+<p>If enabled, cause RStudio to enforce that incoming request origins are from the host domain. This can be added for additional security. See https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#verifying-origin-with-standard-headers</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="www-allow-origin" class="level4">
+<h4 class="anchored" data-anchor-id="www-allow-origin"><strong>www-allow-origin</strong></h4>
+<p>Specifies an additional origin that requests are allowed from, even if it does not match the host domain. Used if origin checking is enabled. May be specified multiple times for multiple origins.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="ssl-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-enabled"><strong>ssl-enabled</strong></h4>
+<p>Enables or disables SSL.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="ssl-certificate" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-certificate"><strong>ssl-certificate</strong></h4>
+<p>Specifies the path to the SSL certificate for RStudio Server to use.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="ssl-certificate-key" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-certificate-key"><strong>ssl-certificate-key</strong></h4>
+<p>Specifies the path to the SSL certificate private key.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="ssl-protocols" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-protocols"><strong>ssl-protocols</strong></h4>
+<p>Specifies the list of supported SSL protocols separated by a space.</p>
+<p>Type: string<br>
+Default: <code>TLSv1 TLSv1.1 TLSv1.2</code></p>
+</section>
+<section id="ssl-redirect-http" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-redirect-http"><strong>ssl-redirect-http</strong></h4>
+<p>Indicates whether or not HTTP requests should automatically be redirected to HTTPS.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="ssl-hsts" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-hsts"><strong>ssl-hsts</strong></h4>
+<p>Indicates whether or not to enable Strict Transport Security when SSL is in use.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="ssl-hsts-max-age" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-hsts-max-age"><strong>ssl-hsts-max-age</strong></h4>
+<p>Specifies the maximum age for Strict Transport Security.</p>
+<p>Type: int<br>
+Default: <code>86400</code></p>
+</section>
+<section id="ssl-hsts-include-subdomains" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="ssl-hsts-include-subdomains"><strong>ssl-hsts-include-subdomains</strong></h4>
+<p>Indicates whether or not to include subdomains in HSTS protection.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="rsession-settings" class="level3">
+<h3 class="anchored" data-anchor-id="rsession-settings"><em>rsession</em> Settings</h3>
+<section id="rsession-which-r" class="level4">
+<h4 class="anchored" data-anchor-id="rsession-which-r"><strong>rsession-which-r</strong></h4>
+<p>The path to the main R program (e.g.&nbsp;/usr/bin/R). This should be set if no versions are specified in /etc/rstudio/r-versions and the default R installation is not available on the system path.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="rsession-path" class="level4">
+<h4 class="anchored" data-anchor-id="rsession-path"><strong>rsession-path</strong></h4>
+<p>The relative path from the RStudio installation directory, or absolute path to the rsession executable.</p>
+<p>Type: string<br>
+Default: <code>rsession</code></p>
+</section>
+<section id="rldpath-path" class="level4">
+<h4 class="anchored" data-anchor-id="rldpath-path"><strong>rldpath-path</strong></h4>
+<p>The path to the r-ldpath script which specifies extra library paths for R versions.</p>
+<p>Type: string<br>
+Default: <code>r-ldpath</code></p>
+</section>
+<section id="rsession-ld-library-path" class="level4">
+<h4 class="anchored" data-anchor-id="rsession-ld-library-path"><strong>rsession-ld-library-path</strong></h4>
+<p>Specifies additional LD_LIBRARY_PATHs to use for R sessions.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="rsession-config-file" class="level4">
+<h4 class="anchored" data-anchor-id="rsession-config-file"><strong>rsession-config-file</strong></h4>
+<p>If set, overrides the path to the /etc/rstudio/rsession.conf configuration file. The specified path may be a relative path from the RStudio installation directory, or an absolute path.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="rsession-proxy-max-wait-secs" class="level4">
+<h4 class="anchored" data-anchor-id="rsession-proxy-max-wait-secs"><strong>rsession-proxy-max-wait-secs</strong></h4>
+<p>The maximum time to wait in seconds for a successful response when proxying requests to rsession.</p>
+<p>Type: int<br>
+Default: <code>10</code></p>
+</section>
+<section id="rsession-exec-command" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-exec-command"><strong>rsession-exec-command</strong></h4>
+<p>Specifies the wrapper command used when executing the rsession binary.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="rsession-no-profile" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-no-profile"><strong>rsession-no-profile</strong></h4>
+<p>Indicates whether or not to disable user profiles from executing on session start.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="rsession-diagnostics-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-diagnostics-enabled"><strong>rsession-diagnostics-enabled</strong></h4>
+<p>Indicates whether or not session diagnostic data should be collected. This can be used for troubleshooting issues with session starts.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="rsession-diagnostics-dir" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-diagnostics-dir"><strong>rsession-diagnostics-dir</strong></h4>
+<p>Specifies the directory where session diagnostic data should be written.</p>
+<p>Type: string<br>
+Default: <code>/tmp</code></p>
+</section>
+<section id="rsession-diagnostics-strace-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-diagnostics-strace-enabled"><strong>rsession-diagnostics-strace-enabled</strong></h4>
+<p>Indicates whether or not strace data should be included when collecting session diagnostic data.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="rsession-diagnostics-libsegfault" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="rsession-diagnostics-libsegfault"><strong>rsession-diagnostics-libsegfault</strong></h4>
+<p>Specifies the path to libSegFault.so library which is used for dumping stack trace information when session diagnostics are collected.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+</section>
+<section id="database-settings" class="level3">
+<h3 class="anchored" data-anchor-id="database-settings"><em>database</em> Settings</h3>
+<section id="database-config-file" class="level4">
+<h4 class="anchored" data-anchor-id="database-config-file"><strong>database-config-file</strong></h4>
+<p>If set, overrides the path to the /etc/rstudio/database.conf configuration file.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+</section>
+<section id="auth-settings" class="level3">
+<h3 class="anchored" data-anchor-id="auth-settings"><em>auth</em> Settings</h3>
+<section id="auth-none" class="level4">
+<h4 class="anchored" data-anchor-id="auth-none"><strong>auth-none</strong></h4>
+<p>If set, disables multi-user authentication. Workbench/Pro features may not work in this mode.</p>
+<p>Type: bool<br>
+Default: <code>1 (true) if rserver was run without root privilege, otherwise 0 (false).</code></p>
+</section>
+<section id="auth-validate-users" class="level4">
+<h4 class="anchored" data-anchor-id="auth-validate-users"><strong>auth-validate-users</strong></h4>
+<p>Indicates whether or not to validate that authenticated users exist on the target system. Disabling this option may cause issues to start or to run a session.</p>
+<p>Type: bool<br>
+Default: <code>1 (true) if rserver was run with root privilege, otherwise 0 (false).</code></p>
+</section>
+<section id="auth-stay-signed-in-days" class="level4">
+<h4 class="anchored" data-anchor-id="auth-stay-signed-in-days"><strong>auth-stay-signed-in-days</strong></h4>
+<p>The number of days to keep a user signed in when using the “Stay Signed In” option. Will only take affect when auth-timeout-minutes is 0 (disabled).</p>
+<p>Type: int<br>
+Default: <code>30</code></p>
+</section>
+<section id="auth-timeout-minutes" class="level4">
+<h4 class="anchored" data-anchor-id="auth-timeout-minutes"><strong>auth-timeout-minutes</strong></h4>
+<p>The number of minutes a user will stay logged in while idle before required to sign in again. Set this to 0 (disabled) to enable legacy timeout auth-stay-signed-in-days.</p>
+<p>Type: int<br>
+Default: <code>60</code></p>
+</section>
+<section id="auth-encrypt-password" class="level4">
+<h4 class="anchored" data-anchor-id="auth-encrypt-password"><strong>auth-encrypt-password</strong></h4>
+<p>Indicates whether or not to encrypt the password sent from the login form. For security purposes, we strongly recommend you leave this enabled.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="auth-login-page-html" class="level4">
+<h4 class="anchored" data-anchor-id="auth-login-page-html"><strong>auth-login-page-html</strong></h4>
+<p>The path to a file containing additional HTML customization for the login page.</p>
+<p>Type: string<br>
+Default: <code>/etc/rstudio/login.html</code></p>
+</section>
+<section id="auth-rdp-login-page-html" class="level4">
+<h4 class="anchored" data-anchor-id="auth-rdp-login-page-html"><strong>auth-rdp-login-page-html</strong></h4>
+<p>The path to a file containing additional HTML customization for the login page, as seen by RDP users.</p>
+<p>Type: string<br>
+Default: <code>/etc/rstudio/rdplogin.html</code></p>
+</section>
+<section id="auth-required-user-group" class="level4">
+<h4 class="anchored" data-anchor-id="auth-required-user-group"><strong>auth-required-user-group</strong></h4>
+<p>Specifies a group that users must be in to be able to use RStudio.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-minimum-user-id" class="level4">
+<h4 class="anchored" data-anchor-id="auth-minimum-user-id"><strong>auth-minimum-user-id</strong></h4>
+<p>Specifies a minimum user id value. Users with a uid lower than this value may not use RStudio.</p>
+<p>Type: string<br>
+Default: <code>auto</code></p>
+</section>
+<section id="auth-pam-require-password-prompt" class="level4">
+<h4 class="anchored" data-anchor-id="auth-pam-require-password-prompt"><strong>auth-pam-require-password-prompt</strong></h4>
+<p>Indicates whether or not to require the “Password:” prompt before sending the password via PAM. In most cases, this should be enabled. If using a custom PAM password prompt, you may need to disable this setting if PAM logins do not work correctly.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="auth-sign-in-throttle-seconds" class="level4">
+<h4 class="anchored" data-anchor-id="auth-sign-in-throttle-seconds"><strong>auth-sign-in-throttle-seconds</strong></h4>
+<p>The minimum amount of time a user must wait before attempting to sign in again after signing out.</p>
+<p>Type: int<br>
+Default: <code>5</code></p>
+</section>
+<section id="auth-revocation-list-dir" class="level4">
+<h4 class="anchored" data-anchor-id="auth-revocation-list-dir"><strong>auth-revocation-list-dir</strong></h4>
+<p>If set, overrides the path to the directory which contains the revocation list to be used for storing expired tokens. As of RStudio Server 1.4, this has been moved to database storage, and so this setting is deprecated, but will be used to port over any existing file-based expired tokens.<br>
+<strong>This option is deprecated and should not be used.</strong></p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-cookies-force-secure" class="level4">
+<h4 class="anchored" data-anchor-id="auth-cookies-force-secure"><strong>auth-cookies-force-secure</strong></h4>
+<p>Indicates whether or not auth cookies should be forcefully marked as secure. This should be enabled if running an SSL terminator infront of RStudio Server. Otherwise, cookies will be marked secure if SSL is configured.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-stay-signed-in" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-stay-signed-in"><strong>auth-stay-signed-in</strong></h4>
+<p>Indicates whether or not to allow users to stay signed in across browser sessions.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="auth-google-accounts" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-google-accounts"><strong>auth-google-accounts</strong></h4>
+<p>Enables/disables authentication via Google accounts.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-google-accounts-redirect-base-uri" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-google-accounts-redirect-base-uri"><strong>auth-google-accounts-redirect-base-uri</strong></h4>
+<p>Specifies an override URI to use instead of the redirect URI detected for Google accounts. This is needed if running behind a proxy without the X-RStudio-Request header.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-openid" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-openid"><strong>auth-openid</strong></h4>
+<p>Enables/disables authentication via OpenID SSO.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-openid-base-uri" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-openid-base-uri"><strong>auth-openid-base-uri</strong></h4>
+<p>Overrides the detected base URI for the server. This is needed if running behind a proxy without the X-RStudio-Request header.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-openid-issuer" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-openid-issuer"><strong>auth-openid-issuer</strong></h4>
+<p>Specifies the HTTPS URL of the OpenID issuer and the location of ‘/.well-known/open-configuration’</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-openid-scopes" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-openid-scopes"><strong>auth-openid-scopes</strong></h4>
+<p>Specifies any additional space-separated scopes required by the OpenID OP to return a username claim.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-openid-username-claim" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-openid-username-claim"><strong>auth-openid-username-claim</strong></h4>
+<p>Specifies the name of the OpenID claim used to define the username.</p>
+<p>Type: string<br>
+Default: <code>preferred_username</code></p>
+</section>
+<section id="auth-saml" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml"><strong>auth-saml</strong></h4>
+<p>Enables/disables authentication via SAML SSO.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-saml-metadata-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-metadata-path"><strong>auth-saml-metadata-path</strong></h4>
+<p>Specifies the path to the XML SAML metadata file. Overrides the metadata URL option if present.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-metadata-url" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-metadata-url"><strong>auth-saml-metadata-url</strong></h4>
+<p>Specifies the location of the XML SAML metadata on the Identity Provider. Requires backend connectivity.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-idp-entity-id" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-idp-entity-id"><strong>auth-saml-idp-entity-id</strong></h4>
+<p>Specifies the entity identifier (name or URI) of the Identity Provider. Only used if no metadata is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-idp-sso-url" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-idp-sso-url"><strong>auth-saml-idp-sso-url</strong></h4>
+<p>Specifies the endpoint that will receive SSO requests on the Identity Provider. Only used if no metadata is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-idp-sign-cert-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-idp-sign-cert-path"><strong>auth-saml-idp-sign-cert-path</strong></h4>
+<p>Specifies the path to the PEM certificate file for verifying SAML signatures. Only used if no metadata is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-idp-post-binding" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-idp-post-binding"><strong>auth-saml-idp-post-binding</strong></h4>
+<p>When enabled, uses HTTP POST for SSO. Otherwise, uses an HTTP redirect. This must match the metadata specification if metadata is defined.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-saml-sso-initiation" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sso-initiation"><strong>auth-saml-sso-initiation</strong></h4>
+<p>Indicates if only “idp” or “sp” can initiate a SAML SSO sequence. If not defined, both can initiate.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-base-uri" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-base-uri"><strong>auth-saml-sp-base-uri</strong></h4>
+<p>Overrides the detected base URI for the server. This is needed if running behind a proxy without the X-RStudio-Request header.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-encryption-key-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-encryption-key-path"><strong>auth-saml-sp-encryption-key-path</strong></h4>
+<p>Specifies the path to the PEM file containing the private key for decrypting SAML responses. Also used for request signing if a signing method is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-encryption-cert-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-encryption-cert-path"><strong>auth-saml-sp-encryption-cert-path</strong></h4>
+<p>Specifies the path to the PEM certificate file for encrypting SAML responses. Also used for request signing if a signing method is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-signing-key-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-signing-key-path"><strong>auth-saml-sp-signing-key-path</strong></h4>
+<p>Specifies the path to the PEM file containing the private key for signing SAML requests. Not used if an encryption key is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-signing-cert-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-signing-cert-path"><strong>auth-saml-sp-signing-cert-path</strong></h4>
+<p>Specifies the path to the PEM certificate file for verifying SAML requests signature. Not used if an encryption certificate is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-request-signing-method" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-request-signing-method"><strong>auth-saml-sp-request-signing-method</strong></h4>
+<p>Indicates whether “sha1”, “sha256”, or “sha512” is used to sign SAML requests. If not defined, the SAML requests will not be signed.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-name-id-format" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-name-id-format"><strong>auth-saml-sp-name-id-format</strong></h4>
+<p>Requests that the NameID Format be one of “unspecified”, “emailAddress”, “persistent” or “transient”. This must match the metadata specification if metadata is defined.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-saml-sp-attribute-username" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-saml-sp-attribute-username"><strong>auth-saml-sp-attribute-username</strong></h4>
+<p>Specifies the name of the attribute in the SAML assertion used to define the username.</p>
+<p>Type: string<br>
+Default: <code>Username</code></p>
+</section>
+<section id="auth-proxy" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy"><strong>auth-proxy</strong></h4>
+<p>Enables/disables authentication via proxy by using a special header field.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-proxy-sign-in-url" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy-sign-in-url"><strong>auth-proxy-sign-in-url</strong></h4>
+<p>Specifies the URL of the sign in page for proxied authentication.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-proxy-sign-out-url" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy-sign-out-url"><strong>auth-proxy-sign-out-url</strong></h4>
+<p>Specifies the optional URL of the sign out page for proxied authentication.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-proxy-sign-in-delay" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy-sign-in-delay"><strong>auth-proxy-sign-in-delay</strong></h4>
+<p>Specifies the delay in seconds to show user sign in info when redirecting from the proxy sign in page.</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-proxy-user-header" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy-user-header"><strong>auth-proxy-user-header</strong></h4>
+<p>Specifies the name of the HTTP header that RStudio should read the proxied user identity from.</p>
+<p>Type: string<br>
+Default: <code>X-RStudio-Username</code></p>
+</section>
+<section id="auth-proxy-user-header-rewrite" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-proxy-user-header-rewrite"><strong>auth-proxy-user-header-rewrite</strong></h4>
+<p>Specifies the re-write rule for the auth-proxy-user-header. The format of a re-write rule is a regular expression followed by a space and then a replacement string. The replacement string can reference captured parts of the regular expression using $1, $2, etc.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="auth-pam-sessions-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-pam-sessions-enabled"><strong>auth-pam-sessions-enabled</strong></h4>
+<p>Enables or disables PAM sessions when new sessions are started.</p>
+<p>Type: bool<br>
+Default: <code>Disabled if using Launcher sessions. Enabled otherwise.</code></p>
+</section>
+<section id="auth-pam-sessions-profile" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-pam-sessions-profile"><strong>auth-pam-sessions-profile</strong></h4>
+<p>Specifies the profile to use for PAM sessions.</p>
+<p>Type: string<br>
+Default: <code>su</code></p>
+</section>
+<section id="auth-pam-sessions-use-password" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-pam-sessions-use-password"><strong>auth-pam-sessions-use-password</strong></h4>
+<p>Indicates whether or not to use passwords when creating PAM sessions. Requires storing of user passwords in memory, though we use industry best-practices for keeping the passwords secure.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="auth-pam-sessions-close" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="auth-pam-sessions-close"><strong>auth-pam-sessions-close</strong></h4>
+<p>Indicates whether or not to close the PAM session when the R session exits.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="monitor-settings" class="level3">
+<h3 class="anchored" data-anchor-id="monitor-settings"><em>monitor</em> Settings</h3>
+<section id="monitor-interval-seconds" class="level4">
+<h4 class="anchored" data-anchor-id="monitor-interval-seconds"><strong>monitor-interval-seconds</strong></h4>
+<p>The interval in seconds at which the monitor is probed for new data.</p>
+<p>Type: int<br>
+Default: <code>60</code></p>
+</section>
+<section id="monitor-stderr-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-stderr-enabled"><strong>monitor-stderr-enabled</strong></h4>
+<p>Indicates whether or not to log metrics to stderr.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="monitor-rrd-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-rrd-enabled"><strong>monitor-rrd-enabled</strong></h4>
+<p>Indicates whether or not to enable logging of metrics to RRD.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="monitor-data-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-data-path"><strong>monitor-data-path</strong></h4>
+<p>Specifies the path where monitor logs and RRD databases should be written.</p>
+<p>Type: string<br>
+Default: <code>/var/lib/rstudio-server/monitor</code></p>
+</section>
+<section id="monitor-rstudio-session-metrics" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-rstudio-session-metrics"><strong>monitor-rstudio-session-metrics</strong></h4>
+<p>Indicates whether or not to collect metrics about session utilization per user.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="monitor-rrd-rrdtool-binary" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-rrd-rrdtool-binary"><strong>monitor-rrd-rrdtool-binary</strong></h4>
+<p>Specifies the path to the rrdtool binary.</p>
+<p>Type: string<br>
+Default: <code>/usr/bin/rrdtool</code></p>
+</section>
+<section id="monitor-graphite-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-graphite-enabled"><strong>monitor-graphite-enabled</strong></h4>
+<p>Enables/disables logging of metrics to graphite.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="monitor-graphite-host" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-graphite-host"><strong>monitor-graphite-host</strong></h4>
+<p>Specifies the host to send graphite metrics to.</p>
+<p>Type: string<br>
+Default: <code>127.0.0.1</code></p>
+</section>
+<section id="monitor-graphite-port" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-graphite-port"><strong>monitor-graphite-port</strong></h4>
+<p>Specifies the port to send graphite metrics to.</p>
+<p>Type: int<br>
+Default: <code>2003</code></p>
+</section>
+<section id="monitor-graphite-client-id" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="monitor-graphite-client-id"><strong>monitor-graphite-client-id</strong></h4>
+<p>Specifies the optional client id to include along with graphite metrics.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="audit-data-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-data-path"><strong>audit-data-path</strong></h4>
+<p>Specifies the path to where audit data should be stored.</p>
+<p>Type: string<br>
+Default: <code>/var/lib/rstudio-server/audit</code></p>
+</section>
+<section id="audit-r-console" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-console"><strong>audit-r-console</strong></h4>
+<p>Specifies the level of console activity that should be audited (none, input, or all).</p>
+<p>Type: string<br>
+Default: <code>none</code></p>
+</section>
+<section id="audit-r-console-user-limit-months" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-console-user-limit-months"><strong>audit-r-console-user-limit-months</strong></h4>
+<p>Specifies the number of months of user console data to retain within the audit directory.</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="audit-r-console-user-limit-mb" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-console-user-limit-mb"><strong>audit-r-console-user-limit-mb</strong></h4>
+<p>Specifies the limit in megabytes on user console actions to retain in the audit log.</p>
+<p>Type: int<br>
+Default: <code>50</code></p>
+</section>
+<section id="audit-r-console-compress" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-console-compress"><strong>audit-r-console-compress</strong></h4>
+<p>Indicates whether or not to compress console audit logs using gzip compression.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="audit-r-console-format" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-console-format"><strong>audit-r-console-format</strong></h4>
+<p>Specifies the format to use for the console audit log (csv or json).</p>
+<p>Type: string<br>
+Default: <code>csv</code></p>
+</section>
+<section id="audit-r-sessions" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-sessions"><strong>audit-r-sessions</strong></h4>
+<p>Indicates whether or not to audit R session activity.</p>
+<p>Type: bool<br>
+Default: <code>Enabled if using named user licensing. Disabled otherwise.</code></p>
+</section>
+<section id="audit-r-sessions-limit-months" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-sessions-limit-months"><strong>audit-r-sessions-limit-months</strong></h4>
+<p>Specifies the number of months of session action data to retain within the audit directory.</p>
+<p>Type: int<br>
+Default: <code>13</code></p>
+</section>
+<section id="audit-r-sessions-limit-mb" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-sessions-limit-mb"><strong>audit-r-sessions-limit-mb</strong></h4>
+<p>Specifies the limit in megabytes on session actions to retain in the audit log.</p>
+<p>Type: int<br>
+Default: <code>1024</code></p>
+</section>
+<section id="audit-r-sessions-format" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="audit-r-sessions-format"><strong>audit-r-sessions-format</strong></h4>
+<p>Specifies the format to use for the session audit log (csv or json).</p>
+<p>Type: string<br>
+Default: <code>csv</code></p>
+</section>
+<section id="server-shared-storage-path" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="server-shared-storage-path"><strong>server-shared-storage-path</strong></h4>
+<p>Specifies the path to the shared storage directory.</p>
+<p>Type: string<br>
+Default: <code>/var/lib/rstudio-server/shared-storage</code></p>
+<!-- -->
+</section>
+</section>
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+      <a href="../rstudio_server_configuration/rstudio_server_configuration.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../rstudio_server_configuration/rsession_conf.html">
+        <span class="nav-page-text">rsession.conf</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>

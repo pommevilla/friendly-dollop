@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – configuration</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007ba5; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #007ba5; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #007ba5; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../load_balancing/access_and_availability.html" rel="next">
+  <link href="../load_balancing/load_balancing_vs_job_launcher.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="active">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#lb-configuration" class="nav-link active" data-scroll-target="#lb-configuration">Configuration</a>
+<ul class="collapse">
+<li><a href="#requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
+<li><a href="#defining-nodes" class="nav-link" data-scroll-target="#defining-nodes">Defining Nodes</a></li>
+<li><a href="#key-file-requirements" class="nav-link" data-scroll-target="#key-file-requirements">Key File Requirements</a></li>
+<li><a href="#generating-a-key" class="nav-link" data-scroll-target="#generating-a-key">Generating a Key</a></li>
+<li><a href="#launcher-considerations" class="nav-link" data-scroll-target="#launcher-considerations">Launcher Considerations</a></li>
+<li><a href="#file-locking" class="nav-link" data-scroll-target="#file-locking">File Locking</a></li>
+<li><a href="#managing-nodes" class="nav-link" data-scroll-target="#managing-nodes">Managing Nodes</a></li>
+<li><a href="#troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
+</ul></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/load_balancing/configuration.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="lb-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="lb-configuration">Configuration</h2>
+<section id="requirements" class="level3">
+<h3 class="anchored" data-anchor-id="requirements">Requirements</h3>
+<p>There are several requirements for nodes within RStudio clusters:</p>
+<ol type="1">
+<li><p>All nodes must run the same version of RStudio Workbench.</p></li>
+<li><p>Server configurations (i.e.&nbsp;contents of the <code>/etc/rstudio</code> directory) must be identical.</p></li>
+<li><p>User accounts must be accessible from each node and usernames and user ids must be identical on all nodes. The same applies for any groups used by RStudio users, and also to the rstudio service user account.</p></li>
+<li><p>The clocks on all nodes must be synchronized.</p></li>
+<li><p>User home directories must be accessible via <strong>shared storage</strong> (e.g. all nodes mounting the same NFS volume).</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Due to high latencies, use of EFS (Elastic File System) for home directories within AWS is strongly discouraged. If EFS is used, RStudio will experience highly degraded performance. We recommend using a traditional NFSv3 or NFSv4 mount instead.</p>
+</div>
+</div></li>
+<li><p>An explicit server-wide shared storage path also must be defined. See the <a href="../r_sessions/project_sharing.html#shared-storage">Shared Storage</a> section for additional details.</p></li>
+<li><p>RStudio must be configured to use a <a href="../database/configuration.html#postgresql">PostgreSQL</a> database, and an empty database must be present for RStudio to write important cross-node state. If you have previously run RStudio with a <a href="../database/configuration.html#sqlite">SQLite</a> database, it is strongly advised that you execute the database <a href="../database/migration.html#migration">Migration</a> to the PostgreSQL database first. For more information, see <a href="../database/database.html">Database</a>.</p></li>
+</ol>
+</section>
+<section id="defining-nodes" class="level3">
+<h3 class="anchored" data-anchor-id="defining-nodes">Defining Nodes</h3>
+<p>To define a cluster node, two configuration files need to be provided:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/etc/rstudio/load-balancer</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/etc/rstudio/secure-cookie-key</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The first of these defines the available nodes and load balancing strategy. The second defines a shared key used for signing cookies (in single node configurations this key is generated automatically, however with multiple nodes explicit coordination is required. The same secure-cookie-key value <strong>must</strong> be used on each node).</p>
+<p>For example, to define a cluster with two nodes that load balances based the number of actively running R sessions you could use the following configuration:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">;</span> <span class="ex">/etc/rstudio/load-balancer</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[config]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">balancer</span> = sessions</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">[nodes]</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">server1.example.com</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">server2.example.com</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/secure-cookie-key</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">a55e5dc0-d6ae-11e3-9334-000c29635f71</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The secure cookie key file above is only an example; you need to generate your own unique key to share among the nodes in your cluster.</p>
+</section>
+<section id="key-file-requirements" class="level3">
+<h3 class="anchored" data-anchor-id="key-file-requirements">Key File Requirements</h3>
+<p>The following are the requirements for the secure cookie key file:</p>
+<ul>
+<li>The key value must have a minimum length of 128 bits (16 bytes/characters). RStudio won’t start if the key is too weak.</li>
+<li>The key file must have restrictive permissions (i.e.&nbsp;0600) to protect its contents from other users.</li>
+<li>The key file must be identical on all nodes in a load-balanced cluster, so that the nodes can communicate with each other.</li>
+<li>The key must have a secret value that cannot be guessed. Randomly generating the value is recommended; see below for one mechanism for doing so.</li>
+</ul>
+</section>
+<section id="generating-a-key" class="level3">
+<h3 class="anchored" data-anchor-id="generating-a-key">Generating a Key</h3>
+<p>You can create a secure cookie key using the <code>uuid</code> utility as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> sh <span class="at">-c</span> <span class="st">"echo </span><span class="kw">`</span><span class="ex">uuid</span><span class="kw">`</span><span class="st"> &gt; /etc/rstudio/secure-cookie-key"</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 0600 /etc/rstudio/secure-cookie-key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This is the recommended method, but any mechanism that generates a unique, random value will work.</p>
+<p>You do not need to generate a <code>secure-cookie-key</code> file on each server; generate it once, and copy it to each node along with the rest of the <code>/etc/rstudio</code> directory.</p>
+<p>This secure cookie key will also be used for encrypting and decrypting the PostgreSQL database password, if applicable. See <a href="../database/configuration.html#postgresql-password-encryption">PostgreSQL Password Encryption</a> for more details.</p>
+<section id="key-file-location" class="level4">
+<h4 class="anchored" data-anchor-id="key-file-location">Key File Location</h4>
+<p>You may optionally change the path of the secure-cookie-key by changing the <code>secure-cookie-key-file</code> setting in <code>rserver.conf</code>, though it is not necessary. Changing the path in this manner is only recommended in very specific circumstances when running the launcher with both RStudio Workbench and Package Manager simultaneously. For example:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">secure-cookie-key-file</span><span class="ot">=</span><span class="st">/mnt/rstudio/secure-cookie-key</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In addition, an explicit server-wide shared storage path must be defined (this is used for inter-node synchronization). This path is defined in the <code>/etc/rstudio/rserver.conf</code> file. For example:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">server-shared-storage-path</span><span class="ot">=</span><span class="st">/shared/rstudio-server/shared-storage</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For convenience, this path will often be located on the same volume used for shared home directory storage (e.g.&nbsp;at path <code>/home/rstudio-server/shared-storage</code>).</p>
+</section>
+</section>
+<section id="launcher-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="launcher-considerations">Launcher Considerations</h3>
+<p>If you are running RStudio Workbench load balancing in addition to using Launcher sessions, you will need to ensure that the <code>/etc/rstudio/launcher.pub</code> and <code>/etc/rstudio/launcher.pem</code> files match on all Workbench nodes in the cluster. Failure to do so will prevent users from being able to connect to their sessions from Workbench nodes other than where their sessions were initiated.</p>
+<p>For more information, see <a href="../job_launcher/configuration.html#rstudio-workbench-integration">RStudio Workbench Integration</a>.</p>
+</section>
+<section id="file-locking" class="level3">
+<h3 class="anchored" data-anchor-id="file-locking">File Locking</h3>
+<p>In order to synchronize the creation of sessions across multiple nodes RStudio Workbench uses a cross-node locking scheme. This scheme relies on the clocks on all nodes being synchronized. RStudio Workbench includes a <code>locktester</code> utility which you can use to verify that file locking is working correctly. To use the <code>locktester</code> you should login (e.g.&nbsp;via SSH or telnet) to at least two nodes using the same user account and then invoke the utility from both sessions as follows:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> /usr/lib/rstudio-server/bin/locktester</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The first node you execute the utility from should indicate the types of locks it was able to acquire, for example:</p>
+<pre><code>* Acquired advisory lock
+* Acquired link-based lock</code></pre>
+<p>After the message is printed the process will pause so that it can retain the lock (you can cause it to release the lock by interrupting it e.g.&nbsp;via Ctrl+C).</p>
+<p>The second and subsequent nodes you execute the utility will attempt to acquire the lock. A message will be printed to the console indicating which type of locks are supported, for example:</p>
+<pre><code>* Acquired advisory lock
+* Unable to acquire link-based lock
+
+Your filesystem appears to support link-based locks.</code></pre>
+<p>In this example, advisory locks are not supported (because both nodes were able to acquire an advisory lock), but link-based locks are. See <a href="#lock-configuration">Lock Configuration</a> for more information on configuring lock types.</p>
+<p>If you interrupt the first node (e.g.&nbsp;via Ctrl+C) the lock will be released and you can then acquire it from the other nodes.</p>
+<p>If either of the following occurs then there is an issue with file locking capabilities (or configuration) that should be addressed prior to using load balancing:</p>
+<ol type="1">
+<li>All nodes successfully acquire the file lock (i.e.&nbsp;more than one node can hold it concurrently).</li>
+<li>No nodes are able to acquire the file lock.</li>
+</ol>
+<p>If either of the above conditions hold then RStudio won’t be able to correctly synchronize the creation of R sessions throughout the cluster (potentially resulting in duplicate sessions and lost data due to sessions overwriting each others state).</p>
+<section id="lock-configuration" class="level4">
+<h4 class="anchored" data-anchor-id="lock-configuration">Lock Configuration</h4>
+<p>RStudio’s file locking scheme can be configured using a file at <code>/etc/rstudio/file-locks</code>. Valid entries are:</p>
+<ul>
+<li><code>lock-type=[linkbased|advisory]</code></li>
+<li><code>refresh-rate=[seconds]</code></li>
+<li><code>timeout-interval=[seconds]</code></li>
+<li><code>enable-logging=[0|1]</code></li>
+<li><code>log-file=[path]</code></li>
+</ul>
+<p>The default locking scheme, <code>linkbased</code>, uses a file locking scheme whereby locks are considered acquired when the process successfully hardlinks a dummy file to a location within the folder RStudio uses for client state (typically <code>~/.local/share/rstudio</code>). This scheme is generally more robust with older network file systems, and the locks should survive temporary filesystem mounts / unmounts.</p>
+<p>The <code>timeout-interval</code> and <code>refresh-rate</code> options can be used to configure how often the locks generated in the <code>linkbased</code> locking scheme are refreshed and reaped. By default, a process refreshes any locks it owns every 20 seconds, and scans for stale locks every 30 seconds. If an <code>rsession</code> process crashes, it can leave behind stale lock files; those lock files will be cleaned up after they expire by any newly-launched <code>rsession</code> processes.</p>
+<p><code>advisory</code> can be selected to use advisory file locks (using e.g.&nbsp;<code>fcntl()</code> or <code>flock()</code>). These locks are robust, but are not supported by all network file systems.</p>
+<p>If you are having issues with file locking, you can set <code>enable-logging=1</code>, and set the <code>log-file</code> option to a path where output should be written. When logging is enabled, RStudio will report its attempts to acquire and release locks to the log file specified by <code>log-file</code>. When <code>log-file</code> is unset, log entries will be emitted to the system logfile, typically located at <code>/var/log/messages</code> or <code>/var/lib/syslog</code>.</p>
+</section>
+</section>
+<section id="managing-nodes" class="level3">
+<h3 class="anchored" data-anchor-id="managing-nodes">Managing Nodes</h3>
+<section id="starting-up" class="level4">
+<h4 class="anchored" data-anchor-id="starting-up">Starting Up</h4>
+<p>After creating your configuration files you should ensure that these files (along with all other configuration defined in <code>/etc/rstudio</code>) are copied to all nodes in the cluster. Assuming that the server is already installed and running on each node, you can then apply the load balancing configuration by restarting the server:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rstudio-server restart</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="current-status" class="level4">
+<h4 class="anchored" data-anchor-id="current-status">Current Status</h4>
+<p>Once the cluster is running you can inspect its state (which sessions are running where) using the load balancing status HTTP endpoint. For example, when running the server on the default port (8787):</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:8787/load-balancer/status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that the status endpoint is accessed using localhost rather than an external IP address. This is because this endpoint is IP restricted to only be accessible within the cluster, so needs to be accessed directly from one of the nodes.</p>
+<p>The <code>status</code> endpoint will return output similar to the following:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.55.101:8787</span>  Load: 0.45, 0.66, 0.32</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>   <span class="ex">12108</span> <span class="at">-</span> jdoe</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>   <span class="ex">12202</span> <span class="at">-</span> kmccurdy</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.55.102:8787</span>  Load: 1, 0.75, 0.31</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>   <span class="ex">3404</span> <span class="at">-</span> bdylan</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.55.103:8787</span> <span class="er">(</span><span class="ex">unreachable</span><span class="kw">)</span>  <span class="ex">Load:</span> 0, 0, 0</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">192.168.55.104:8787</span> <span class="er">(</span><span class="ex">offline</span><span class="kw">)</span>  <span class="ex">Load:</span> 0.033, 0.38, 0.24</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This output will show all of the nodes in the cluster. Each node is indicated by its address and an optional status indicating whether the node is unreachable or offline. If the node does not indicate a status, then it is healthy and servicing requests. Following the node address is its CPU <code>Load</code>, indicated by three decimal values indicating the last known 1-minute, 5-minute, and 15-minute load averages, represented as a fraction of total CPU load. On subsequent output lines, each RStudio IDE session that is running on that particular node is listed along with its process ID and running user.</p>
+<p>An unreachable node indicates an issue connecting to it via the network. In most cases, this indicates that the <code>rstudio-server</code> service is not running on the node and should be troubleshooted by viewing any startup issues in the system logs for that particular node (see <a href="#diagnostics">Diagnostics</a> if the service is running and healthy). An offline node is one that was specifically put into offline mode via the command <code>sudo rstudio-server offline</code>, which causes it to stop servicing new sessions.</p>
+</section>
+<section id="adding-and-removing-nodes" class="level4">
+<h4 class="anchored" data-anchor-id="adding-and-removing-nodes">Adding and Removing Nodes</h4>
+<p>To temporarily remove a node from the cluster you can simply stop it:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rstudio-server stop</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>R sessions running on that node will be automatically moved to another active node. Note that only the session state is moved, not the running processes. To restore the node you can simply start it back up again:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rstudio-server start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that removing nodes does not require changing the list of defined nodes in <code>/etc/rstudio/load-balancer</code> (traffic is automatically routed around nodes not currently running).</p>
+<p>To add new nodes, simply add the nodes to the <code>/etc/rstudio/load-balancer</code> configuration file and send the <code>SIGHUP</code> signal to the <code>rserver</code> process (e.g., via <code>sudo rstudio-server reload</code>). It is recommended that this should be done to all nodes in the cluster, but depending on your routing configuration, at a minimum the node selected as the “main” node MUST be updated and signaled to start routing traffic to the new node(s).</p>
+<p>When removing nodes from the configuration file via the <code>SIGHUP</code> signal, you must ensure that any removed nodes have their processes stopped by running <code>sudo rstudio-server stop</code> on that node. Alternatively, you can suspend any actively running sessions by running <code>sudo rstudio-server suspend-all</code> on the node to be removed. Failure to do this will cause existing sessions running on the removed node to be stuck in an inaccessible state, and users will not be able to connect to those sessions.</p>
+<p>Reloading the load balancer configuration will also cause the <code>rserver-http</code> proxy configuration to be updated as well, which affects the RStudio’s running HTTP server. It is recommended that you do not make any other HTTP-related changes when updating the load balancer configuration unless you are aware of the potential side-effects!</p>
+</section>
+</section>
+<section id="troubleshooting" class="level3">
+<h3 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h3>
+<p>If users are having difficulty accessing RStudio in a load balanced configuration it’s likely due to one of the load balancing requirements not being satisfied. This section describes several scenarios where a failure due to unsatisfied requirements might occur.</p>
+<section id="node-network-instability" class="level4">
+<h4 class="anchored" data-anchor-id="node-network-instability">Node network instability</h4>
+<p>Some scenarios may causes RStudio to wait a long time for a node to respond due to network instability. You can limit how long is this waiting period with the <code>timeout</code> option, which is set to 10 seconds by default. This disable this timeout and use the system defaults, set it to zero.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">;</span> <span class="ex">/etc/rstudio/load-balancer</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[config]</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">balancer</span> = sessions</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">timeout</span> = 5</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ssl" class="level4">
+<h4 class="anchored" data-anchor-id="ssl">SSL</h4>
+<p>If one of the nodes is temporarily using a self-signed or otherwise functional but invalid certificate the load balancer may fail to use that node. You can skip SSL certificate verification by disabling the option <code>verify-ssl-certs</code>, which is only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">;</span> <span class="ex">/etc/rstudio/load-balancer</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">[config]</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">balancer</span> = sessions</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">verify-ssl-certs</span> = 0</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="user-accounts-not-synchronized" class="level4">
+<h4 class="anchored" data-anchor-id="user-accounts-not-synchronized">User Accounts Not Synchronized</h4>
+<p>One of the load balancing requirements is that user accounts must be accessible from each node and usernames and user ids must be identical on all nodes. If a user has the same username but <em>different</em> user ids on different nodes then permissions problems will result when the same user attempts to access shared storage using different user-ids.</p>
+<p>You can determine the ID for a given username via the <code>id</code> command. For example:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span> <span class="at">-u</span> jsmith</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="nfs-volume-mounting-problems" class="level4">
+<h4 class="anchored" data-anchor-id="nfs-volume-mounting-problems">NFS Volume Mounting Problems</h4>
+<p>If NFS volumes containing shared storage are unmounted during an RStudio session that session will become unreachable. Furthermore, unmounting can cause loss or corruption of file locks (see section below). If you are having problems related to accessing user directories then fully resetting the connections between RStudio nodes and NFS will often resolve them. To perform a full reset:</p>
+<ol type="1">
+<li><p>Stop RStudio on all nodes (<code>sudo rstudio-server stop</code>).</p></li>
+<li><p>Fully unmount the NFS volume from all nodes.</p></li>
+<li><p>Remount the NFS volume on all nodes.</p></li>
+<li><p>Restart RStudio on all nodes (<code>sudo rstudio-server start</code>).</p></li>
+</ol>
+</section>
+<section id="file-locking-problems" class="level4">
+<h4 class="anchored" data-anchor-id="file-locking-problems">File Locking Problems</h4>
+<p>Shared user storage (e.g.&nbsp;NFS) must support file locking so that RStudio can synchronize access to sessions across the various nodes in the cluster. File locking will not work correctly if the clocks on all nodes in the cluster are not synchronized. This condition may be surfaced as 502 HTTP errors. You can verify that file locking is working correctly by following the instructions in the <a href="#file-locking">File Locking</a> section above.</p>
+</section>
+<section id="diagnostics" class="level4">
+<h4 class="anchored" data-anchor-id="diagnostics">Diagnostics</h4>
+<p>To troubleshoot more complicated load balancing issues, RStudio can output detailed diagnostic information about internal load balancing traffic and state. You can enable this by using the <code>diagnostics</code> setting as follows:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[config]</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">diagnostics </span><span class="ot">=</span><span class="st"> tmp</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Set this on <em>every</em> server in the cluster, and restart the servers to apply the change. This will write a file <code>/tmp/rstudio-load-balancer-diagnostics</code> on each server containing the diagnostic information.</p>
+<p>The value <code>stderr</code> can be used in place of <code>tmp</code> to send diagnostics from the <code>rserver</code> process to standard error instead of a file on disk; this is useful if your RStudio Workbench instance runs non-daemonized.</p>
+<!-- -->
+</section>
+</section>
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+      <a href="../load_balancing/load_balancing_vs_job_launcher.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Load Balancing vs. Job Launcher</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../load_balancing/access_and_availability.html">
+        <span class="nav-page-text">Access and Availability</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>

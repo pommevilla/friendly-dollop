@@ -3,8 +3,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <meta name="dcterms.date" content="2021-06-28">
-  <title>RStudio Workbench Administration – RStudio Workbench 23.12.5-17</title>
+  <title>RStudio Workbench Administration – authenticating_users</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -17,24 +16,25 @@
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
-  <script src="site_libs/quarto-nav/quarto-nav.js"></script>
-  <script src="site_libs/quarto-nav/headroom.min.js"></script>
-  <meta name="quarto:offset" content=".">
-  <script src="site_libs/quarto-search/autocomplete.min.js"></script>
-  <script src="site_libs/quarto-search/fuse.min.js"></script>
-  <script src="site_libs/quarto-search/quarto-search.js"></script>
-  <link href="./getting_started/installation.html" rel="next">
-  <script src="site_libs/quarto-html/quarto.js"></script>
-  <script src="site_libs/quarto-html/popper.min.js"></script>
-  <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-  <script src="site_libs/quarto-html/clipboard.min.js"></script>
-  <script src="site_libs/quarto-html/anchor.min.js"></script>
-  <script src="site_libs/quarto-html/quarto-html.js"></script>
-  <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-  <link href="site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
-  <script src="site_libs/bootstrap/bootstrap.min.js"></script>
-  <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-  <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../authenticating_users/user_provisioning.html" rel="next">
+  <link href="../server_management/automated_crash_reporting.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
   <!-- Google Analytics -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -74,16 +74,16 @@
       display: none;
     }
   </style>
-  <link rel="stylesheet" href="styles/guide.css">
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
 </head>
 <body>
 <div id="quarto-search-results"></div>
 <header id="quarto-header" class="headroom fixed-top">
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
     <div class="container-fluid">
-  <a class="navbar-brand" href="./index.html">
-    <img src="./images/Rstudio-ball.svg" alt="">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
     RStudio Workbench Administration
   </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -112,7 +112,7 @@
 </nav>
 <nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <div class="container-fluid d-flex justify-content-between">
-    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline">RStudio Workbench 23.12.5-17</h1>
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
     <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
       <i class="bi bi-chevron-right"></i>
     </button>
@@ -131,33 +131,33 @@
       <ul class="list-unstyled sidebar-section depth1">
     <li class="">
         <div class="me-auto ">
-            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="true">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
               <div class="me-auto  sidebar-section-item">Getting Started</div>
             <div><i class="bi bi-chevron-right ms-2 "></i></div>
             </a>
         </div>
-      <div class="collapse  show" id="gettingstarted-collapse">
+      <div class="collapse  " id="gettingstarted-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./index.html" class="active">Introduction</a>
+  <a href="../index.html" class="">Introduction</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/installation.html" class="">Installation</a>
+  <a href="../getting_started/installation.html" class="">Installation</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/management_script.html" class="">Management Script</a>
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/activation.html" class="">Activation</a>
+  <a href="../getting_started/activation.html" class="">Activation</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/community_resources.html" class="">Community Resources</a>
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
 </li>
           <li class="sidebar-item">
-  <a href="./getting_started/professional_support.html" class="">Professional Support</a>
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
 </li>
         </ul>
       </div>
@@ -174,19 +174,19 @@
       <div class="collapse  " id="servermanagement-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./server_management/server_management.html" class="">Overview</a>
+  <a href="../server_management/server_management.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
 </li>
           <li class="sidebar-item">
-  <a href="./server_management/logging.html" class="">Logging</a>
+  <a href="../server_management/logging.html" class="">Logging</a>
 </li>
           <li class="sidebar-item">
-  <a href="./server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
 </li>
           <li class="sidebar-item">
-  <a href="./server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
 </li>
         </ul>
       </div>
@@ -195,48 +195,48 @@
       <ul class="list-unstyled sidebar-section depth1">
     <li class="">
         <div class="me-auto ">
-            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="true">
               <div class="me-auto  sidebar-section-item">Authenticating Users</div>
             <div><i class="bi bi-chevron-right ms-2 "></i></div>
             </a>
         </div>
-      <div class="collapse  " id="authenticatingusers-collapse">
+      <div class="collapse  show" id="authenticatingusers-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./authenticating_users/authenticating_users.html" class="">Overview</a>
+  <a href="../authenticating_users/authenticating_users.html" class="active">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/pam_basics.html" class="">PAM Basics</a>
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
 </li>
           <li class="sidebar-item">
-  <a href="./authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
 </li>
         </ul>
       </div>
@@ -253,43 +253,43 @@
       <div class="collapse  " id="accessandsecurity-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./access_and_security/access_and_security.html" class="">Overview</a>
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/frame_origin.html" class="">Frame Origin</a>
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/additional_headers.html" class="">Additional Headers</a>
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/ssl_ports.html" class="">SSL Ports</a>
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/cookies.html" class="">Cookies</a>
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/server_permissions.html" class="">Server Permissions</a>
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
 </li>
           <li class="sidebar-item">
-  <a href="./access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
 </li>
         </ul>
       </div>
@@ -306,55 +306,55 @@
       <div class="collapse  " id="rsessions-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./r_sessions/r_sessions.html" class="">Overview</a>
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/kerberos.html" class="">Kerberos</a>
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/directory_management.html" class="">Directory Management</a>
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/workspace_management.html" class="">Workspace Management</a>
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/first_project_template.html" class="">First Project Template</a>
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/project_sharing.html" class="">Project Sharing</a>
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/package_installation.html" class="">Package Installation</a>
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/feature_limits.html" class="">Feature Limits</a>
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/notifications.html" class="">Notifications</a>
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
 </li>
         </ul>
       </div>
@@ -371,22 +371,22 @@
       <div class="collapse  " id="rversions-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./r_versions/r_versions.html" class="">Overview</a>
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_versions/installing_r.html" class="">Installing R</a>
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_versions/session_initialization.html" class="">Session Initialization</a>
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
 </li>
         </ul>
       </div>
@@ -403,19 +403,19 @@
       <div class="collapse  " id="loadbalancing-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./load_balancing/load_balancing.html" class="">Overview</a>
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
 </li>
           <li class="sidebar-item">
-  <a href="./load_balancing/configuration.html" class="">Configuration</a>
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./load_balancing/access_and_availability.html" class="">Access and Availability</a>
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
 </li>
           <li class="sidebar-item">
-  <a href="./load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
 </li>
         </ul>
       </div>
@@ -432,16 +432,16 @@
       <div class="collapse  " id="auditingandmonitoring-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
 </li>
         </ul>
       </div>
@@ -458,25 +458,25 @@
       <div class="collapse  " id="licensemanagement-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./license_management/license_management.html" class="">Overview</a>
+  <a href="../license_management/license_management.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/product_activation.html" class="">Product Activation</a>
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/license_details.html" class="">License Details</a>
+  <a href="../license_management/license_details.html" class="">License Details</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/evaluations.html" class="">Evaluations</a>
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/floating_licensing.html" class="">Floating Licensing</a>
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
 </li>
           <li class="sidebar-item">
-  <a href="./license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
 </li>
         </ul>
       </div>
@@ -493,16 +493,16 @@
       <div class="collapse  " id="dataconnectivity-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./data_connectivity/data_connectivity.html" class="">Overview</a>
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
 </li>
           <li class="sidebar-item">
-  <a href="./data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
 </li>
           <li class="sidebar-item">
-  <a href="./data_connectivity/snippet_files.html" class="">Snippet Files</a>
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
 </li>
         </ul>
       </div>
@@ -519,22 +519,22 @@
       <div class="collapse  " id="joblauncher-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./job_launcher/job_launcher.html" class="">Overview</a>
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./job_launcher/configuration.html" class="">Configuration</a>
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
 </li>
           <li class="sidebar-item">
-  <a href="./job_launcher/load_balancing.html" class="">Load Balancing</a>
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
 </li>
           <li class="sidebar-item">
-  <a href="./job_launcher/creating_plugins.html" class="">Creating plugins</a>
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
 </li>
           <li class="sidebar-item">
-  <a href="./job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
 </li>
         </ul>
       </div>
@@ -551,19 +551,19 @@
       <div class="collapse  " id="tutorialapi-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./tutorial_api/tutorial_api.html" class="">Overview</a>
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./tutorial_api/configuration.html" class="">Configuration</a>
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./tutorial_api/interface.html" class="">Interface</a>
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
 </li>
           <li class="sidebar-item">
-  <a href="./tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
 </li>
           <li class="sidebar-item">
-  <a href="./tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
 </li>
         </ul>
       </div>
@@ -580,13 +580,13 @@
       <div class="collapse  " id="jupytersessions-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./jupyter_sessions/configuration.html" class="">Configuration</a>
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
 </li>
         </ul>
       </div>
@@ -603,19 +603,19 @@
       <div class="collapse  " id="vscodesessions-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./vscode_sessions/installation.html" class="">Installation</a>
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
 </li>
           <li class="sidebar-item">
-  <a href="./vscode_sessions/configuration.html" class="">Configuration</a>
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
 </li>
           <li class="sidebar-item">
-  <a href="./vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
 </li>
         </ul>
       </div>
@@ -632,13 +632,13 @@
       <div class="collapse  " id="database-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./database/database.html" class="">Overview</a>
+  <a href="../database/database.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./database/configuration.html" class="">Configuration</a>
+  <a href="../database/configuration.html" class="">Configuration</a>
 </li>
           <li class="sidebar-item">
-  <a href="./database/migration.html" class="">Migration</a>
+  <a href="../database/migration.html" class="">Migration</a>
 </li>
         </ul>
       </div>
@@ -655,22 +655,22 @@
       <div class="collapse  " id="hardening-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./hardening/hardening.html" class="">Overview</a>
+  <a href="../hardening/hardening.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./hardening/set_up_ssl.html" class="">Set up SSL</a>
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
 </li>
           <li class="sidebar-item">
-  <a href="./hardening/browser_security.html" class="">Browser Security</a>
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
 </li>
           <li class="sidebar-item">
-  <a href="./hardening/r_session_security.html" class="">R Session Security</a>
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
 </li>
           <li class="sidebar-item">
-  <a href="./hardening/other.html" class="">Other</a>
+  <a href="../hardening/other.html" class="">Other</a>
 </li>
           <li class="sidebar-item">
-  <a href="./hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
 </li>
         </ul>
       </div>
@@ -688,13 +688,13 @@
       <div class="collapse  " id="appendix-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
 </li>
           <li class="sidebar-item">
-  <a href="./rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
 </li>
           <li class="sidebar-item">
-  <a href="./r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
 </li>
           <ul class="list-unstyled sidebar-section depth2">
     <li class="">
@@ -707,13 +707,13 @@
       <div class="collapse  " id="rstudioconfiguration-collapse">
         <ul class="list-unstyled sidebar-item-contents">
           <li class="sidebar-item">
-  <a href="./rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
 </li>
           <li class="sidebar-item">
-  <a href="./rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
 </li>
           <li class="sidebar-item">
-  <a href="./rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
 </li>
         </ul>
       </div>
@@ -727,47 +727,96 @@
   </div>
 </nav>
   </div>
-  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"></div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/authenticating_users/authenticating_users.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
   <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
 <main>
-<header id="title-block-header">
-<h1 class="title d-none d-lg-block display-7">RStudio Workbench 23.12.5-17</h1>
-<p class="subtitle lead">Administration Guide</p>
-<p class="date">2021-06-28</p>
-</header>
-<p>RStudio Server enables you to provide a browser based interface (the RStudio IDE) to a version of R running on a remote Linux server. Deploying R and RStudio on a server has a number of benefits, including:</p>
-<ul>
-<li>The ability to access R sessions from any computer in any location;</li>
-<li>Easy sharing of code, data, and other files with colleagues;</li>
-<li>Allowing multiple users to share access to the more powerful compute resources (memory, processors, etc.) available on a well equipped server; and</li>
-<li>Centralized installation and configuration of R, R packages, TeX, and other supporting libraries.</li>
-</ul>
-<p>This manual describes <em>RStudio Workbench</em>, which adds many enhancements to the open-source version of RStudio Server, including:</p>
-<ul>
-<li>The ability to run multiple concurrent RStudio IDE sessions per-user.</li>
-<li>Flexible use of multiple versions of R on the same server.</li>
-<li>The ability to run sessions on external cluster nodes, such as Kubernetes or Slurm.</li>
-<li>Support for Jupyter, JupyterLab, and VS Code editor sessions.</li>
-<li>Project sharing for easy collaboration within workgroups.</li>
-<li>Load balancing for increased capacity and higher availability.</li>
-<li>An administrative dashboard that provides insight into active sessions, server health, and monitoring of system-wide and per-user performance and resource metrics;</li>
-<li>Authentication using system accounts, ActiveDirectory, LDAP, SAML, OpenID, or Google Accounts;</li>
-<li>Full support for PAM (including PAM sessions for dynamically provisioning user resources);</li>
-<li>Ability to establish per-user or per-group CPU priorities and memory limits;</li>
-<li>HTTP enhancements including support for SSL and keep-alive for improved performance;</li>
-<li>Ability to restrict access to the server by IP;</li>
-<li>Customizable server health checks; and</li>
-<li>Suspend, terminate, or assume control of user sessions; Impersonate users for assistance and troubleshooting.</li>
-</ul>
-<p>The documentation applies to both RStudio Server (Open Source) and RStudio Workbench (Pro), unless the section is specifically marked <code>Pro</code>, in which case it only applies to RStudio Workbench.</p>
+
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p><strong>R users require local system accounts regardless of what RStudio authentication method you use.</strong> You must set up local system accounts manually or programmatically and then map authenticating users to these accounts.</p>
+<p>For user identification, authentication, and authorization using local system accounts, RStudio relies heavily on Linux <a href="http://en.wikipedia.org/wiki/Pluggable_authentication_module">Pluggable Authentication Module (PAM)</a>. PAM can be used by itself to authenticate users or along with other external authentication mechanisms (e.g., Web Single Sign-On) to authorize existing local system accounts.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Not all RStudio products require local system accounts or PAM. For example, RStudio Connect and Shiny Server rely on their own authentication engines and on a single system account for doing their work in most cases, not requiring individualized development environments like the ones offered by RStudio Workbench.</p>
+</div>
+</div>
+<p>Here are the various authentication mechanisms supported by RStudio:</p>
+<table class="table">
+<colgroup>
+<col style="width: 38%">
+<col style="width: 61%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Authentication</th>
+<th>RStudio Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Local Accounts</td>
+<td><a href="../authenticating_users/pam_authentication.html">PAM Authentication</a> (via <code>pam_unix</code>)</td>
+</tr>
+<tr class="even">
+<td>LDAP or Active Directory</td>
+<td><a href="../authenticating_users/pam_authentication.html">PAM Authentication</a> (via <code>pam_sss</code> or <code>pam_ldap</code> in older systems)</td>
+</tr>
+<tr class="odd">
+<td>Kerberos</td>
+<td><a href="../authenticating_users/pam_authentication.html">PAM Authentication</a> (via <code>pam_sss</code> or <code>pam_krb5</code> in older systems)</td>
+</tr>
+<tr class="even">
+<td>Web Single Sign-On (SSO)</td>
+<td><a href="../authenticating_users/saml_sso.html">SAML Single Sign-On Authentication</a> or <a href="../authenticating_users/openid_connect_authentication.html">OpenID Connect Authentication</a></td>
+</tr>
+<tr class="odd">
+<td>Others (client-server, e.g., RADIUS)</td>
+<td>As supported by various <a href="http://www.linux-pam.org/Linux-PAM-html/Linux-PAM_SAG.html">PAM modules</a></td>
+</tr>
+<tr class="even">
+<td>Others (browser-based, e.g., Kerberos <a href="https://en.wikipedia.org/wiki/SPNEGO">SPNEGO</a> SSO)</td>
+<td><a href="../authenticating_users/proxied_authentication.html">Proxied Authentication</a></td>
+</tr>
+</tbody>
+</table>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>SAML, OpenID, and Proxied authentication still require <a href="../r_sessions/pam_sessions.html">PAM Sessions</a> to automatically create local system accounts. Without it, local system accounts have to be provisioned manually one-by-one.</p>
+</div>
+</div>
 <!-- -->
+</section>
 </main>
 <div class="page-navigation page-navigation-docked">
   <div class="nav-page nav-page-previous">
+      <a href="../server_management/automated_crash_reporting.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Automated Crash Reporting</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./getting_started/installation.html">
-        <span class="nav-page-text">Installation</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../authenticating_users/user_provisioning.html">
+        <span class="nav-page-text">User Provisioning</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </div>

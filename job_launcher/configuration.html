@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – configuration</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007ba5; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #007ba5; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #007ba5; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../job_launcher/running_the_launcher.html" rel="next">
+  <link href="../job_launcher/job_launcher.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="active">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#launcher-configuration" class="nav-link active" data-scroll-target="#launcher-configuration">Configuration</a>
+<ul class="collapse">
+<li><a href="#job-launcher-configuration" class="nav-link" data-scroll-target="#job-launcher-configuration">Job Launcher Configuration</a></li>
+<li><a href="#rstudio-workbench-integration" class="nav-link" data-scroll-target="#rstudio-workbench-integration">RStudio Workbench Integration</a></li>
+</ul></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/job_launcher/configuration.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="launcher-configuration" class="level2">
+<h2 class="anchored" data-anchor-id="launcher-configuration">Configuration</h2>
+<section id="job-launcher-configuration" class="level3">
+<h3 class="anchored" data-anchor-id="job-launcher-configuration">Job Launcher Configuration</h3>
+<p>Before the Job Launcher can be run, it must be properly configured via the config file <code>/etc/rstudio/launcher.conf</code>; see the <a href="https://docs.rstudio.com/job-launcher/1.4.1717-3/index.html">Job Launcher documentation</a> for supported configuration options. If the Launcher was installed with RStudio Workbench, a default working configuration that uses the Local plugin is installed for your convenience.</p>
+<p>The Launcher configuration parameter <code>admin-group</code> should be configured to the group value of the RStudio Workbench server user, specified in the <code>server-user</code> configuration parameter in <code>rserver.conf</code> (which defaults to rstudio-server). This makes the server user a Job Launcher admin, which is necessary to properly launch sessions on behalf of other users.</p>
+</section>
+<section id="rstudio-workbench-integration" class="level3">
+<h3 class="anchored" data-anchor-id="rstudio-workbench-integration">RStudio Workbench Integration</h3>
+<p>RStudio Workbench must be configured in order to integrate with the Job Launcher. There are several files which house the configuration, and they are described within subsequent sections.</p>
+<section id="server-configuration" class="level4">
+<h4 class="anchored" data-anchor-id="server-configuration">Server Configuration</h4>
+<p>The RStudio Workbench process <code>rserver</code> must be configured to communicate with the Job Launcher in order to enable session launching. The following table lists the various configuration options that are available to be specified in the <code>rserver.conf</code> configuration file:</p>
+<p><strong>/etc/rstudio/rserver.conf</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 72%">
+<col style="width: 5%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Config Option</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>launcher-sessions-enabled</td>
+<td>Enables launching of rsession processes via the Job Launcher. This must be enabled to use the Job Launcher.</td>
+<td><strong>N</strong></td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>launcher-address</td>
+<td>TCP host/IP of the launcher host, or unix domain socket path (must match <code>/etc/rstudio/launcher.conf</code> configuration value). If using the default launcher configuration that ships with RStudio, this should be <code>localhost</code> (assuming you run the launcher side-by-side with RStudio Workbench).</td>
+<td><strong>Y</strong></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>launcher-port</td>
+<td>Port that the launcher is listening on. Only required if not using unix domain sockets. If using the default launcher configuration that ships with RStudio, this should be <code>5559</code>.</td>
+<td><strong>Y</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>launcher-default-cluster</td>
+<td>Name of the cluster to use when launching sessions. Can be overridden by the launching user.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>launcher-sessions-callback-address</td>
+<td>Address (HTTP or HTTPS) of RStudio Workbench that will be used by launcher sessions to communicate back for project sharing and launcher features. The address must be the reachable address of the <code>rserver</code> process from the host that will be running <code>rsession</code>, which in the case of launcher sessions can be on a different network segment entirely. If RStudio is configured to use SSL, you must also ensure that the callback address hostname matches the FQDN of the Common Name or one of the Subject Alternate Names on the HTTPS certificate. See the example configuration below for more details.</td>
+<td><strong>Y</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>launcher-sessions-callback-verify-ssl-certs</td>
+<td>Whether or not to verify SSL certificates when Launcher sessions are connecting to RStudio. Only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes.</td>
+<td><strong>N</strong></td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>launcher-use-ssl</td>
+<td>Whether or not to connect to the launcher over HTTPS. Only supported for connections that do not use unix domain sockets.</td>
+<td><strong>N</strong></td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>launcher-verify-ssl-certs</td>
+<td>Whether or not to verify SSL certificates when connecting to the launcher. Only applicable if connecting over HTTPS. For production use, you should always leave the default or have this set to true, but it can be disabled for testing purposes.</td>
+<td><strong>N</strong></td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>launcher-sessions-clusters</td>
+<td>Whitelist of clusters to allow for submitting interactive session jobs to. The default allows all job launcher clusters to run interactive sessions.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>launcher-adhoc-clusters</td>
+<td>Whitelist of clusters to allow for submitting adhoc jobs from the Launcher pane. The default allows all job launcher clusters to run adhoc jobs.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>launcher-sessions-container-image</td>
+<td>The default container image to use when creating sessions. Only required if using a plugin that requires containerization. If none is specified, the Job launcher-specified default will be used, if the plugin supports it.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>launcher-sessions-container-images</td>
+<td>Comma-separated list of images which may be used for launching sessions. Used to filter out incompatible entries from the UI when a user is selecting an image to use for running the session. Leave blank to allow all images to be used.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>launcher-adhoc-container-images</td>
+<td>Comma-separated list of images which may be used for launching adhoc jobs. Used to filter out incompatible entries from the UI when a user is selecting an image to use for running an adhoc job. Leave blank to allow all images to be used.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>launcher-sessions-container-run-as-root</td>
+<td>Whether or not to run as root within the session container. We recommend you do not use this in most cases.</td>
+<td><strong>N</strong></td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>launcher-sessions-create-container-user</td>
+<td>Whether or not to create the session user within the container. Only applicable if using container sessions and not running containers as root. The created user will have the same UID, GID, home directory, and login shell as the user that launched the session. It is recommended that this option be used, unless your containers connect to an LDAP service to manage users and groups. The container starts as root so it can create the correct user and group ids, then drops privilege to use the created user account. If it cannot drop privilege the container will fail to start.</td>
+<td><strong>N</strong></td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>launcher-sessions-forward-container-environment</td>
+<td>Whether or not to forward any container environment variables to the session. This is useful for example, propogating Kubernetes secrets to the sesion. However, the variables <code>USER</code>, <code>HOME</code>, and <code>LOGNAME</code> are not forwarded, and are loaded from the user’s passwd entry.</td>
+<td><strong>N</strong></td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>launcher-sessions-connection-timeout-seconds</td>
+<td>Number of seconds to allow for making the initial connection to a launcher session. Connection failures are retried automatically - this is simply to prevent unreachable hosts from hanging the retry process as the default connection timeout on most systems is very high. Only change this if you are having trouble connecting to sessions. A value of 0 indicates that there should be no timeout (system default).</td>
+<td><strong>N</strong></td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>launcher-sessions-container-forward-groups</td>
+<td>Whether or not to forward the user’s supplemental groups to the created containers. This will only be done when not creating the container user, and when running the container as a non-root user, such as if integrating with LDAP. This is enabled by default, but if group lookups are very expensive in your environment and supplemental groups are not necessary, this can be disabled.</td>
+<td><strong>N</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>For example, your <code>rserver.conf</code> file might look like the following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/rserver.conf</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-address</span><span class="ot">=</span><span class="kw">localhost</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-port</span><span class="ot">=</span><span class="dv">5559</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-sessions-enabled</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-default-cluster</span><span class="ot">=</span><span class="st">Kubernetes</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># the callback address that launcher sessions will reconnect to rserver on</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># since our Kubernetes jobs run on a different network segment, this needs</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># to be the routable IP address of the web server servicing RStudio traffic</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># (routable from the point of view of any Kubernetes nodes)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-sessions-callback-address</span><span class="ot">=</span><span class="st">http://</span><span class="dv">10</span><span class="st">.</span><span class="dv">15</span><span class="st">.</span><span class="fl">44.30</span><span class="st">:</span><span class="dv">8787</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-use-ssl</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-sessions-container-image</span><span class="ot">=</span><span class="st">rstudio:R</span><span class="fl">-3.5</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-sessions-container-run-as-root</span><span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="dt">launcher-sessions-create-container-user</span><span class="ot">=</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ssl-considerations" class="level4">
+<h4 class="anchored" data-anchor-id="ssl-considerations">SSL Considerations</h4>
+<p>Both RStudio Workbench and the Job Launcher can be configured to use SSL. When the Launcher is configured to use SSL, the RStudio Workbench node(s) that are connecting to the Launcher must ensure that the hostname configured in the <code>launcher-address</code> field matches the FQDN of the Common Name or Subject Alternate Name of the certificate that is presented by the Launcher. If the hostnames do not match exactly, SSL verification will fail, and RStudio will be unable to connect to the Job Launcher.</p>
+<p>Similarly, if RStudio Workbench is configured to use SSL, the hostname configured in the <code>launcher-sessions-callback-address</code> field must match the FQDN of the Common Name or Subject Alternate Name of the certificate that is presented by RStudio. Failure to do so will cause certificate verification to fail when sessions attempt to connect to RStudio, preventing you from using Job Launcher functionality such as starting Launcher jobs.</p>
+<p>Additionally, both the RStudio Workbench and Job Launcher root certificates need to be imported into the trusted root certificate store on the systems that are accessing those addresses. For example, the Workbench server nodes need to have the Job Launcher root certificate installed in their trusted certificate store to ensure that certificate verification works correctly. The exact steps for importing a certificate into the trusted root store are operating system specific and outside of the scope of this document.</p>
+</section>
+<section id="job-launcher-and-pam-sessions" class="level4">
+<h4 class="anchored" data-anchor-id="job-launcher-and-pam-sessions">Job Launcher and PAM Sessions</h4>
+<p>PAM Sessions work slightly differently when used with Launcher sessions. See <a href="../r_sessions/pam_sessions.html#pam-sessions-with-the-job-launcher">PAM Sessions with the Job Launcher</a> for more information.</p>
+</section>
+<section id="authentication" class="level4">
+<h4 class="anchored" data-anchor-id="authentication">Authentication</h4>
+<p>RStudio Workbench authenticates with the Job Launcher via the <code>secure-cookie-key</code> file, a secret key that is read on startup of both the launcher and RStudio which is only readable by the root account. The file is present at <code>/etc/rstudio/secure-cookie-key</code>. If the Job Launcher is running on a different machine than RStudio Workbench, you will need to make sure that the exact same <code>secure-cookie-key</code> file is present on both machines.</p>
+<p>To do this, create a secure cookie key file on one of the nodes like so:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate secure-cookie-key as a simple UUID</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> sh <span class="at">-c</span> <span class="st">"echo </span><span class="kw">`</span><span class="ex">uuid</span><span class="kw">`</span><span class="st"> &gt; /etc/rstudio/secure-cookie-key"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ensure that the cookie is only readable by root</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 0600 /etc/rstudio/secure-cookie-key</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Once this file has been created, copy it to the other node to the same location so that both services use the same key. Alternatively, you could accomplish this via a symlink to a location on a file share.</p>
+<p>The path to the <code>secure-cookie-key</code> file can be changed, but it is not recommended in most cases. If you need to change it, it can be done by adding the following line to the <code>/etc/rstudio/rserver.conf</code> and <code>/etc/rstudio/launcher.conf</code> configuration files:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">secure-cookie-key-file=/path/to/secure-cookie-key</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>When running Launcher sessions in a load balanced RStudio deployment, sessions do additional authorization verification to ensure that they are only used by the user that created them. This is accomplished by an RSA key pair, located at <code>/etc/rstudio/launcher.pem</code> and <code>/etc/rstudio/launcher.pub</code>. These files must be the same on every RStudio node, or users will be unable to use their sessions on multiple nodes.</p>
+<p>In order to create the RSA files, run the following commands:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> openssl genpkey <span class="at">-algorithm</span> RSA <span class="at">-out</span> /etc/rstudio/launcher.pem <span class="at">-pkeyopt</span> rsa_keygen_bits:2048</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> openssl rsa <span class="at">-in</span> /etc/rstudio/launcher.pem <span class="at">-pubout</span> <span class="op">&gt;</span> /etc/rstudio/launcher.pub</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 0600 /etc/rstudio/launcher.pem<span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You must ensure that the above private key (.pem) file is owned by root and has <code>600</code> permissions, as it <em>must</em> remain secret to your users.</p>
+<p>Once the files are created, simply copy them to each RStudio node in your cluster.</p>
+</section>
+<section id="launcher-sessions" class="level4">
+<h4 class="anchored" data-anchor-id="launcher-sessions">Launcher Sessions</h4>
+<p>It is recommended that you configure the Shared Storage path (see <a href="../r_sessions/project_sharing.html#shared-storage">Shared Storage</a> for configuration) in a location that will be reachable both by the RStudio Workbench instance and each Launcher Session in order to support various RStudio features. Failure to do so could cause subtle, unintended issues.</p>
+<p>See the <a href="#launcher-mounts">Launcher Mounts</a> section for more details about how to configure this correctly with <a href="#containerized-sessions">Containerized Sessions</a>.</p>
+</section>
+<section id="containerized-sessions" class="level4">
+<h4 class="anchored" data-anchor-id="containerized-sessions">Containerized Sessions</h4>
+<p>In order to run your R sessions in containers, you will need a Docker image that contains the necessary <code>rsession</code> binaries installed. RStudio provides an official image for this purpose, which you can get from <a href="https://hub.docker.com/r/rstudio/r-session-complete">Docker Hub</a>.</p>
+<p>For example, to get the RHEL6 image, you would run:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull rstudio/r-session-complete:centos7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After pulling the desired image, you will need to create your own Dockerfile that extends from the r-session-complete image and adds whatever versions of R you want to be available to your users, as well as adding any R packages that they will need. For example, your Dockerfile should look similar to the following:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> rstudio/r-session-complete:centos7</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install desired versions of R</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> yum install <span class="at">-y</span> R</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># install R packages</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>See <a href="https://hub.docker.com/r/rstudio/r-session-complete">Docker Hub</a> for more information.</p>
+<section id="launcher-mounts" class="level5">
+<h5 class="anchored" data-anchor-id="launcher-mounts">Launcher Mounts</h5>
+<p>When creating containerized sessions via the Job Launcher, you will need to specify mount points as appropriate to mount the users’ home drives and any other desired paths. In order for sessions to run properly within containers, it is <strong>required</strong> to mount the home directories into the containers, as well as any directories containing per-user state (e.g., a customized <code>XDG_DATA_HOME</code>). The home mount path within the container must be the same as the user’s home path as seen by the RStudio Workbench instance itself (generally, <code>/home/{USER}</code>).</p>
+<p>To specify mount points, modify the <code>/etc/rstudio/launcher-mounts</code> file to consist of multiple mount entries separated by a blank line. The following table lists the fields that are available for each mount entry in the file.</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 64%">
+<col style="width: 3%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MountType</td>
+<td>The type of mount. Can be <code>Host</code>, <code>NFS</code>, <code>CephFs</code>, <code>GlusterFs</code>, <code>AzureFile</code>, <code>KubernetesPersistentVolumeClaim</code>, or <code>Passthrough</code></td>
+<td><strong>Y</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>MountPath</td>
+<td>The path within the container that the directory will be mounted to.</td>
+<td><strong>Y</strong></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>ReadOnly</td>
+<td>Whether or not the mount is read only. Can be true or false.</td>
+<td><strong>N</strong></td>
+<td>false</td>
+</tr>
+<tr class="even">
+<td>JobType</td>
+<td>What type of jobs the mount is applied to. Can be <code>session</code>, <code>adhoc</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="odd">
+<td>Workbench</td>
+<td>What type of workbench the mount is applied to. Can be <code>rstudio</code>, <code>jupyterlab</code>, <code>jupyter notebook</code>, <code>vs code</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="even">
+<td>Cluster</td>
+<td>The specific cluster that this mount applies to. Applies to all clusters if not specified.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Depending on the <code>MountType</code> specified above, different settings may be used to control the mount.</p>
+<p><strong>MountType: Host</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Path</td>
+<td>The source directory of the mount, i.e.&nbsp;where the mount data comes from.</td>
+<td><strong>Y</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: NFS</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Path</td>
+<td>The source directory of the mount, i.e.&nbsp;where the mount data comes from.</td>
+<td><strong>Y</strong></td>
+</tr>
+<tr class="even">
+<td>Host</td>
+<td>The NFS host name for the NFS mount.</td>
+<td><strong>N</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: CephFs</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Monitors</td>
+<td>A comma-separated list of Ceph monitor addresses. For example: <code>192.168.1.200:8765,192.168.1.200:8766</code></td>
+<td><strong>Y</strong></td>
+</tr>
+<tr class="even">
+<td>Path</td>
+<td>The path within the Ceph filesystem to mount</td>
+<td><strong>N</strong></td>
+</tr>
+<tr class="odd">
+<td>User</td>
+<td>The Ceph username to use</td>
+<td><strong>N</strong></td>
+</tr>
+<tr class="even">
+<td>SecretFile</td>
+<td>The file which contains the Ceph keyring for authentication</td>
+<td><strong>N</strong></td>
+</tr>
+<tr class="odd">
+<td>SecretRef</td>
+<td>Reference to Ceph authentication secrets, which overrides <code>SecretFile</code> if specified</td>
+<td><strong>N</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: GlusterFs</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Endpoints</td>
+<td>The name of the endpoints object that represents a Gluster cluster configuration</td>
+<td><strong>Y</strong></td>
+</tr>
+<tr class="even">
+<td>Path</td>
+<td>The name of the GlusterFs volume</td>
+<td><strong>Y</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: AzureFile</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SecretName</td>
+<td>The name of the secret that contains both the Azure storage account name and the key</td>
+<td><strong>Y</strong></td>
+</tr>
+<tr class="even">
+<td>ShareName</td>
+<td>The share name to be used</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: KubernetesPersistentVolumeClaim</strong></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ClaimName</td>
+<td>The name of the Kubernetes Persistent Volume Claim to use</td>
+<td><strong>Y</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>MountType: Passthrough</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 82%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FilePath</td>
+<td>Path to a file that contains the raw JSON object representing the mount, which is sent directly to the back-end without transformation</td>
+<td><strong>Y</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Note that for many mount types, paths may contain the special variable <code>{USER}</code> to indicate that the user’s name be substituted, enabling you to mount user-specific paths.</p>
+<p>An example <code>/etc/rstudio/launcher-mounts</code> file is shown below.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-mounts</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># User home mount - This is REQUIRED for the session to run</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">MountType: NFS</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Host: nfs01</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Path: /home/{USER}</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">MountPath: /home/{USER}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="dt">ReadOnly: false</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Shared code mount</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="dt">Cluster: Kubernetes</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="dt">MountType: NFS</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="dt">Host: nfs01</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="dt">Path: /dev64</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="dt">MountPath: /code</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="dt">ReadOnly: false</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Only mount the following directory when the user is launching a JupyterLab session</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="dt">Cluster: Kubernetes</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="dt">Workbench: JupyterLab</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="dt">MountType: CephFs</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="dt">Monitors: 127.0.0.1:8080,127.0.0.1:8081</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="dt">SecretFile: /etc/secrets/ceph</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="dt">ReadOnly: true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It is important that each entry consists of the fields as specified above. Each field must go on its own line. There should be no empty lines between field definitions. Each entry must be separated by one full blank line (two new-line <code>\n</code> characters).</p>
+<p>If you choose to run your containers as root, the user home drive <strong>must</strong> be mapped to <code>/root</code>. For example:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-mounts</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MountType: NFS</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Host: nfs01</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Path: /home/{USER}</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">MountPath: /root</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="dt">ReadOnly: false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As noted in the <a href="#launcher-sessions">Launcher Sessions</a> section, it is recommended that you also mount the Shared Storage path (see [Shared Storage] for configuration) into the session container to support various RStudio features. When mounting the shared storage path, ensure that the folder is mounted to the same path within the container to ensure that the <code>rsession</code> executable will correctly find it. For example:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-mounts</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">MountType: NFS</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Host: nfs01</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Path: /rstudio/shared-storage</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">MountPath: /rstudio/shared-storage</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="dt">ReadOnly: false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="launcher-environment" class="level5">
+<h5 class="anchored" data-anchor-id="launcher-environment">Launcher Environment</h5>
+<p>You may optionally specify environment variables to set when creating launcher sessions.</p>
+<p>To specify environment overrides, modify the <code>/etc/rstudio/launcher-env</code> file to consist of multiple environment entries separated by a blank line. The following table lists the fields that are available for each environment entry in the file.</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 64%">
+<col style="width: 3%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>JobType</td>
+<td>What type of jobs the environment value(s) is applied to. Can be <code>session</code>, <code>adhoc</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="even">
+<td>Workbench</td>
+<td>What type of workbench the mount is applied to. Can be <code>rstudio</code>, <code>jupyterlab</code>, <code>jupyter notebook</code>, <code>vs code</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="odd">
+<td>Cluster</td>
+<td>The specific cluster that the environment applies to. Applies to all clusters if not specified.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Environment</td>
+<td>The environment variables to set, one per line (each subsequent line must be indented with an arbitrary amount of spaces or tabs), in the form of <code>KEY=VALUE</code> pairs.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Additionally, you can use the special <code>{USER}</code> variable to specify the value of the launching user’s username, similar to the mounts file above.</p>
+<p>An example <code>/etc/rstudio/launcher-env</code> file is shown below.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-env</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">JobType: session</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Environment: IS_LAUNCHER_SESSION</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="dt"> IS_ADHOC_JOB</span><span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="dt"> USER_HOME</span><span class="ot">=</span><span class="st">/home/{USER}</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="dt">JobType: adhoc</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Environment: IS_LAUNCHER_SESSION</span><span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="dt"> IS_ADHOC_JOB</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="dt"> USER_HOME</span><span class="ot">=</span><span class="st">/home/{USER}</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="dt">JobType: any</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="dt">Cluster: Kubernetes</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="dt">ENVIRONMENT: IS_KUBERNETES</span><span class="ot">=</span><span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you do not need to set different environment variables for different job types or different clusters, you may simply specify <code>KEY=VALUE</code> pairs, one per line, which will be applied to all launcher ad-hoc jobs and sessions. For example:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="dt">IS_LAUNCHER_JOB</span><span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="dt">USER_HOME</span><span class="ot">=</span><span class="st">/home/{USER}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="launcher-ports" class="level5">
+<h5 class="anchored" data-anchor-id="launcher-ports">Launcher Ports</h5>
+<p>You may optionally specify ports that should be exposed when creating containerized jobs. This will allow the ports to be exposed within the host running the container, allowing the ports to be reachable from external services. For example, for Shiny applications to be usable, you must expose the desired Shiny port, otherwise the browser window will not be able to connect to the Shiny application running within the container.</p>
+<p>To specify exposed ports, modify the <code>/etc/rstudio/launcher-ports</code> file to consist of multiple port entries separated by a blank line. The following table lists the fields that are available for each port entry in the file.</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 64%">
+<col style="width: 3%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Description</th>
+<th>Required (Y/N)</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>JobType</td>
+<td>What type of jobs the port(s) is applied to. Can be <code>session</code>, <code>adhoc</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="even">
+<td>Workbench</td>
+<td>What type of workbench the mount is applied to. Can be <code>rstudio</code>, <code>jupyterlab</code>, <code>jupyter notebook</code>, <code>vs code</code>, or <code>any</code>.</td>
+<td><strong>N</strong></td>
+<td>any</td>
+</tr>
+<tr class="odd">
+<td>Cluster</td>
+<td>The specific cluster that this set of ports applies to. Applies to all clusters if not specified.</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Ports</td>
+<td>The ports to expose, one per line (each subsequent line must be indented with an arbitrary amount of spaces or tabs).</td>
+<td><strong>N</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>An example <code>/etc/rstudio/launcher-ports</code> file is shown below.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-ports</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">JobType: adhoc</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Ports: 6210</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="dt"> 6143</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="dt"> 6244</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="dt"> 6676</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># additional Kubernetes ports to expose</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="dt">JobType: adhoc</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="dt">Cluster: Kubernetes</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Ports: 4434</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you do not need to set different exposed ports for different job types or different clusters, you may simply specify port values, one per line, which will be applied to all launcher ad-hoc jobs and sessions. For example:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># /etc/rstudio/launcher-ports</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">5873</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">5874</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dt">64234</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="dt">64235</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="containerized-adhoc-jobs" class="level4">
+<h4 class="anchored" data-anchor-id="containerized-adhoc-jobs">Containerized Adhoc Jobs</h4>
+<p>To run adhoc jobs in containers from the Launcher pane, you need a Docker image containing the bash shell and the desired version of R on the path.</p>
+<p>The adhoc job container will run using the same userId and groupId value as the RStudio user. In order for scripts under the home directory to be found in the container, the home directory must be mounted with the same absolute path inside the container.</p>
+<p>Jobs started from the RStudio console via <code>rstudioapi::launcherSubmitJob()</code> have no specific container requirements.</p>
+<!-- -->
+</section>
+</section>
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+      <a href="../job_launcher/job_launcher.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../job_launcher/running_the_launcher.html">
+        <span class="nav-page-text">Running the Launcher</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>

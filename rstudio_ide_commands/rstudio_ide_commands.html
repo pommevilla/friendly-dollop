@@ -1,0 +1,2866 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – rstudio_ide_commands</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../r_package_dependencies/r_package_dependencies.html" rel="next">
+  <link href="../session_user_settings/session_user_settings.html" rel="prev">
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="active">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#rstudio-ide-commands" class="nav-link active" data-scroll-target="#rstudio-ide-commands">RStudio IDE Commands</a></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/rstudio_ide_commands/rstudio_ide_commands.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="rstudio-ide-commands" class="level1">
+<h1>RStudio IDE Commands</h1>
+<p>The following table enumerates all of the commands currently supported by RStudio. These command IDs can be used in RStudio API calls such as <code>rstudioapi::executeCommand</code>.</p>
+<div class="cell">
+<table class="table">
+<colgroup>
+<col style="width: 32%">
+<col style="width: 67%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Id</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">activateBuild</td>
+<td style="text-align: left;">Show Build</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateCompilePDF</td>
+<td style="text-align: left;">Show Compile PDF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateConnections</td>
+<td style="text-align: left;">Show Connections</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateConsole</td>
+<td style="text-align: left;">Move Focus to Console</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateConsolePane</td>
+<td style="text-align: left;">Move Focus to Console Panel</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateData</td>
+<td style="text-align: left;">Show Data</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateDeployContent</td>
+<td style="text-align: left;">Show Deploy Content</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateEnvironment</td>
+<td style="text-align: left;">Show Environment</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateFiles</td>
+<td style="text-align: left;">Show Files</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateFindInFiles</td>
+<td style="text-align: left;">Show Find in Files</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateHelp</td>
+<td style="text-align: left;">Move Focus to Help</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateHistory</td>
+<td style="text-align: left;">Show History</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateJobs</td>
+<td style="text-align: left;">Show Jobs</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateLauncherJobs</td>
+<td style="text-align: left;">Show Launcher</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateMarkers</td>
+<td style="text-align: left;">Show Markers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activatePackages</td>
+<td style="text-align: left;">Show Packages</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activatePlots</td>
+<td style="text-align: left;">Show Plots</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activatePresentation</td>
+<td style="text-align: left;">Show Presentation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateRMarkdown</td>
+<td style="text-align: left;">Show R Markdown</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateSource</td>
+<td style="text-align: left;">Move Focus to Source</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateSourceCpp</td>
+<td style="text-align: left;">Show Source Cpp</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateSQLResults</td>
+<td style="text-align: left;">Show SQL Results</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateTerminal</td>
+<td style="text-align: left;">Move Focus to Terminal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateTutorial</td>
+<td style="text-align: left;">Show Tutorial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">activateVcs</td>
+<td style="text-align: left;">Show Vcs</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">activateViewer</td>
+<td style="text-align: left;">Show Viewer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">addCursorAbove</td>
+<td style="text-align: left;">Add Cursor Above Current Cursor</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">addCursorBelow</td>
+<td style="text-align: left;">Add Cursor Below Current Cursor</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">authoringRPresentationsHelp</td>
+<td style="text-align: left;">Guide to using R Markdown</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">browseAddins</td>
+<td style="text-align: left;">Browse addins</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">browseCheatSheets</td>
+<td style="text-align: left;">Browse available cheat sheets in your web browser</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">buildAll</td>
+<td style="text-align: left;">Install the package and restart R</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">buildBinaryPackage</td>
+<td style="text-align: left;">Build a binary package</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">buildSourcePackage</td>
+<td style="text-align: left;">Build a source package</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">buildToolsProjectSetup</td>
+<td style="text-align: left;">Configure build tools</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">checkForUpdates</td>
+<td style="text-align: left;">Check for Updates</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">checkPackage</td>
+<td style="text-align: left;">R CMD check</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">checkSpelling</td>
+<td style="text-align: left;">Check spelling in document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cleanAll</td>
+<td style="text-align: left;">Clean all</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearBuild</td>
+<td style="text-align: left;">Clear build</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearCommandPaletteMru</td>
+<td style="text-align: left;">Clear Recently Executed Command List</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearHelpHistory</td>
+<td style="text-align: left;">Clear history</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearHistory</td>
+<td style="text-align: left;">Clear all history entries</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearJobs</td>
+<td style="text-align: left;">Clean up all completed local jobs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearKnitrCache</td>
+<td style="text-align: left;">Clear the knitr cache for the current document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearPlots</td>
+<td style="text-align: left;">Clear all Plots</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearPrerenderedOutput</td>
+<td style="text-align: left;">Clear the prerendered output for the current document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearPresentationCache</td>
+<td style="text-align: left;">Clear knitr cache for this presentation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearRecentFiles</td>
+<td style="text-align: left;">Clear List</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearRecentProjects</td>
+<td style="text-align: left;">Clear Project List</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearTerminalScrollbackBuffer</td>
+<td style="text-align: left;">Clear terminal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">clearUserPrefs</td>
+<td style="text-align: left;">Clear User Prefs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">clearWorkspace</td>
+<td style="text-align: left;">Clear objects from the workspace</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">closeAllSourceDocs</td>
+<td style="text-align: left;">Close All</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">closeAllTerminals</td>
+<td style="text-align: left;">Close All Terminals</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">closeOtherSourceDocs</td>
+<td style="text-align: left;">Close All Except Current</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">closeProject</td>
+<td style="text-align: left;">Close the currently open project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">closeSourceDoc</td>
+<td style="text-align: left;">Close</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">closeTerminal</td>
+<td style="text-align: left;">Close current terminal session</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">codeCompletion</td>
+<td style="text-align: left;">Show code completions at the current cursor location</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">commentUncomment</td>
+<td style="text-align: left;">Comment or uncomment the current line/selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">compileNotebook</td>
+<td style="text-align: left;">Compile a report from the current R script</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">compilePDF</td>
+<td style="text-align: left;">Compile a PDF from the current LaTeX or Sweave document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">consoleClear</td>
+<td style="text-align: left;">Clear console</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">copyDummy</td>
+<td style="text-align: left;">Copy</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">copyFile</td>
+<td style="text-align: left;">Copy selected file or folder</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">copyFileTo</td>
+<td style="text-align: left;">Copy selected file or folder to another folder</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">copyLinesDown</td>
+<td style="text-align: left;">Copy Lines Down</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">copyPlotToClipboard</td>
+<td style="text-align: left;">Copy the current plot to the clipboard</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">copySourceDocPath</td>
+<td style="text-align: left;">Copy current document path</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cutDummy</td>
+<td style="text-align: left;">Cut</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debugBreakpoint</td>
+<td style="text-align: left;">Set or remove a breakpoint on the current line of code</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debugClearBreakpoints</td>
+<td style="text-align: left;">Remove all the breakpoints in the current project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debugContinue</td>
+<td style="text-align: left;">Continue execution until the next breakpoint is encountered</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debugDumpContents</td>
+<td style="text-align: left;">Dump Editor Contents…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debugFinish</td>
+<td style="text-align: left;">Execute the remainder of the current function or loop</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debugHelp</td>
+<td style="text-align: left;">Guide to debugging features</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debugImportDump</td>
+<td style="text-align: left;">Import Editor Contents…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debugStep</td>
+<td style="text-align: left;">Execute the next line of code</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">debugStepInto</td>
+<td style="text-align: left;">Step into the current function call</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debugStop</td>
+<td style="text-align: left;">Exit debug mode</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">deleteFiles</td>
+<td style="text-align: left;">Delete selected files or folders</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">devtoolsLoadAll</td>
+<td style="text-align: left;">Execute devtools::load_all</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">diagnosticsReport</td>
+<td style="text-align: left;">Write Diagnostics Report</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">disconnectConnection</td>
+<td style="text-align: left;">Disconnect from a connection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">editCodeSnippets</td>
+<td style="text-align: left;">Edit code snippets</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">editLinesFromStart</td>
+<td style="text-align: left;">Create a new cursor at start of each line in selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">editRmdFormatOptions</td>
+<td style="text-align: left;">Edit the R Markdown format options for the current file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">editUserPrefs</td>
+<td style="text-align: left;">Edit User Prefs File</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">enableProsemirrorDevTools</td>
+<td style="text-align: left;">Enable Prosemirror DevTools</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">errorsBreak</td>
+<td style="text-align: left;">Break when any unhandled error occurs</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">errorsMessage</td>
+<td style="text-align: left;">Print the error message when an unhandled error occurs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">errorsTraceback</td>
+<td style="text-align: left;">Show the error inspector when an unhandled error occurs</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeAllCode</td>
+<td style="text-align: left;">Run all of the code in the source file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeCode</td>
+<td style="text-align: left;">Run the current line or selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeCodeWithoutMovingCursor</td>
+<td style="text-align: left;">Run the current line or selection without moving the cursor</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeCurrentChunk</td>
+<td style="text-align: left;">Run the current code chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeCurrentFunction</td>
+<td style="text-align: left;">Run the top-level function definition, if any, that contains the cursor</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeCurrentLine</td>
+<td style="text-align: left;">Execute the line which contains the cursor</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeCurrentParagraph</td>
+<td style="text-align: left;">Execute the current paragraph of code, delimited by blank lines.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeCurrentSection</td>
+<td style="text-align: left;">Run the code section that contains the cursor</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeCurrentStatement</td>
+<td style="text-align: left;">Execute the entire R statement which contains the cursor.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeFromCurrentLine</td>
+<td style="text-align: left;">Run from the current line through the end of the source file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeLastCode</td>
+<td style="text-align: left;">Re-run the previous code region</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeNextChunk</td>
+<td style="text-align: left;">Run the next code chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executePreviousChunks</td>
+<td style="text-align: left;">Run all chunks above the current one</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeSetupChunk</td>
+<td style="text-align: left;">Run the initial setup chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">executeSubsequentChunks</td>
+<td style="text-align: left;">Run all chunks below the current one</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">executeToCurrentLine</td>
+<td style="text-align: left;">Run from the beginning of the source file up through the current line</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">expandSelection</td>
+<td style="text-align: left;">Expand selection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">expandToLine</td>
+<td style="text-align: left;">Expand Selection to Line</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">expandToMatching</td>
+<td style="text-align: left;">Expand selection to matching bracket</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">exportFiles</td>
+<td style="text-align: left;">Export selected files or folders</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">extractFunction</td>
+<td style="text-align: left;">Turn the current selection into a function</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">extractLocalVariable</td>
+<td style="text-align: left;">Extract a variable out of the current selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">findFromSelection</td>
+<td style="text-align: left;">Use Selection for Find</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">findInFiles</td>
+<td style="text-align: left;">Find in Files…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">findNext</td>
+<td style="text-align: left;">Find next occurrence</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">findPrevious</td>
+<td style="text-align: left;">Find previous occurrence</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">findReplace</td>
+<td style="text-align: left;">Find…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">findSelectAll</td>
+<td style="text-align: left;">Find and select all matches</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">findUsages</td>
+<td style="text-align: left;">Find source locations where this symbol is used</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">firstTab</td>
+<td style="text-align: left;">First Tab</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">focusCenterSeparator</td>
+<td style="text-align: left;">Adjust Center Splitter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">focusConsoleOutputEnd</td>
+<td style="text-align: left;">Focus Console Output</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">focusLeftSeparator</td>
+<td style="text-align: left;">Adjust Left Splitter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">focusMainToolbar</td>
+<td style="text-align: left;">Focus Main Toolbar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">focusNextPane</td>
+<td style="text-align: left;">Focus Next Pane</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">focusPreviousPane</td>
+<td style="text-align: left;">Focus Previous Pane</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">focusRightSeparator</td>
+<td style="text-align: left;">Adjust Right Splitter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">focusSourceColumnSeparator</td>
+<td style="text-align: left;">Adjust Source Column Splitter</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fold</td>
+<td style="text-align: left;">Collapse</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">foldAll</td>
+<td style="text-align: left;">Collapse All</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">forceQuitSession</td>
+<td style="text-align: left;">Quit the current R session even if busy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">freeUnusedMemory</td>
+<td style="text-align: left;">Free Unused R Memory</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">goToDefinition</td>
+<td style="text-align: left;">Go to to the definition of the currently selected function</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">goToFileFunction</td>
+<td style="text-align: left;">Go To File/Function…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">goToHelp</td>
+<td style="text-align: left;">Go to help for the currently selected function</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">goToLine</td>
+<td style="text-align: left;">Go to Line…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">goToNextChunk</td>
+<td style="text-align: left;">Go to next chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">goToNextSection</td>
+<td style="text-align: left;">Go to next section/chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">goToPrevChunk</td>
+<td style="text-align: left;">Go to previous chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">goToPrevSection</td>
+<td style="text-align: left;">Go to previous section/chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gotoProfileSource</td>
+<td style="text-align: left;">Open sources associated with the selection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">goToWorkingDir</td>
+<td style="text-align: left;">View the current working directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">helpBack</td>
+<td style="text-align: left;">Previous topic</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">helpForward</td>
+<td style="text-align: left;">Next topic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">helpHome</td>
+<td style="text-align: left;">Show R Help</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">helpKeyboardShortcuts</td>
+<td style="text-align: left;">Keyboard Shortcuts Help</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">helpPopout</td>
+<td style="text-align: left;">Show in new window</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">helpSearch</td>
+<td style="text-align: left;">Search R Help</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">helpUsingRStudio</td>
+<td style="text-align: left;">RStudio Docs</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">hideToolbar</td>
+<td style="text-align: left;">Hide Toolbar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">historyDismissContext</td>
+<td style="text-align: left;">« Back</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">historyDismissResults</td>
+<td style="text-align: left;">Done</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">historyRemoveEntries</td>
+<td style="text-align: left;">Remove the selected history entries</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">historySendToConsole</td>
+<td style="text-align: left;">Send the selected commands to the R console (Enter)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">historySendToSource</td>
+<td style="text-align: left;">Insert the selected commands into the current document (Shift+Enter)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">importDatasetFromCsv</td>
+<td style="text-align: left;">From CSV</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">importDatasetFromCsvUsingBase</td>
+<td style="text-align: left;">From Text (base)…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">importDatasetFromCsvUsingReadr</td>
+<td style="text-align: left;">From Text (readr)…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">importDatasetFromFile</td>
+<td style="text-align: left;">From Local File…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">importDatasetFromSAS</td>
+<td style="text-align: left;">From SAS…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">importDatasetFromSAV</td>
+<td style="text-align: left;">From SAV…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">importDatasetFromSAV</td>
+<td style="text-align: left;">From SPSS…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">importDatasetFromStata</td>
+<td style="text-align: left;">From Stata…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">importDatasetFromURL</td>
+<td style="text-align: left;">From Web URL…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">importDatasetFromXLS</td>
+<td style="text-align: left;">From Excel…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertChunk</td>
+<td style="text-align: left;">Insert a new code chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">insertChunkBash</td>
+<td style="text-align: left;">Insert a new Bash chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertChunkD3</td>
+<td style="text-align: left;">Insert a new D3 chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">insertChunkPython</td>
+<td style="text-align: left;">Insert a new Python chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertChunkR</td>
+<td style="text-align: left;">Insert a new R chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">insertChunkRCPP</td>
+<td style="text-align: left;">Insert a new Rcpp chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertChunkSQL</td>
+<td style="text-align: left;">Insert a new SQL chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">insertChunkStan</td>
+<td style="text-align: left;">Insert a new Stan chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertRoxygenSkeleton</td>
+<td style="text-align: left;">Insert a roxygen comment for the current function</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">insertSection</td>
+<td style="text-align: left;">Insert a new code section</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">insertSnippet</td>
+<td style="text-align: left;">Expand snippet at cursor</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">installPackage</td>
+<td style="text-align: left;">Install R packages</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">interruptR</td>
+<td style="text-align: left;">Interrupt R</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">interruptTerminal</td>
+<td style="text-align: left;">Send Ctrl+C to Current Terminal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">joinLines</td>
+<td style="text-align: left;">Join Lines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">jumpTo</td>
+<td style="text-align: left;">Jump To…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">jumpToMatching</td>
+<td style="text-align: left;">Jump to matching bracket</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">knitDocument</td>
+<td style="text-align: left;">Knit the current document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">knitWithParameters</td>
+<td style="text-align: left;">Knit the document with a set of custom parameters</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lastTab</td>
+<td style="text-align: left;">Last Tab</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutConsoleOnLeft</td>
+<td style="text-align: left;">Console on Left</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutConsoleOnRight</td>
+<td style="text-align: left;">Console on Right</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutEndZoom</td>
+<td style="text-align: left;">Show All Panes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomBuild</td>
+<td style="text-align: left;">Zoom Build</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomConnections</td>
+<td style="text-align: left;">Zoom Connections</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomConsole</td>
+<td style="text-align: left;">Zoom Console</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomConsolePane</td>
+<td style="text-align: left;">Zoom Console Pane</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomEnvironment</td>
+<td style="text-align: left;">Zoom Environment</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomFiles</td>
+<td style="text-align: left;">Zoom Files</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomHelp</td>
+<td style="text-align: left;">Zoom Help</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomHistory</td>
+<td style="text-align: left;">Zoom History</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomLeftColumn</td>
+<td style="text-align: left;">Zoom Left / Center Column</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomPackages</td>
+<td style="text-align: left;">Zoom Packages</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomPlots</td>
+<td style="text-align: left;">Zoom Plots</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomRightColumn</td>
+<td style="text-align: left;">Zoom Right Column</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomSource</td>
+<td style="text-align: left;">Zoom Source</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomTutorial</td>
+<td style="text-align: left;">Zoom Tutorial</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">layoutZoomVcs</td>
+<td style="text-align: left;">Zoom VCS</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">layoutZoomViewer</td>
+<td style="text-align: left;">Zoom Viewer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">loadHistory</td>
+<td style="text-align: left;">Load history from an existing file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">loadServerHome</td>
+<td style="text-align: left;">RStudio Server Home</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">loadWorkspace</td>
+<td style="text-align: left;">Load workspace</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">logFocusedElement</td>
+<td style="text-align: left;">Log focused element</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">macPreferences</td>
+<td style="text-align: left;">Preferences…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">markdownHelp</td>
+<td style="text-align: left;">Markdown quick reference</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">maximizeConsole</td>
+<td style="text-align: left;">Maximize Console</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">modifyKeyboardShortcuts</td>
+<td style="text-align: left;">Modify keyboard shortcuts</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">moveFiles</td>
+<td style="text-align: left;">Move selected files or folders</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">moveLinesDown</td>
+<td style="text-align: left;">Move Lines Down</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">moveLinesUp</td>
+<td style="text-align: left;">Move Lines Up</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">moveTabLeft</td>
+<td style="text-align: left;">Move Tab Left</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">moveTabRight</td>
+<td style="text-align: left;">Move Tab Right</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">moveTabToFirst</td>
+<td style="text-align: left;">Move Tab to First</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">moveTabToLast</td>
+<td style="text-align: left;">Move Tab to Last</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newCDoc</td>
+<td style="text-align: left;">Create a new C file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newConnection</td>
+<td style="text-align: left;">Create a new connection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newCppDoc</td>
+<td style="text-align: left;">Create a new C++ file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newCssDoc</td>
+<td style="text-align: left;">Create a new CSS file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newD3Doc</td>
+<td style="text-align: left;">Create a new D3 Script</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newFolder</td>
+<td style="text-align: left;">Create a new folder</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newHeaderDoc</td>
+<td style="text-align: left;">Create a new header file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newHtmlDoc</td>
+<td style="text-align: left;">Create a new HTML file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newJavaScriptDoc</td>
+<td style="text-align: left;">Create a new JavaScript file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newMarkdownDoc</td>
+<td style="text-align: left;">Create a new Markdown document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newProject</td>
+<td style="text-align: left;">Create a project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newPythonDoc</td>
+<td style="text-align: left;">Create a new Python script</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newQuartoDoc</td>
+<td style="text-align: left;">Create a new Quarto document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newRDocumentationDoc</td>
+<td style="text-align: left;">Create a new Rd documentation file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newRHTMLDoc</td>
+<td style="text-align: left;">Create a new R HTML document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newRMarkdownDoc</td>
+<td style="text-align: left;">Create a new R Markdown document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newRNotebook</td>
+<td style="text-align: left;">Create a new R Markdown notebook</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newRPlumberDoc</td>
+<td style="text-align: left;">Create a new Plumber API</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newRPresentationDoc</td>
+<td style="text-align: left;">Create a new R presentation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newRShinyApp</td>
+<td style="text-align: left;">Create a new Shiny web application</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newSession</td>
+<td style="text-align: left;">Open a new R session</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newShellDoc</td>
+<td style="text-align: left;">Create a new shell script</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newSourceColumn</td>
+<td style="text-align: left;">Add Source Column</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newSourceDoc</td>
+<td style="text-align: left;">Create a new R script</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newSqlDoc</td>
+<td style="text-align: left;">Create a new SQL script</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newStanDoc</td>
+<td style="text-align: left;">Create a new Stan program</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newSweaveDoc</td>
+<td style="text-align: left;">Create a new R Sweave document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">newTerminal</td>
+<td style="text-align: left;">Create a new terminal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">newTextDoc</td>
+<td style="text-align: left;">Create a new text file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nextPlot</td>
+<td style="text-align: left;">Next plot</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">nextTab</td>
+<td style="text-align: left;">Next Tab</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nextTerminal</td>
+<td style="text-align: left;">Show next terminal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">notebookClearAllOutput</td>
+<td style="text-align: left;">Remove all code chunk output in the current file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">notebookClearOutput</td>
+<td style="text-align: left;">Clear the output of the current notebook chunk</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">notebookCollapseAllOutput</td>
+<td style="text-align: left;">Collapse all code chunk output in the current file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">notebookExpandAllOutput</td>
+<td style="text-align: left;">Expand all code chunk output in the current file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">notebookToggleExpansion</td>
+<td style="text-align: left;">Expand or collapse the output of the current notebook chunk</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openDataImportCheatSheet</td>
+<td style="text-align: left;">Import data with readr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openDataTransformationCheatSheet</td>
+<td style="text-align: left;">Data transformation with dplyr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openDataVisualizationCheatSheet</td>
+<td style="text-align: left;">Data visualization with ggplot2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openDataWranglingCheatSheet</td>
+<td style="text-align: left;">Data manipulation with dplyr and tidyr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openDeveloperConsole</td>
+<td style="text-align: left;">Open Developer Console</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openHtmlExternal</td>
+<td style="text-align: left;">View the page with the system web browser</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openNewTerminalAtEditorLocation</td>
+<td style="text-align: left;">Open New Terminal at File Location</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openNewTerminalAtFilePaneLocation</td>
+<td style="text-align: left;">Open New Terminal Here</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openPackageDevelopmentCheatSheet</td>
+<td style="text-align: left;">Package development with devtools</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openProfile</td>
+<td style="text-align: left;">Opens a profile from a file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openProfileInBrowser</td>
+<td style="text-align: left;">Opens current profile in a web browser</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openProject</td>
+<td style="text-align: left;">Open a project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openProjectInNewWindow</td>
+<td style="text-align: left;">Open project in a new R session</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openPurrrCheatSheet</td>
+<td style="text-align: left;">List manipulation with purrr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openRMarkdownCheatSheet</td>
+<td style="text-align: left;">R Markdown cheat sheet</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openRMarkdownReferenceGuide</td>
+<td style="text-align: left;">R Markdown reference guide</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openRoxygenQuickReference</td>
+<td style="text-align: left;">Roxygen quick reference</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openRStudioIDECheatSheet</td>
+<td style="text-align: left;">RStudio IDE cheat sheet</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openSharedProject</td>
+<td style="text-align: left;">Open a project shared with you</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openShinyCheatSheet</td>
+<td style="text-align: left;">Build web applications with Shiny</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openSourceDoc</td>
+<td style="text-align: left;">Open an existing file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">openSourceDocNewColumn</td>
+<td style="text-align: left;">Open an existing file in a new column</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">openSparklyrCheatSheet</td>
+<td style="text-align: left;">Interfacing Apache Spark with sparklyr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">packratBootstrap</td>
+<td style="text-align: left;">Use packrat with this project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">packratBundle</td>
+<td style="text-align: left;">Bundle a Packrat Project</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">packratCheckStatus</td>
+<td style="text-align: left;">Check the status of the Packrat library</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">packratClean</td>
+<td style="text-align: left;">Remove unused packages from your packrat library</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">packratHelp</td>
+<td style="text-align: left;">Help on using packrat with R projects</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">packratOptions</td>
+<td style="text-align: left;">Configure packrat options for this project</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">paneLayout</td>
+<td style="text-align: left;">Pane Layout…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pasteDummy</td>
+<td style="text-align: left;">Paste</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pasteWithIndentDummy</td>
+<td style="text-align: left;">Paste with Indent</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">plumberRunInBrowser</td>
+<td style="text-align: left;">Run the Plumber API in the system’s default Web browser</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">plumberRunInPane</td>
+<td style="text-align: left;">Run the Plumber API in an RStudio pane</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">plumberRunInViewer</td>
+<td style="text-align: left;">Run the Plumber API in an RStudio viewer window</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">popoutDoc</td>
+<td style="text-align: left;">Show in new window</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">presentationEdit</td>
+<td style="text-align: left;">Edit this slide of the presentation</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">presentationFullscreen</td>
+<td style="text-align: left;">Show presentation in full screen mode</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">presentationHome</td>
+<td style="text-align: left;">Go to the first slide</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">presentationNext</td>
+<td style="text-align: left;">Go to the next slide</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">presentationPrev</td>
+<td style="text-align: left;">Go to the previous slide</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">presentationSaveAsStandalone</td>
+<td style="text-align: left;">Save the presentation as a standalone web page</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">presentationViewInBrowser</td>
+<td style="text-align: left;">View the presentation in an external web browser</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">previewHTML</td>
+<td style="text-align: left;">Show a preview of the current document as HTML</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">previewJS</td>
+<td style="text-align: left;">Preview the active JavaScript document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">previewSql</td>
+<td style="text-align: left;">Preview the active SQL document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">previousPlot</td>
+<td style="text-align: left;">Previous plot</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">previousTab</td>
+<td style="text-align: left;">Previous Tab</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">previousTerminal</td>
+<td style="text-align: left;">Show previous terminal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">printCppCompletions</td>
+<td style="text-align: left;">Print C++ Completions</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">printHelp</td>
+<td style="text-align: left;">Print topic</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">printSourceDoc</td>
+<td style="text-align: left;">Print the current file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">profileCode</td>
+<td style="text-align: left;">Profile the current line or selection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">profileHelp</td>
+<td style="text-align: left;">Guide to profiling features</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">projectOptions</td>
+<td style="text-align: left;">Edit options for the current project</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">publishHTML</td>
+<td style="text-align: left;">Publish the current document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quartoRenderDocument</td>
+<td style="text-align: left;">Render the current document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quickAddNext</td>
+<td style="text-align: left;">Find and add next occurence</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">quitSession</td>
+<td style="text-align: left;">Quit the current R session</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">raiseException</td>
+<td style="text-align: left;">Raise Exception</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">raiseException2</td>
+<td style="text-align: left;">Raise Exception JS</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rcppHelp</td>
+<td style="text-align: left;">Help on using Rcpp</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rebuildAll</td>
+<td style="text-align: left;">Clean previous output and rebuild all</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">redoDummy</td>
+<td style="text-align: left;">Redo</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reflowComment</td>
+<td style="text-align: left;">Reflow selected comment lines so they wrap evenly</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reformatCode</td>
+<td style="text-align: left;">Reformat the current line/selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">refreshConnection</td>
+<td style="text-align: left;">Refresh data</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">refreshEnvironment</td>
+<td style="text-align: left;">Refresh the list of objects in the environment</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">refreshFiles</td>
+<td style="text-align: left;">Refresh file listing</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">refreshHelp</td>
+<td style="text-align: left;">Refresh topic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">refreshHtmlPreview</td>
+<td style="text-align: left;">Refresh the preview</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">refreshPackages</td>
+<td style="text-align: left;">Refresh Package listing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">refreshPlot</td>
+<td style="text-align: left;">Refresh current plot</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">refreshPresentation</td>
+<td style="text-align: left;">Refresh the presentation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">refreshWorkspace</td>
+<td style="text-align: left;">Refresh Workspace</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reindent</td>
+<td style="text-align: left;">Reindent the current line/selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reloadPlumberAPI</td>
+<td style="text-align: left;">Reload the Plumber API</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reloadShinyApp</td>
+<td style="text-align: left;">Reload the Shiny application</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">reloadUi</td>
+<td style="text-align: left;">Reload UI</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">removeConnection</td>
+<td style="text-align: left;">Remove connection from the connection history</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">removeLine</td>
+<td style="text-align: left;">Remove Line</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">removePlot</td>
+<td style="text-align: left;">Remove the current plot</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">renameFile</td>
+<td style="text-align: left;">Rename selected file or folder</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">renameInScope</td>
+<td style="text-align: left;">Rename symbol in current scope</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">renameSourceDoc</td>
+<td style="text-align: left;">Rename current document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">renameTerminal</td>
+<td style="text-align: left;">Change terminal session name</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">renvHelp</td>
+<td style="text-align: left;">Learn how to use renv</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">renvRestore</td>
+<td style="text-align: left;">Restore your project library from renv.lock</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">renvSnapshot</td>
+<td style="text-align: left;">Snapshot the state of your project library</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">reopenSourceDocWithEncoding</td>
+<td style="text-align: left;">Reopen the current file with a different encoding</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">replaceAndFind</td>
+<td style="text-align: left;">Replace and find next occurrence</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">restartR</td>
+<td style="text-align: left;">Restart R</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">restartRClearOutput</td>
+<td style="text-align: left;">Restart R session and clear chunk output</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">restartRRunAllChunks</td>
+<td style="text-align: left;">Restart R session and run all chunks</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">returnDocToMain</td>
+<td style="text-align: left;">Return to main window</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">roxygenizePackage</td>
+<td style="text-align: left;">Build package documentation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rsconnectConfigure</td>
+<td style="text-align: left;">Configure the application</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rsconnectDeploy</td>
+<td style="text-align: left;">Publish the application or document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rsconnectManageAccounts</td>
+<td style="text-align: left;">Connect or disconnect accounts</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rstudioCommunityForum</td>
+<td style="text-align: left;">RStudio Community Forum</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">rstudioLicense</td>
+<td style="text-align: left;">RStudio License</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rstudioSupport</td>
+<td style="text-align: left;">RStudio Support</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">runSelectionAsJob</td>
+<td style="text-align: left;">Run the selected code as a local job</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">runSelectionAsLauncherJob</td>
+<td style="text-align: left;">Run the selected code as a launcher job</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">saveAllSourceDocs</td>
+<td style="text-align: left;">Save all open documents</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">saveHistory</td>
+<td style="text-align: left;">Save history into a file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">saveHtmlPreviewAs</td>
+<td style="text-align: left;">Save the page to another location</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">saveHtmlPreviewAsLocalFile</td>
+<td style="text-align: left;">Download the page to a local file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">savePlotAsImage</td>
+<td style="text-align: left;">Save the current plot as an image file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">savePlotAsPdf</td>
+<td style="text-align: left;">Save the current plot as a PDF file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">saveProfileAs</td>
+<td style="text-align: left;">Saves current profile into a file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">saveSourceDoc</td>
+<td style="text-align: left;">Save current document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">saveSourceDocAs</td>
+<td style="text-align: left;">Save current file to a specific path</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">saveSourceDocWithEncoding</td>
+<td style="text-align: left;">Save the current file with a different encoding</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">saveWorkspace</td>
+<td style="text-align: left;">Save workspace as</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sendFilenameToTerminal</td>
+<td style="text-align: left;">Send Filename to Terminal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sendTerminalToEditor</td>
+<td style="text-align: left;">Copy current terminal’s buffer to a new editor buffer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sendToTerminal</td>
+<td style="text-align: left;">Send the current line or selection to terminal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">setTerminalToCurrentDirectory</td>
+<td style="text-align: left;">Go to Current Directory</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">setWorkingDir</td>
+<td style="text-align: left;">Select and change to a new working directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">setWorkingDirToActiveDoc</td>
+<td style="text-align: left;">Change working directory to path of active document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">setWorkingDirToFilesPane</td>
+<td style="text-align: left;">Change working directory to location of Files pane</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">setWorkingDirToProjectDir</td>
+<td style="text-align: left;">Change working directory to project root directory</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shareProject</td>
+<td style="text-align: left;">Share this project with others</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shinyCompareTest</td>
+<td style="text-align: left;">Compare test results for Shiny application</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shinyRecordTest</td>
+<td style="text-align: left;">Record test for Shiny application</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shinyRunAllTests</td>
+<td style="text-align: left;">Run tests for Shiny application</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shinyRunInBrowser</td>
+<td style="text-align: left;">Run the Shiny application in the system’s default Web browser</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shinyRunInPane</td>
+<td style="text-align: left;">Run the Shiny application in an RStudio pane</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">shinyRunInViewer</td>
+<td style="text-align: left;">Run the Shiny application in an RStudio viewer window</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showAboutDialog</td>
+<td style="text-align: left;">About RStudio</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showAccessibilityHelp</td>
+<td style="text-align: left;">Accessibility Help…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showAccessibilityOptions</td>
+<td style="text-align: left;">Accessibility Options…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showBuildMenu</td>
+<td style="text-align: left;">Show Build Menu</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showCodeMenu</td>
+<td style="text-align: left;">Show Code Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showCommandPalette</td>
+<td style="text-align: left;">Show Command Palette</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showDebugMenu</td>
+<td style="text-align: left;">Show Debug Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showDiagnosticsActiveDocument</td>
+<td style="text-align: left;">Show diagnostics for the active document</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showDiagnosticsProject</td>
+<td style="text-align: left;">Show diagnostics for all source files in the current project</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showDomElements</td>
+<td style="text-align: left;">Show DOM Elements</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showEditMenu</td>
+<td style="text-align: left;">Show Edit Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showFileMenu</td>
+<td style="text-align: left;">Show File Menu</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showGpuDiagnostics</td>
+<td style="text-align: left;">Show GPU Diagnostics</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showHelpMenu</td>
+<td style="text-align: left;">Show Help Menu</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showHtmlPreviewLog</td>
+<td style="text-align: left;">Show the compilation log for this document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showLicenseDialog</td>
+<td style="text-align: left;">Manage License…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showLogFiles</td>
+<td style="text-align: left;">Show Log Files</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showManipulator</td>
+<td style="text-align: left;">Show the manipulator for this plot</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showMemoryUsageReport</td>
+<td style="text-align: left;">Memory Usage Report…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showOptions</td>
+<td style="text-align: left;">Global Options…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showPdfExternal</td>
+<td style="text-align: left;">Show in an external PDF viewer window</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showPlotsMenu</td>
+<td style="text-align: left;">Show Plots Menu</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showProfileMenu</td>
+<td style="text-align: left;">Show Profile Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showRequestLog</td>
+<td style="text-align: left;">Show internal request log</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showSessionMenu</td>
+<td style="text-align: left;">Show Session Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showSessionServerOptionsDialog</td>
+<td style="text-align: left;">Configure available session servers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showShellDialog</td>
+<td style="text-align: left;">Execute shell commands</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showShortcutCommand</td>
+<td style="text-align: left;">Show Keyboard Shortcut Commands</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showTerminalInfo</td>
+<td style="text-align: left;">Show info on current terminal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showTerminalOptions</td>
+<td style="text-align: left;">Terminal Options…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showToolbar</td>
+<td style="text-align: left;">Show Toolbar</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showToolsMenu</td>
+<td style="text-align: left;">Show Tools Menu</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">showViewMenu</td>
+<td style="text-align: left;">Show View Menu</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">showWarningBar</td>
+<td style="text-align: left;">Show warning bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">shrinkSelection</td>
+<td style="text-align: left;">Shrink selection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">signOut</td>
+<td style="text-align: left;">Sign out from RStudio</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sortLauncherJobsRecorded</td>
+<td style="text-align: left;">Sort jobs by time submitted</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sortLauncherJobsState</td>
+<td style="text-align: left;">Sort jobs by current state</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sourceActiveDocument</td>
+<td style="text-align: left;">Source the contents of the active document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sourceActiveDocumentWithEcho</td>
+<td style="text-align: left;">Source the contents of the active document (with echo)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sourceAsJob</td>
+<td style="text-align: left;">Run the current R script as a local job</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sourceAsLauncherJob</td>
+<td style="text-align: left;">Run the current R script on a cluster</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sourceFile</td>
+<td style="text-align: left;">Source the contents of an R file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sourceNavigateBack</td>
+<td style="text-align: left;">Go back to the previous source location</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sourceNavigateForward</td>
+<td style="text-align: left;">Go forward to the next source location</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sparkHelp</td>
+<td style="text-align: left;">Help on using Spark with RStudio</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sparkLog</td>
+<td style="text-align: left;">View the log for the Spark connection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">sparkUI</td>
+<td style="text-align: left;">View the browser UI for the Spark connection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">speakEditorLocation</td>
+<td style="text-align: left;">Speak Text Editor Location</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">splitIntoLines</td>
+<td style="text-align: left;">Create a new cursor on each line in current selection</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">startJob</td>
+<td style="text-align: left;">Run a background local job</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">startLauncherJob</td>
+<td style="text-align: left;">Run a background job on a cluster</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">startProfiler</td>
+<td style="text-align: left;">Start profiling R code</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stopBuild</td>
+<td style="text-align: left;">Stop the current build</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stopProfiler</td>
+<td style="text-align: left;">Stop profiling R code</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">suspendSession</td>
+<td style="text-align: left;">Suspend R Session</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">switchToChunkBash</td>
+<td style="text-align: left;">Switch chunk to Bash</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">switchToChunkPython</td>
+<td style="text-align: left;">Switch chunk to Python</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">switchToChunkR</td>
+<td style="text-align: left;">Switch chunk to R</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">switchToChunkRCPP</td>
+<td style="text-align: left;">Switch chunk to Rcpp</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">switchToChunkSQL</td>
+<td style="text-align: left;">Switch chunk to SQL</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">switchToChunkStan</td>
+<td style="text-align: left;">Switch chunk to Stan</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">switchToTab</td>
+<td style="text-align: left;">Switch to Tab…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">synctexSearch</td>
+<td style="text-align: left;">Sync PDF view to editor location (Ctrl+Click)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terminateR</td>
+<td style="text-align: left;">Forcibly terminate R session</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">testPackage</td>
+<td style="text-align: left;">Run tests for package</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">testShinytestFile</td>
+<td style="text-align: left;">Run test using the shinytest package</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">testTestthatFile</td>
+<td style="text-align: left;">Run tests using the testthat package</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">toggleDocumentOutline</td>
+<td style="text-align: left;">Show document outline</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">toggleEditorTokenInfo</td>
+<td style="text-align: left;">Toggle Editor Token Information</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">toggleFullScreen</td>
+<td style="text-align: left;">Toggle Full Screen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">toggleRainbowParens</td>
+<td style="text-align: left;">Rainbow Parentheses</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">toggleRmdVisualMode</td>
+<td style="text-align: left;">Toggle visual markdown editor</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">toggleScreenReaderSupport</td>
+<td style="text-align: left;">Screen Reader Support</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">toggleShowMemoryUsage</td>
+<td style="text-align: left;">Show Current Memory Usage</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">toggleSoftWrapMode</td>
+<td style="text-align: left;">Soft Wrap Long Lines</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">toggleTabKeyMovesFocus</td>
+<td style="text-align: left;">Tab Key Always Moves Focus</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">toggleToolbar</td>
+<td style="text-align: left;">Toggle Toolbar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tutorialBack</td>
+<td style="text-align: left;">Go back</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tutorialForward</td>
+<td style="text-align: left;">Go forward</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tutorialHome</td>
+<td style="text-align: left;">Return to home</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tutorialPopout</td>
+<td style="text-align: left;">Show in new window</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tutorialRefresh</td>
+<td style="text-align: left;">Refresh tutorial</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tutorialStop</td>
+<td style="text-align: left;">Stop tutorial</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tutorialZoom</td>
+<td style="text-align: left;">View a larger version in a new window</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">undoDummy</td>
+<td style="text-align: left;">Undo</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">unfold</td>
+<td style="text-align: left;">Expand</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">unfoldAll</td>
+<td style="text-align: left;">Expand All</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">updateCredentials</td>
+<td style="text-align: left;">Update Credentials</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">updatePackages</td>
+<td style="text-align: left;">Check for package updates</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">uploadFile</td>
+<td style="text-align: left;">Upload files to server</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">usingRMarkdownHelp</td>
+<td style="text-align: left;">Guide to using R Markdown</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsAddFiles</td>
+<td style="text-align: left;">Add the selected files or folders</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsBlameOnGitHub</td>
+<td style="text-align: left;">Blame view for this file on Github</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsCleanup</td>
+<td style="text-align: left;">Recursively clean up the working copy (removing locks, etc)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsCommit</td>
+<td style="text-align: left;">Commit pending changes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsDiff</td>
+<td style="text-align: left;">Diff selected file(s)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsFileDiff</td>
+<td style="text-align: left;">Show differences for the file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsFileLog</td>
+<td style="text-align: left;">Show log of changes to the file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsFileRevert</td>
+<td style="text-align: left;">Revert changes to the file</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsIgnore</td>
+<td style="text-align: left;">Ignore the selected files or folders</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsOpen</td>
+<td style="text-align: left;">Open selected file(s)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsPull</td>
+<td style="text-align: left;">Pull Branches</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsPullRebase</td>
+<td style="text-align: left;">Pull with Rebase</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsPush</td>
+<td style="text-align: left;">Push Branch</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsRefresh</td>
+<td style="text-align: left;">Refresh listing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsRemoveFiles</td>
+<td style="text-align: left;">Delete the selected files or folders</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsResolve</td>
+<td style="text-align: left;">Resolve conflicts in the selected files or folders</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsRevert</td>
+<td style="text-align: left;">Revert selected changes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vcsShowHistory</td>
+<td style="text-align: left;">View history of previous commits</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vcsViewOnGitHub</td>
+<td style="text-align: left;">View this file on Github</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">versionControlHelp</td>
+<td style="text-align: left;">Help on using version control with RStudio</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">versionControlOptions</td>
+<td style="text-align: left;">Configure version control options</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">versionControlProjectSetup</td>
+<td style="text-align: left;">Setup version control for the current project</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">versionControlShowRsaKey</td>
+<td style="text-align: left;">Show RSA public key</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewAllPrefs</td>
+<td style="text-align: left;">View All Prefs</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerBack</td>
+<td style="text-align: left;">Go back</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerClear</td>
+<td style="text-align: left;">Remove current viewer item</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerClearAll</td>
+<td style="text-align: left;">Clear all viewer items</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerCopyToClipboard</td>
+<td style="text-align: left;">Copy to the system clipboard</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerForward</td>
+<td style="text-align: left;">Go forward</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerPopout</td>
+<td style="text-align: left;">Show in new window</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerRefresh</td>
+<td style="text-align: left;">Refresh viewer</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerSaveAllAndRefresh</td>
+<td style="text-align: left;">Save source files and refresh viewer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerSaveAsImage</td>
+<td style="text-align: left;">Save as an image file</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerSaveAsWebPage</td>
+<td style="text-align: left;">Save as a standalone web page</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">viewerStop</td>
+<td style="text-align: left;">Stop application</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">viewerZoom</td>
+<td style="text-align: left;">View a larger version in a new window</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">wordCount</td>
+<td style="text-align: left;">Count words in selection or document</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">zoomActualSize</td>
+<td style="text-align: left;">Actual Size</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">zoomIn</td>
+<td style="text-align: left;">Zoom In</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">zoomOut</td>
+<td style="text-align: left;">Zoom Out</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">zoomPlot</td>
+<td style="text-align: left;">View a larger version of the plot in a new window</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- -->
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+      <a href="../session_user_settings/session_user_settings.html">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Session User Settings</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../r_package_dependencies/r_package_dependencies.html">
+        <span class="nav-page-text">R Package Dependencies</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>

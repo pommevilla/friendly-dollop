@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>RStudio Workbench Administration – rsession_conf</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../site_libs/quarto-nav/headroom.min.js"></script>
+  <meta name="quarto:offset" content="..">
+  <script src="../site_libs/quarto-search/autocomplete.min.js"></script>
+  <script src="../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../site_libs/quarto-search/quarto-search.js"></script>
+  <script src="../site_libs/quarto-html/quarto.js"></script>
+  <script src="../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../site_libs/quarto-html/clipboard.min.js"></script>
+  <script src="../site_libs/quarto-html/anchor.min.js"></script>
+  <script src="../site_libs/quarto-html/quarto-html.js"></script>
+  <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="../site_libs/quarto-html/quarto-css-variables.css" rel="stylesheet">
+  <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Analytics -->
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
+  ga('require', 'linker');
+  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'team-admin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com', 'blogs.rstudio.com', 'keras.rstudio.com', 'swag.rstudio.com', 'tensorflow.rstudio.com', 'packagemanager.rstudio.com'] );
+  ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  <style type="text/css">
+    details {
+      margin-bottom: 1em;
+    } 
+    details[show] {
+      margin-bottom: 0;
+    }
+
+    .quarto-unresolved-ref {
+      font-weight: 600;
+    }
+
+    .quarto-cover-image {
+      max-width: 35%;
+      float: right;
+      margin-left: 30px;
+    }
+
+    .cell-output-display {
+      overflow-x: auto;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/guide.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+<div id="quarto-search-results"></div>
+<header id="quarto-header" class="headroom fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="../index.html">
+    <img src="../images/Rstudio-ball.svg" alt="">
+    RStudio Workbench Administration
+  </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="https://www.rstudio.com/" aria-current="page">
+ Rstudio.com</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us/articles/200716783-RStudio-Release-History">
+ Release Notes</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://support.rstudio.com/hc/en-us">
+ Help</a>
+  </li>  
+</ul>
+          <form class="d-flex mb-0">
+  <input id="quarto-search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+      </div> <!-- /navcollapse -->
+  </div> <!-- /container-fluid -->
+</nav>
+<nav class="quarto-secondary-nav py-2 d-lg-none d-md-block " data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <div class="container-fluid d-flex justify-content-between">
+    <h1 class="quarto-secondary-nav-title mb-0 fs-3 d-inline"></h1>
+    <button type="button" class="quarto-btn-toggle btn d-lg-none py-0 px-1 d-inline-block border-0 ">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</nav>
+</header>
+ <!-- /navbar/sidebar -->
+<div class="container-fluid quarto-container d-flex flex-column page-layout-article">
+<div class="row flex-fill" id="quarto-content">
+  <div id="quarto-sidebar" class="col col-12 col-lg-3 d-lg-flex px-0 pt-0 sidebar collapse sidebar-navigation">
+    <nav class="me-lg-auto py-2 docked  overflow-scroll">
+  <div class="px-3 pt-lg-2 mt-1 text-left sidebar-header">
+  </div>
+  <div class="sidebar-menu-container"> 
+  <ul class="list-unstyled mt-3 px-3">
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#gettingstarted-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Getting Started</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="gettingstarted-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../index.html" class="">Introduction</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/management_script.html" class="">Management Script</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/activation.html" class="">Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/accessing_the_server.html" class="">Accessing the Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/community_resources.html" class="">Community Resources</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../getting_started/professional_support.html" class="">Professional Support</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#servermanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Server Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="servermanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../server_management/server_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/core_administrative_tasks.html" class="">Core Administrative Tasks</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/logging.html" class="">Logging</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/administrative_dashboard.html" class="">Administrative Dashboard</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../server_management/automated_crash_reporting.html" class="">Automated Crash Reporting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#authenticatingusers-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Authenticating Users</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="authenticatingusers-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authenticating_users.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/user_provisioning.html" class="">User Provisioning</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_basics.html" class="">PAM Basics</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authentication_migration.html" class="">Authentication Migration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/pam_authentication.html" class="">PAM Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/restricting_access.html" class="">Restricting Access to Specific Users</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/saml_sso.html" class="">SAML Single Sign-On Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/openid_connect_authentication.html" class="">OpenID Connect Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/proxied_authentication.html" class="">Proxied Authentication</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/google_accounts.html" class="">Google Accounts (deprecated)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/customizing_signin.html" class="">Customizing the Sign-In Page</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../authenticating_users/authorization_timeout.html" class="">Authorization Timeout</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#accessandsecurity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Access and Security</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="accessandsecurity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../access_and_security/access_and_security.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/network_port_and_address.html" class="">Network Port and Address</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ip_access_rules.html" class="">IP Access Rules</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/frame_origin.html" class="">Frame Origin</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/same_site_cookies.html" class="">Same Site cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/compatibility_with_safari.html" class="">Compatibility with Safari 13+</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_security_considerations.html" class="">Additional Security Considerations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/additional_headers.html" class="">Additional Headers</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/secure_sockets.html" class="">Secure Sockets (SSL)</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/ssl_ports.html" class="">SSL Ports</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/cookies.html" class="">Cookies</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/server_permissions.html" class="">Server Permissions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../access_and_security/running_with_a_proxy.html" class="">Running with a Proxy</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rsessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rsessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/r_executable_and_libraries.html" class="">R Executable and Libraries</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/session_startup_scripts.html" class="">Session Startup Scripts</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/user_and_group_profiles.html" class="">User and Group Profiles</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/multiple_r_sessions.html" class="">Multiple R Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/pam_sessions.html" class="">PAM Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/kerberos.html" class="">Kerberos</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/directory_management.html" class="">Directory Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/workspace_management.html" class="">Workspace Management</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/first_project_template.html" class="">First Project Template</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/project_sharing.html" class="">Project Sharing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/package_installation.html" class="">Package Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/feature_limits.html" class="">Feature Limits</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/notifications.html" class="">Notifications</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/rstudio_connect_server.html" class="">RStudio Connect Server</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/terminal_websockets.html" class="">Terminal WebSockets</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_sessions/customizing_session_settings.html" class="">Customizing Session Settings</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#rversions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">R Versions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="rversions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../r_versions/r_versions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/installing_r.html" class="">Installing R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/configuring_default.html" class="">Configuring the Default Version of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/using_multiple_versions_of_r.html" class="">Using Multiple Versions of R Concurrently</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/managing_upgrades.html" class="">Managing Upgrades of R</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_versions/session_initialization.html" class="">Session Initialization</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#loadbalancing-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Load Balancing</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="loadbalancing-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/load_balancing_vs_job_launcher.html" class="">Load Balancing vs. Job Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/access_and_availability.html" class="">Access and Availability</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../load_balancing/balancing_methods.html" class="">Balancing Methods</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#auditingandmonitoring-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Auditing and Monitoring</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="auditingandmonitoring-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_and_monitoring.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/auditing_configuration.html" class="">Auditing Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/monitoring_configuration.html" class="">Monitoring Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../auditing_and_monitoring/server_health_checks.html" class="">Server Health Checks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#licensemanagement-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">License Management</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="licensemanagement-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../license_management/license_management.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/product_activation.html" class="">Product Activation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/license_details.html" class="">License Details</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/connectivity_requirements.html" class="">Connectivity Requirements</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/evaluations.html" class="">Evaluations</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/floating_licensing.html" class="">Floating Licensing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../license_management/userspace_licensing.html" class="">Userspace Licensing</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#dataconnectivity-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Data Connectivity</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="dataconnectivity-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../data_connectivity/data_connectivity.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_odbc.html" class="">Connectivity using ODBC</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/connectivity_using_r_packages.html" class="">Connectivity using R Packages</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../data_connectivity/snippet_files.html" class="">Snippet Files</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#joblauncher-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Job Launcher</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="joblauncher-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../job_launcher/job_launcher.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/running_the_launcher.html" class="">Running the Launcher</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/load_balancing.html" class="">Load Balancing</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/creating_plugins.html" class="">Creating plugins</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../job_launcher/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#tutorialapi-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Tutorial API</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="tutorialapi-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/interface.html" class="">Interface</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_methods.html" class="">Tutorial API Methods</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../tutorial_api/tutorial_api_callbacks.html" class="">Tutorial API Callbacks</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#jupytersessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Jupyter Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="jupytersessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/jupyter_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../jupyter_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#vscodesessions-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">VS Code Sessions</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="vscodesessions-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/vs_code_sessions.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/installation.html" class="">Installation</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/multiple_sessions.html" class="">Multiple Sessions</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../vscode_sessions/troubleshooting.html" class="">Troubleshooting</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#database-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Database</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="database-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../database/database.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/configuration.html" class="">Configuration</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../database/migration.html" class="">Migration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 collapsed" data-bs-toggle="collapse" data-bs-target="#hardening-collapse" aria-expanded="false">
+              <div class="me-auto  sidebar-section-item">Hardening</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  " id="hardening-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../hardening/hardening.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/set_up_ssl.html" class="">Set up SSL</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/browser_security.html" class="">Browser Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/r_session_security.html" class="">R Session Security</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/other.html" class="">Other</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../hardening/example_secure_configuration.html" class="">Example Secure Configuration</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+      <li class="px-0"><hr class="sidebar-divider hi "></li>
+      <ul class="list-unstyled sidebar-section depth1">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#appendix-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-section-item">Appendix</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="appendix-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../session_user_settings/session_user_settings.html" class="">Session User Settings</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_ide_commands/rstudio_ide_commands.html" class="">RStudio IDE Commands</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../r_package_dependencies/r_package_dependencies.html" class="">R Package Dependencies</a>
+</li>
+          <ul class="list-unstyled sidebar-section depth2">
+    <li class="">
+        <div class="me-auto ">
+            <a class="sidebar-section-item d-inline-flex text-start w-100 " data-bs-toggle="collapse" data-bs-target="#rstudioconfiguration-collapse" aria-expanded="true">
+              <div class="me-auto  sidebar-item">R Studio Configuration</div>
+            <div><i class="bi bi-chevron-right ms-2 "></i></div>
+            </a>
+        </div>
+      <div class="collapse  show" id="rstudioconfiguration-collapse">
+        <ul class="list-unstyled sidebar-item-contents">
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rstudio_server_configuration.html" class="">Overview</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rserver_conf.html" class="">rserver.conf</a>
+</li>
+          <li class="sidebar-item">
+  <a href="../rstudio_server_configuration/rsession_conf.html" class="active">rsession.conf</a>
+</li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+        </ul>
+      </div>
+    </li>
+  </ul>
+  </ul>
+  </div>
+</nav>
+  </div>
+  <div id="quarto-toc-sidebar" class="col col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-toc order-last"><nav id="TOC" role="doc-toc">
+<h2 id="toc-title">On this page</h2>
+<ul>
+<li><a href="#rsession.conf" class="nav-link active" data-scroll-target="#rsession.conf">rsession.conf</a>
+<ul class="collapse">
+<li><a href="#verify-settings" class="nav-link" data-scroll-target="#verify-settings"><em>verify</em> Settings</a></li>
+<li><a href="#version-settings" class="nav-link" data-scroll-target="#version-settings"><em>version</em> Settings</a></li>
+<li><a href="#docs-settings" class="nav-link" data-scroll-target="#docs-settings"><em>docs</em> Settings</a></li>
+<li><a href="#session-settings" class="nav-link" data-scroll-target="#session-settings"><em>session</em> Settings</a></li>
+<li><a href="#allow-settings" class="nav-link" data-scroll-target="#allow-settings"><em>allow</em> Settings</a></li>
+<li><a href="#r-settings" class="nav-link" data-scroll-target="#r-settings"><em>r</em> Settings</a></li>
+<li><a href="#limits-settings" class="nav-link" data-scroll-target="#limits-settings"><em>limits</em> Settings</a></li>
+<li><a href="#external-settings" class="nav-link" data-scroll-target="#external-settings"><em>external</em> Settings</a></li>
+<li><a href="#git-settings" class="nav-link" data-scroll-target="#git-settings"><em>git</em> Settings</a></li>
+<li><a href="#user-settings" class="nav-link" data-scroll-target="#user-settings"><em>user</em> Settings</a></li>
+<li><a href="#misc-settings" class="nav-link" data-scroll-target="#misc-settings"><em>misc</em> Settings</a></li>
+</ul></li>
+</ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/rstudio/rstudio/edit/main/rstudio_server_configuration/rsession_conf.qmd">Edit this page</a></p><p><a href="https://github.com/rstudio/rstudio/issues/new">Report an issue</a></p></div></div></nav></div>
+  <div class="col mx-auto col-sm-12 col-md-9 col-lg-7 px-lg-4">
+<main>
+
+<section id="rsession.conf" class="level2">
+<h2 class="anchored" data-anchor-id="rsession.conf">rsession.conf</h2>
+<p>The following is a list of available options that can be specified in the <code>rsession.conf</code> configuration file, which controls behavior of the <code>rsession</code> process, allowing you to tune various R session parameters.</p>
+<section id="verify-settings" class="level3">
+<h3 class="anchored" data-anchor-id="verify-settings"><em>verify</em> Settings</h3>
+<section id="verify-installation" class="level4">
+<h4 class="anchored" data-anchor-id="verify-installation"><strong>verify-installation</strong></h4>
+<p>Verifies that the session installation is working correctly and exits.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="version-settings" class="level3">
+<h3 class="anchored" data-anchor-id="version-settings"><em>version</em> Settings</h3>
+<section id="version" class="level4">
+<h4 class="anchored" data-anchor-id="version"><strong>version</strong></h4>
+<p>Prints the version number and exits.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="docs-settings" class="level3">
+<h3 class="anchored" data-anchor-id="docs-settings"><em>docs</em> Settings</h3>
+<section id="docs-url" class="level4">
+<h4 class="anchored" data-anchor-id="docs-url"><strong>docs-url</strong></h4>
+<p>If specified, overrides the URL to navigate to when a user clicks on the RStudio help link.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+</section>
+<section id="session-settings" class="level3">
+<h3 class="anchored" data-anchor-id="session-settings"><em>session</em> Settings</h3>
+<section id="session-timeout-minutes" class="level4">
+<h4 class="anchored" data-anchor-id="session-timeout-minutes"><strong>session-timeout-minutes</strong></h4>
+<p>The amount of minutes before a session times out, at which point the session will either suspend or exit.</p>
+<p>Type: int<br>
+Default: <code>120</code></p>
+</section>
+<section id="session-timeout-suspend" class="level4">
+<h4 class="anchored" data-anchor-id="session-timeout-suspend"><strong>session-timeout-suspend</strong></h4>
+<p>Indicates whether or not to suspend the session after the timeout has elapsed. Setting this to <code>false</code> will cause the session to quit instead of suspending to disk when the session times out.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="session-disconnected-timeout-minutes" class="level4">
+<h4 class="anchored" data-anchor-id="session-disconnected-timeout-minutes"><strong>session-disconnected-timeout-minutes</strong></h4>
+<p>If set, causes the session to time out after not receiving any new connections within the specified minutes. This behavior is generally not needed, and you should instead use session-timeout-minutes</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-preflight-script" class="level4">
+<h4 class="anchored" data-anchor-id="session-preflight-script"><strong>session-preflight-script</strong></h4>
+<p>Sets a script to be run on startup before any R initialization has occurred.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="session-create-public-folder" class="level4">
+<h4 class="anchored" data-anchor-id="session-create-public-folder"><strong>session-create-public-folder</strong></h4>
+<p>Indicates whether or not to create a <code>Public</code> folder for the user whenever the session starts. This folder will have global read permissions, and can be used as a simple means for users to share files. It is recommended you do not use this feature, and instead use the more advanced Project Sharing features.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-create-profile" class="level4">
+<h4 class="anchored" data-anchor-id="session-create-profile"><strong>session-create-profile</strong></h4>
+<p>Indicates whether or not to create a default empty .Rprofile script within the user’s home directory, which can be altered to perform any desired common startup tasks.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-rprofile-on-resume-default" class="level4">
+<h4 class="anchored" data-anchor-id="session-rprofile-on-resume-default"><strong>session-rprofile-on-resume-default</strong></h4>
+<p>Specifies the default user setting for running the Rprofile when sessions are resumed.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-save-action-default" class="level4">
+<h4 class="anchored" data-anchor-id="session-save-action-default"><strong>session-save-action-default</strong></h4>
+<p>Specifies the default save action (yes, no, or ask).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="session-default-working-dir" class="level4">
+<h4 class="anchored" data-anchor-id="session-default-working-dir"><strong>session-default-working-dir</strong></h4>
+<p>Specifies the default working directory to use for new sessions.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="session-default-new-project-dir" class="level4">
+<h4 class="anchored" data-anchor-id="session-default-new-project-dir"><strong>session-default-new-project-dir</strong></h4>
+<p>Specifies the default directory to use for new projects.<br>
+<strong>This option is deprecated and should not be used.</strong></p>
+<p>Type: string<br>
+Default: <code>~</code></p>
+</section>
+<section id="show-help-home" class="level4">
+<h4 class="anchored" data-anchor-id="show-help-home"><strong>show-help-home</strong></h4>
+<p>Indicates whether or not to show the help home page on startup.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-default-console-term" class="level4">
+<h4 class="anchored" data-anchor-id="session-default-console-term"><strong>session-default-console-term</strong></h4>
+<p>Specifies the default TERM setting for the R console.</p>
+<p>Type: string<br>
+Default: <code>xterm-256color</code></p>
+</section>
+<section id="session-default-clicolor-force" class="level4">
+<h4 class="anchored" data-anchor-id="session-default-clicolor-force"><strong>session-default-clicolor-force</strong></h4>
+<p>Specifies the default CLICOLOR_FORCE setting for the R console.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="session-quit-child-processes-on-exit" class="level4">
+<h4 class="anchored" data-anchor-id="session-quit-child-processes-on-exit"><strong>session-quit-child-processes-on-exit</strong></h4>
+<p>Indicates whether or not to quit child processes of the session on exit. If unset, child processes created by forking or parallel processing may continue to run in the background after the session is terminated.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-first-project-template-path" class="level4">
+<h4 class="anchored" data-anchor-id="session-first-project-template-path"><strong>session-first-project-template-path</strong></h4>
+<p>Specifies the path to a first project template which will be copied into new users’ home directories and opened the first time they run a session. The template can optionally be configured with <code>DefaultOpenDocs</code> to cause documents to automatically be opened for the first project.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="default-rsconnect-server" class="level4">
+<h4 class="anchored" data-anchor-id="default-rsconnect-server"><strong>default-rsconnect-server</strong></h4>
+<p>Specifies the default RStudio Connect server URL.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="websocket-ping-seconds" class="level4">
+<h4 class="anchored" data-anchor-id="websocket-ping-seconds"><strong>websocket-ping-seconds</strong></h4>
+<p>Specifies the WebSocket keep-alive ping interval for session terminals.</p>
+<p>Type: int<br>
+Default: <code>10</code></p>
+</section>
+<section id="websocket-connect-timeout" class="level4">
+<h4 class="anchored" data-anchor-id="websocket-connect-timeout"><strong>websocket-connect-timeout</strong></h4>
+<p>Specifies the WebSocket initial connection timeout in seconds for session terminals.</p>
+<p>Type: int<br>
+Default: <code>3</code></p>
+</section>
+<section id="websocket-log-level" class="level4">
+<h4 class="anchored" data-anchor-id="websocket-log-level"><strong>websocket-log-level</strong></h4>
+<p>Specifies the WebSocket log level for session terminals ((0=none, 1=errors, 2=activity, 3=all).</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="websocket-handshake-timeout" class="level4">
+<h4 class="anchored" data-anchor-id="websocket-handshake-timeout"><strong>websocket-handshake-timeout</strong></h4>
+<p>Specifies the WebSocket protocol handshake timeout for session terminals in milliseconds.</p>
+<p>Type: int<br>
+Default: <code>5000</code></p>
+</section>
+<section id="package-output-to-package-folder" class="level4">
+<h4 class="anchored" data-anchor-id="package-output-to-package-folder"><strong>package-output-to-package-folder</strong></h4>
+<p>Specifies whether or not package builds output to the package project folder.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="restrict-directory-view" class="level4">
+<h4 class="anchored" data-anchor-id="restrict-directory-view"><strong>restrict-directory-view</strong></h4>
+<p>Indicates whether or not to restrict the directories that can be viewed within the IDE.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="directory-view-whitelist" class="level4">
+<h4 class="anchored" data-anchor-id="directory-view-whitelist"><strong>directory-view-whitelist</strong></h4>
+<p>Specifies a list of directories exempt from directory view restrictions, separated by a colon character (:).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="session-env-var-save-blacklist" class="level4">
+<h4 class="anchored" data-anchor-id="session-env-var-save-blacklist"><strong>session-env-var-save-blacklist</strong></h4>
+<p>Specifies a list of environment variables that will not be saved when sessions suspend, separated by a colon character (:).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="session-suspend-on-incomplete-statement" class="level4">
+<h4 class="anchored" data-anchor-id="session-suspend-on-incomplete-statement"><strong>session-suspend-on-incomplete-statement</strong></h4>
+<p>Specifies whether the session should be allowed to suspend when a user has entered a partial R statement.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="allow-settings" class="level3">
+<h3 class="anchored" data-anchor-id="allow-settings"><em>allow</em> Settings</h3>
+<section id="allow-vcs-executable-edit" class="level4">
+<h4 class="anchored" data-anchor-id="allow-vcs-executable-edit"><strong>allow-vcs-executable-edit</strong></h4>
+<p>Indicates whether or not to allow editing of VCS (Version Control Systems) executables.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-r-cran-repos-edit" class="level4">
+<h4 class="anchored" data-anchor-id="allow-r-cran-repos-edit"><strong>allow-r-cran-repos-edit</strong></h4>
+<p>Indicates whether or not to allow editing of CRAN repositories.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-vcs" class="level4">
+<h4 class="anchored" data-anchor-id="allow-vcs"><strong>allow-vcs</strong></h4>
+<p>Indicates whether or not to allow the use of version control features.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-package-installation" class="level4">
+<h4 class="anchored" data-anchor-id="allow-package-installation"><strong>allow-package-installation</strong></h4>
+<p>Indicates whether or not to allow installation of packages from the packages pane.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-shell" class="level4">
+<h4 class="anchored" data-anchor-id="allow-shell"><strong>allow-shell</strong></h4>
+<p>Indicates whether or not to allow access to the shell dialog.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-terminal-websockets" class="level4">
+<h4 class="anchored" data-anchor-id="allow-terminal-websockets"><strong>allow-terminal-websockets</strong></h4>
+<p>Indicates whether or not to allow connections to terminal sessions with websockets.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-file-downloads" class="level4">
+<h4 class="anchored" data-anchor-id="allow-file-downloads"><strong>allow-file-downloads</strong></h4>
+<p>Indicates whether or not to allow file downloads from the files pane.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-file-uploads" class="level4">
+<h4 class="anchored" data-anchor-id="allow-file-uploads"><strong>allow-file-uploads</strong></h4>
+<p>Indicates whether or not to allow file uploads from the files pane.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-remove-public-folder" class="level4">
+<h4 class="anchored" data-anchor-id="allow-remove-public-folder"><strong>allow-remove-public-folder</strong></h4>
+<p>Indicates whether or not to allow removal of the user public folder.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-rpubs-publish" class="level4">
+<h4 class="anchored" data-anchor-id="allow-rpubs-publish"><strong>allow-rpubs-publish</strong></h4>
+<p>Indicates whether or not to allow publishing of content to external services.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-external-publish" class="level4">
+<h4 class="anchored" data-anchor-id="allow-external-publish"><strong>allow-external-publish</strong></h4>
+<p>Indicates whether or not to allow publishing of content to external services.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-publish" class="level4">
+<h4 class="anchored" data-anchor-id="allow-publish"><strong>allow-publish</strong></h4>
+<p>Indicates whether or not to allow publishing of content.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-presentation-commands" class="level4">
+<h4 class="anchored" data-anchor-id="allow-presentation-commands"><strong>allow-presentation-commands</strong></h4>
+<p>Indicates whether or not to allow presentation commands.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="allow-full-ui" class="level4">
+<h4 class="anchored" data-anchor-id="allow-full-ui"><strong>allow-full-ui</strong></h4>
+<p>Indicates whether or not to allow full standalone UI mode.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+<section id="allow-launcher-jobs" class="level4">
+<h4 class="anchored" data-anchor-id="allow-launcher-jobs"><strong>allow-launcher-jobs</strong></h4>
+<p>Indicates whether or not to allow running jobs via the Launcher.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+</section>
+<section id="r-settings" class="level3">
+<h3 class="anchored" data-anchor-id="r-settings"><em>r</em> Settings</h3>
+<section id="r-core-source" class="level4">
+<h4 class="anchored" data-anchor-id="r-core-source"><strong>r-core-source</strong></h4>
+<p>Specifies the Core R source path.</p>
+<p>Type: string<br>
+Default: <code>R</code></p>
+</section>
+<section id="r-modules-source" class="level4">
+<h4 class="anchored" data-anchor-id="r-modules-source"><strong>r-modules-source</strong></h4>
+<p>Specifies the Modules R source path.</p>
+<p>Type: string<br>
+Default: <code>R/modules</code></p>
+</section>
+<section id="r-session-package-archives" class="level4">
+<h4 class="anchored" data-anchor-id="r-session-package-archives"><strong>r-session-package-archives</strong></h4>
+<p>Specifies the R package archives path.</p>
+<p>Type: string<br>
+Default: <code>R/packages</code></p>
+</section>
+<section id="r-libs-user" class="level4">
+<h4 class="anchored" data-anchor-id="r-libs-user"><strong>r-libs-user</strong></h4>
+<p>Specifies the R user library path.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="r-cran-repos" class="level4">
+<h4 class="anchored" data-anchor-id="r-cran-repos"><strong>r-cran-repos</strong></h4>
+<p>Specifies the default CRAN repository.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="r-cran-repos-file" class="level4">
+<h4 class="anchored" data-anchor-id="r-cran-repos-file"><strong>r-cran-repos-file</strong></h4>
+<p>Specifies the path to a configuration file which contains default CRAN repositories.</p>
+<p>Type: string<br>
+Default: <code>The first repos.conf file that is found within the XDG_CONFIG_DIRS environment, or /etc/rstudio/repos.conf if not XDG_CONFIG_DIRS are specified.</code></p>
+</section>
+<section id="r-cran-repos-url" class="level4">
+<h4 class="anchored" data-anchor-id="r-cran-repos-url"><strong>r-cran-repos-url</strong></h4>
+<p>Specifies the URL to a configuration file which contains optional CRAN repositories.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="r-auto-reload-source" class="level4">
+<h4 class="anchored" data-anchor-id="r-auto-reload-source"><strong>r-auto-reload-source</strong></h4>
+<p>Indicates whether or not to automatically reload R source if it changes during the session.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="r-compatible-graphics-engine-version" class="level4">
+<h4 class="anchored" data-anchor-id="r-compatible-graphics-engine-version"><strong>r-compatible-graphics-engine-version</strong></h4>
+<p>Specifies the maximum graphics engine version that this version of RStudio is compatible with.</p>
+<p>Type: int<br>
+Default: <code>14</code></p>
+</section>
+<section id="r-resources-path" class="level4">
+<h4 class="anchored" data-anchor-id="r-resources-path"><strong>r-resources-path</strong></h4>
+<p>Specifies the directory containing external resources.</p>
+<p>Type: string<br>
+Default: <code>resources</code></p>
+</section>
+<section id="r-doc-dir-override" class="level4">
+<h4 class="anchored" data-anchor-id="r-doc-dir-override"><strong>r-doc-dir-override</strong></h4>
+<p>Specifies the override for R_DOC_DIR (used for debug configurations).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="r-restore-workspace" class="level4">
+<h4 class="anchored" data-anchor-id="r-restore-workspace"><strong>r-restore-workspace</strong></h4>
+<p>If set, overrides the user/project restore workspace setting. Can be 0 (No), 1 (Yes), or 2 (Default).</p>
+<p>Type: int<br>
+Default: <code>2 (Default).</code></p>
+</section>
+<section id="r-run-rprofile" class="level4">
+<h4 class="anchored" data-anchor-id="r-run-rprofile"><strong>r-run-rprofile</strong></h4>
+<p>If set, overrides the user/project .Rprofile run setting. Can be 0 (No), 1 (Yes), or 2 (Default).</p>
+<p>Type: int<br>
+Default: <code>2 (Default).</code></p>
+</section>
+</section>
+<section id="limits-settings" class="level3">
+<h3 class="anchored" data-anchor-id="limits-settings"><em>limits</em> Settings</h3>
+<section id="limit-file-upload-size-mb" class="level4">
+<h4 class="anchored" data-anchor-id="limit-file-upload-size-mb"><strong>limit-file-upload-size-mb</strong></h4>
+<p>Sets a size limit in megabytes on files that are uploaded via the files pane.</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="limit-cpu-time-minutes" class="level4">
+<h4 class="anchored" data-anchor-id="limit-cpu-time-minutes"><strong>limit-cpu-time-minutes</strong></h4>
+<p>Sets a limit in minutes for the amount of time top level R computations may run before being interrupted.</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+</section>
+<section id="limit-xfs-disk-quota" class="level4">
+<h4 class="anchored" data-anchor-id="limit-xfs-disk-quota"><strong>limit-xfs-disk-quota</strong></h4>
+<p>Indicates whether or not XFS quotas should be enforced when performing file operations via the files pane.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+</section>
+<section id="external-settings" class="level3">
+<h3 class="anchored" data-anchor-id="external-settings"><em>external</em> Settings</h3>
+<section id="external-consoleio-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-consoleio-path"><strong>external-consoleio-path</strong></h4>
+<p>Specifies the path to the consoleio executable (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/consoleio.exe</code></p>
+</section>
+<section id="external-gnudiff-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-gnudiff-path"><strong>external-gnudiff-path</strong></h4>
+<p>Specifies the path to gnudiff utilities (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/gnudiff</code></p>
+</section>
+<section id="external-gnugrep-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-gnugrep-path"><strong>external-gnugrep-path</strong></h4>
+<p>Specifies the path to gnugrep utilities (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/gnugrep</code></p>
+</section>
+<section id="external-msysssh-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-msysssh-path"><strong>external-msysssh-path</strong></h4>
+<p>Specifies the path to msys_ssh utilities (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/msys-ssh-1000-18</code></p>
+</section>
+<section id="external-sumatra-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-sumatra-path"><strong>external-sumatra-path</strong></h4>
+<p>Specifies the path to SumatraPDF (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/sumatra</code></p>
+</section>
+<section id="external-winutils-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-winutils-path"><strong>external-winutils-path</strong></h4>
+<p>Specifies the path to Hadoop Winutils (Windows-only).</p>
+<p>Type: string<br>
+Default: <code>bin/winutils</code></p>
+</section>
+<section id="external-hunspell-dictionaries-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-hunspell-dictionaries-path"><strong>external-hunspell-dictionaries-path</strong></h4>
+<p>Specifies the path to hunspell dictionaries.</p>
+<p>Type: string<br>
+Default: <code>resources/dictionaries</code></p>
+</section>
+<section id="external-mathjax-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-mathjax-path"><strong>external-mathjax-path</strong></h4>
+<p>Specifies the path to the mathjax library.</p>
+<p>Type: string<br>
+Default: <code>resources/mathjax-27</code></p>
+</section>
+<section id="external-pandoc-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-pandoc-path"><strong>external-pandoc-path</strong></h4>
+<p>Specifies the path to pandoc binaries.</p>
+<p>Type: string<br>
+Default: <code>bin/pandoc</code></p>
+</section>
+<section id="external-libclang-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-libclang-path"><strong>external-libclang-path</strong></h4>
+<p>Specifies the path to the libclang shared library</p>
+<p>Type: string<br>
+Default: <code>bin/rsclang</code></p>
+</section>
+<section id="external-libclang-headers-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-libclang-headers-path"><strong>external-libclang-headers-path</strong></h4>
+<p>Specifies the path to the libclang builtin headers.</p>
+<p>Type: string<br>
+Default: <code>resources/libclang/builtin-headers</code></p>
+</section>
+<section id="external-winpty-path" class="level4">
+<h4 class="anchored" data-anchor-id="external-winpty-path"><strong>external-winpty-path</strong></h4>
+<p>Specifies the path to winpty binaries.</p>
+<p>Type: string<br>
+Default: <code>bin</code></p>
+</section>
+</section>
+<section id="git-settings" class="level3">
+<h3 class="anchored" data-anchor-id="git-settings"><em>git</em> Settings</h3>
+<section id="git-commit-large-file-size" class="level4">
+<h4 class="anchored" data-anchor-id="git-commit-large-file-size"><strong>git-commit-large-file-size</strong></h4>
+<p>Warns when attempting to commit files larger than this size (in bytes; set 0 to disable).</p>
+<p>Type: int<br>
+Default: <code>5242880</code></p>
+</section>
+</section>
+<section id="user-settings" class="level3">
+<h3 class="anchored" data-anchor-id="user-settings"><em>user</em> Settings</h3>
+<section id="show-user-identity" class="level4">
+<h4 class="anchored" data-anchor-id="show-user-identity"><strong>show-user-identity</strong></h4>
+<p>Indicates whether or not to show the user identity in the session UI.</p>
+<p>Type: bool<br>
+Default: <code>1</code></p>
+</section>
+</section>
+<section id="misc-settings" class="level3">
+<h3 class="anchored" data-anchor-id="misc-settings"><em>misc</em> Settings</h3>
+<section id="tutorial-api-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="tutorial-api-enabled"><strong>tutorial-api-enabled</strong></h4>
+<p>Enables/disables the tutorial API.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="tutorial-api-parent-notify-enabled" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="tutorial-api-parent-notify-enabled"><strong>tutorial-api-parent-notify-enabled</strong></h4>
+<p>Enables/disables tutorial API parent notification.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="tutorial-api-client-origin" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="tutorial-api-client-origin"><strong>tutorial-api-client-origin</strong></h4>
+<p>Specifies the tutorial API client origin.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="nfs-acl-version" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="nfs-acl-version"><strong>nfs-acl-version</strong></h4>
+<p>Specifies the protocol version for the NFS Access Control List to use with Project Sharing (nfsv3 or nfsv4).</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="nfs4-principal-type" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="nfs4-principal-type"><strong>nfs4-principal-type</strong></h4>
+<p>Specifies the type of security principal to use with NFSv4 Access Control Lists (‘username’ or ‘uid’).</p>
+<p>Type: string<br>
+Default: <code>username</code></p>
+</section>
+<section id="nfs4-domain" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="nfs4-domain"><strong>nfs4-domain</strong></h4>
+<p>Specifies the domain for NFSv4 Access Control Lists. Needed when using Project Sharing on an NFSv4 share with username-style security principals.</p>
+<p>Type: string<br>
+Default: <code>&lt;empty string&gt;</code></p>
+</section>
+<section id="project-sharing-enumerate-server-users" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="project-sharing-enumerate-server-users"><strong>project-sharing-enumerate-server-users</strong></h4>
+<p>Indicates whether or not to enumerate the server’s user groups when determining the users available for Project Sharing. If disabled, enumerates the users that are present in the RStudio user database instead.</p>
+<p>Type: bool<br>
+Default: <code>0</code></p>
+</section>
+<section id="session-timeout-kill-hours" class="level4 pro-header">
+<h4 class="pro-header anchored" data-anchor-id="session-timeout-kill-hours"><strong>session-timeout-kill-hours</strong></h4>
+<p>Specifies the amount of hours to wait before forcefully killing a running session after it has been idle.</p>
+<p>Type: int<br>
+Default: <code>0</code></p>
+<!-- -->
+</section>
+</section>
+</section>
+</main>
+<div class="page-navigation page-navigation-docked">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</div>
+</div> <!-- /main column -->
+</div> <!-- /row -->
+</div> <!-- /container fluid -->
+
+
+</body></html>
