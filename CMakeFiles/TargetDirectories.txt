@@ -1,3 +1,0 @@
-/app/CMakeFiles/edit_cache.dir
-/app/CMakeFiles/rebuild_cache.dir
-/app/CMakeFiles/build_book.dir

@@ -1,4 +1,0 @@
-# Overview
-
-The following sections detail user-configurable options for RStudio Server and RStudio Workbench.
-

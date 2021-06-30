@@ -1,31 +1,34 @@
---- 
-title: "RStudio Workbench {{< var version >}}"
-subtitle: "Administration Guide"
-date: "`r Sys.Date()`"
----
+# Quarto render for Github Actions
 
-RStudio Server enables you to provide a browser based interface (the RStudio IDE) to a version of R running on a remote Linux server. Deploying R and RStudio on a server has a number of benefits, including:
+This repository is a demonstration of the `quarto-render` ([link](https://github.com/pommevilla/quarto-render)) Github action on a Quarto project [with freeze](https://quarto.org/docs/books/book-authoring.html?q=freeze#freezing). 
 
-- The ability to access R sessions from any computer in any location;
-- Easy sharing of code, data, and other files with colleagues;
-- Allowing multiple users to share access to the more powerful compute resources (memory, processors, etc.) available on a well equipped server; and
-- Centralized installation and configuration of R, R packages, TeX, and other supporting libraries.
+The documents in this directory contain R and Python code that require various libraries to complete their computations. By setting `freeze: true` in `_quarto.yml`,  computations are not re-executed at render time and documents are rendered quickly. This means we can use the `quarto-render` to quickly generate our documents as part of an Action. Below is the workflow used by this directory that uses the `quarto-render` Github action and pushes the resulting documents to the `gh-pages` branch with `action-gh-pages` ([link](https://github.com/peaceiris/actions-gh-pages)). 
 
-This manual describes *RStudio Workbench*, which adds many enhancements to the open-source version of RStudio Server, including:
+## Github Workflow
 
-- The ability to run multiple concurrent RStudio IDE sessions per-user.
-- Flexible use of multiple versions of R on the same server.
-- The ability to run sessions on external cluster nodes, such as Kubernetes or Slurm.
-- Support for Jupyter, JupyterLab, and VS Code editor sessions.
-- Project sharing for easy collaboration within workgroups.
-- Load balancing for increased capacity and higher availability.
-- An administrative dashboard that provides insight into active sessions, server health, and monitoring of system-wide and per-user performance and resource metrics;
-- Authentication using system accounts, ActiveDirectory, LDAP, SAML, OpenID, or Google Accounts;
-- Full support for PAM (including PAM sessions for dynamically provisioning user resources);
-- Ability to establish per-user or per-group CPU priorities and memory limits;
-- HTTP enhancements including support for SSL and keep-alive for improved performance;
-- Ability to restrict access to the server by IP;
-- Customizable server health checks; and
-- Suspend, terminate, or assume control of user sessions; Impersonate users for assistance and troubleshooting.
+```yaml
+# https://github.com/pommevilla/friendly-dollop/blob/master/.github/workflows/quarto-render.yml
+name: Render and deploy Quarto files
+on: 
+  push:
+  pull_request:
 
-The documentation applies to both RStudio Server (Open Source) and RStudio Workbench (Pro), unless the section is specifically marked `Pro`, in which case it only applies to RStudio Workbench.
+jobs:
+  quarto-render-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: "Install Quarto and render"
+      uses: pommevilla/quarto-render@main
+
+    - name: "Deploy to gh-pages"
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site
+```
+
+The final results can be viewed [https://pommevilla.github.io/friendly-dollop/](here).
+
